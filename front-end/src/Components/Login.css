@@ -24,7 +24,7 @@
     transform: translateY(-50%);
     width: 400px;
     padding: 50px;
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.33);
     backdrop-filter: blur(10px);
     border-radius: 20px;
     color: white;
@@ -128,7 +128,7 @@
 }
 
 .registerLink {
-    color: #2d5891;
+    color: #254b7d;
     cursor: pointer;
     font-weight: 500;
     transition: 0.3s;
