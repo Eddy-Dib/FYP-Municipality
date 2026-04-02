@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
 .container {
     width: 100%;
     height: 100vh;
@@ -14,8 +15,10 @@
     z-index: -1;
 }
 
-.rightbox {
+.rightBox {
     position: absolute;
+    flex-direction: column;
+    display: flex;
     top: 50%;
     right: 10%;
     transform: translateY(-50%);
@@ -25,18 +28,35 @@
     backdrop-filter: blur(10px);
     border-radius: 20px;
     color: white;
+    transition: all 0.6s ease-in-out;
 }
 
-.rightbox h2 {
-    font-family: cursive;
+
+.rightBox h2 {
+    font-family: "Poppins", sans-serif;
     text-align: center;
-    font-size: 30px;
+    font-size: 40px;
+    font-weight: 600;
+    color:#ffffff;
+    letter-spacing: 0.5px;
+    margin-bottom: 5px;
 }
 
-.rightbox p {
+.rightBox h3{
+    font-family: "Poppins", sans-serif;
+    text-align: left;
+    font-size: 28px;
+    color: #ffffff;
+    letter-spacing: 0.5px;
+    margin-bottom: 5px;
+}
 
-    text-align: center;
-    font-size: 18px;
+.rightBox p {
+    font-family: "Poppins", sans-serif;
+    text-align: left;
+    font-size: 17px;
+    color: #f3f5f9;
+    margin-bottom: 25px;
 }
 
 .loginForm .inputGroup {
@@ -47,7 +67,7 @@
 
 .loginForm input {
     padding: 12px 14px;
-    border-radius: 10px;
+    border-radius: 12px;
     border: 1px solid rgba(255, 255, 255, 0.3);
     background: rgba(255, 255, 255, 0.262);
     color: white;
@@ -56,10 +76,15 @@
     transition: all 0.3s ease;
 }
 
+.loginForm input:focus {
+    border: 1px solid #4a90e2;
+    box-shadow: 0 0 8px rgba(74, 144, 226, 0.4);
+}
+
 .loginForm label {
     margin-bottom: 6px;
     font-size: 19px;
-    color: #ddd;
+    color: #f6f6f6;
 }
 
 .loginForm input:focus {
@@ -79,25 +104,59 @@
     width: 100%;
     padding: 12px;
     border: none;
-    border-radius: 10px;
-    background-color: #1e3a5f;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #1e3a5f, #c3d7ef);
     color: white;
     font-size: 17px;
     cursor: pointer;
     transition: 0.3s;
+    display: block;
+    margin: 40px auto 0;
 }
-
 .loginButton:hover {
+    transform: translateY(-1.5px);
+    box-shadow: 0 10px 20px rgba(2, 2, 2, 0.3);
     background-color: #15314a;
 }
 
 .registerText {
-    margin-top: 15px;
+    margin-top: 40px;
     font-size: 14px;
+    text-align: center;
+    margin: 40px auto 0 auto;
+    display: inline-block;
 }
 
 .registerLink {
-    color: #fcfbf6;
+    color: #2d5891;
     cursor: pointer;
-    text-decoration: underline;
+    font-weight: 500;
+    transition: 0.3s;
+    cursor: pointer;
+    
+}
+.registerLink:hover {
+    color: #ffffff;
+}
+
+.rightBox.register {
+    width: 520px;
+    right: 5%;
+}
+
+.loginForm {
+    margin-top: 18px;
+    animation: fadeIn 0.6s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
 }
