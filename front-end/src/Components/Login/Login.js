@@ -10,7 +10,7 @@ function Login() {
     return (
         <div className={styles.container}>
 
-            <div className={styles.background} style={{ backgroundImage: `url(${Background})` }}></div>
+            <div className={styles.background} style={{ backgroundImage: `url(${Background})` }}/>
 
             <div className={`${styles.rightBox} ${isRegister ? styles.register : ""}`}>
 
