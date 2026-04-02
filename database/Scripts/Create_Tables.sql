@@ -106,9 +106,9 @@ CREATE TABLE LOCATION (
 -- Stores users on the system of any type
 CREATE TABLE USERS (
     U_ID INT NOT NULL AUTO_INCREMENT,
-    Username VARCHAR(50) NOT NULL,
+    Username VARCHAR(50) NOT NULL UNIQUE,
     Password VARCHAR(255) NOT NULL,
-    Email VARCHAR(100) NOT NULL,
+    Email VARCHAR(100) NOT NULL UNIQUE,
     Phone_Num VARCHAR(20),
     RegDate DATETIME NOT NULL,
     PRIMARY KEY (U_ID)
