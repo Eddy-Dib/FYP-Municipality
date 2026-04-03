@@ -1,10 +1,9 @@
 -- MAIN CREATION SCRIPT: Creates the needed tables (see ER diagram)
-
 -- UTILITY TABLES:
 
 -- Storing states of a task (Pending, In Progress ...)
 CREATE TABLE TASK_STATUSES (
-    TStat_Code INT NOT NULL AUTO_INCREMENT,
+    TStat_Code INT NOT NULL,
     TStat_Name VARCHAR(100) NOT NULL,
     TStat_Desc VARCHAR(255),
     PRIMARY KEY (TStat_Code)
@@ -12,7 +11,7 @@ CREATE TABLE TASK_STATUSES (
 
 -- Storing states of a request (Submitted, Approved ...)
 CREATE TABLE REQ_STATUSES (
-    RStat_Code INT NOT NULL AUTO_INCREMENT,
+    RStat_Code INT NOT NULL,
     RStat_Name VARCHAR(100) NOT NULL,
     RStat_Desc VARCHAR(255),
     PRIMARY KEY (RStat_Code)
@@ -30,21 +29,21 @@ CREATE TABLE SETTINGS_TAX (
 
 -- Store types of locations (Appartment, Business ...)
 CREATE TABLE LOCATION_TYPE (
-    LocT_ID INT NOT NULL AUTO_INCREMENT,
+    LocT_ID INT NOT NULL,
     LocT_Type VARCHAR(100) NOT NULL,
     PRIMARY KEY (LocT_ID)
 );
 
 -- Stores types of reports (Legal, Financial ...)
 CREATE TABLE REP_TYPE (
-    RepType_ID INT NOT NULL AUTO_INCREMENT,
+    RepType_ID INT NOT NULL,
     RepType_Name VARCHAR(100) NOT NULL,
     PRIMARY KEY (RepType_ID)
 );
 
 -- Stores types of requests (Building permit, Business license ...), duration: expected time to be done
 CREATE TABLE REQUEST_TYPES (
-    RType_ID INT NOT NULL AUTO_INCREMENT,
+    RType_ID INT NOT NULL,
     RType_Name VARCHAR(100) NOT NULL,
     RType_Desc VARCHAR(255),
     RType_Duration INT NOT NULL,
@@ -53,7 +52,7 @@ CREATE TABLE REQUEST_TYPES (
 
 -- Stores the roles of employees (Mayor, Admin, Secretary ...)
 CREATE TABLE ROLES (
-    Role_ID INT NOT NULL AUTO_INCREMENT,
+    Role_ID INT NOT NULL,
     Role_Type VARCHAR(100) NOT NULL,
     Role_Desc VARCHAR(255),
     PRIMARY KEY (Role_ID)
@@ -76,6 +75,8 @@ CREATE TABLE STREET (
     City_ID INT NOT NULL,
     PRIMARY KEY (Street_ID),
     FOREIGN KEY (City_ID) REFERENCES CITY(City_ID)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
 );
 
 -- Buildings in each street with names (or number as a name)
@@ -86,6 +87,8 @@ CREATE TABLE BUILDING (
     Street_ID INT NOT NULL,
     PRIMARY KEY (Building_ID),
     FOREIGN KEY (Street_ID) REFERENCES STREET(Street_ID)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
 );
 
 -- Specifies appartments/stores/... in buildings: floor , size (area in square meters)
@@ -96,8 +99,12 @@ CREATE TABLE LOCATION (
     Building_ID INT NOT NULL,
     LocT_ID INT NOT NULL,
     PRIMARY KEY (Location_ID),
-    FOREIGN KEY (Building_ID) REFERENCES BUILDING(Building_ID),
+    FOREIGN KEY (Building_ID) REFERENCES BUILDING(Building_ID)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
     FOREIGN KEY (LocT_ID) REFERENCES LOCATION_TYPE(LocT_ID)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT
 );
 
 
@@ -121,8 +128,14 @@ CREATE TABLE CITIZEN (
     Last_Name VARCHAR(50) NOT NULL,
     BirthDate DATE NOT NULL,
     U_ID INT UNIQUE,				-- can be a user or not (NULL => not registered)
+    Location_ID INT,
     PRIMARY KEY (C_ID),
     FOREIGN KEY (U_ID) REFERENCES USERS(U_ID)
+        ON UPDATE CASCADE
+        ON DELETE SET NULL,
+    FOREIGN KEY (Location_ID) REFERENCES LOCATION(Location_ID)
+        ON UPDATE CASCADE
+        ON DELETE SET NULL
 );
 
 -- Stores all employees
@@ -135,8 +148,12 @@ CREATE TABLE EMPLOYEE (
     U_ID INT NOT NULL UNIQUE,		-- is always a user
     Role_ID INT NOT NULL,
     PRIMARY KEY (Emp_ID),
-    FOREIGN KEY (U_ID) REFERENCES USERS(U_ID),
+    FOREIGN KEY (U_ID) REFERENCES USERS(U_ID)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
     FOREIGN KEY (Role_ID) REFERENCES ROLES(Role_ID)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT
 );
 
 
@@ -149,10 +166,13 @@ CREATE TABLE DOCUMENT (
     DateUploaded DATETIME NOT NULL,
     Description VARCHAR(255),
     ExpDate DATE,
+    FilePath VARCHAR(255),
     C_ID INT NOT NULL,
     IsValid TINYINT(1) DEFAULT 1,	-- 1 = valid, 0 = invalid
     PRIMARY KEY (Doc_ID),
     FOREIGN KEY (C_ID) REFERENCES CITIZEN(C_ID)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
 );
 
 -- Complaints made by citizens: title + details only
@@ -165,6 +185,8 @@ CREATE TABLE COMPLAINT (
     C_ID INT NOT NULL,
     PRIMARY KEY (Cmpt_ID),
     FOREIGN KEY (C_ID) REFERENCES CITIZEN(C_ID)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
 );
 
 -- Requests made by citizens: keeps track of completion/rejection and priority. Details saved as JSON
@@ -179,9 +201,15 @@ CREATE TABLE REQUEST (
     RStat_Code INT NOT NULL,
     C_ID INT NOT NULL,
     PRIMARY KEY (Req_ID),
-    FOREIGN KEY (RStat_Code) REFERENCES REQ_STATUSES(RStat_Code),
-    FOREIGN KEY (RType_ID) REFERENCES REQUEST_TYPES(RType_ID),
+    FOREIGN KEY (RStat_Code) REFERENCES REQ_STATUSES(RStat_Code)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT,
+    FOREIGN KEY (RType_ID) REFERENCES REQUEST_TYPES(RType_ID)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT,
     FOREIGN KEY (C_ID) REFERENCES CITIZEN(C_ID)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
 );
 
 
@@ -198,6 +226,8 @@ CREATE TABLE EVENT (
     Emp_ID INT NOT NULL,
     PRIMARY KEY (Event_ID),
     FOREIGN KEY (Emp_ID) REFERENCES EMPLOYEE(Emp_ID)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
 );
 
 -- Announcements: title and text only
@@ -208,6 +238,8 @@ CREATE TABLE ANNOUNCEMENT (
     Emp_ID INT NOT NULL,
     PRIMARY KEY (Anc_ID),
     FOREIGN KEY (Emp_ID) REFERENCES EMPLOYEE(Emp_ID)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
 );
 
 -- list of tasks, each related to exactly 1 request and 1 employee. Handles priority and tracking
@@ -221,9 +253,15 @@ CREATE TABLE TASK (
     Emp_ID INT NOT NULL,
     Req_ID INT NOT NULL,
     PRIMARY KEY (Task_ID),
-    FOREIGN KEY (TStat_Code) REFERENCES TASK_STATUSES(TStat_Code),
-    FOREIGN KEY (Emp_ID) REFERENCES EMPLOYEE(Emp_ID),
+    FOREIGN KEY (TStat_Code) REFERENCES TASK_STATUSES(TStat_Code)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT,
+    FOREIGN KEY (Emp_ID) REFERENCES EMPLOYEE(Emp_ID)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
     FOREIGN KEY (Req_ID) REFERENCES REQUEST(Req_ID)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
 );
 
 -- Internal reports, basic text and title. Used to make reviews and auditing easier
@@ -234,8 +272,12 @@ CREATE TABLE REPORT (
     RepType_ID INT NOT NULL,
     Task_ID INT NOT NULL,
     PRIMARY KEY (Report_ID),
-    FOREIGN KEY (RepType_ID) REFERENCES REP_TYPE(RepType_ID),
+    FOREIGN KEY (RepType_ID) REFERENCES REP_TYPE(RepType_ID)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT,
     FOREIGN KEY (Task_ID) REFERENCES TASK(Task_ID)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
 );
 
 -- stores amount needed per location for each fee type. TBD: automation (backend or database?)
@@ -247,6 +289,8 @@ CREATE TABLE FEE (
     Location_ID INT NOT NULL,
     PRIMARY KEY (Fee_ID),
     FOREIGN KEY (Location_ID) REFERENCES LOCATION(Location_ID)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
 );
 
 -- stores payment amount for each fee. Handles late tax if needed
@@ -258,6 +302,8 @@ CREATE TABLE PAYMENT (
     Fee_ID INT NOT NULL,
     PRIMARY KEY (Pay_ID),
     FOREIGN KEY (Fee_ID) REFERENCES FEE(Fee_ID)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
 );
 
 -- stores general notifications. Special cases: late fees, request related notifications.
@@ -269,6 +315,10 @@ CREATE TABLE NOTIFICATION (
     Fee_ID INT,
     Req_ID INT,
     PRIMARY KEY (Notif_ID),
-    FOREIGN KEY (Fee_ID) REFERENCES FEE(Fee_ID),
+    FOREIGN KEY (Fee_ID) REFERENCES FEE(Fee_ID)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
     FOREIGN KEY (Req_ID) REFERENCES REQUEST(Req_ID)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
 );
