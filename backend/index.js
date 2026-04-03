@@ -7,6 +7,10 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+const PORT = 5000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+
 // login endpoint
 app.post("/login", async (req, res) => {
     const { username, password } = req.body;
@@ -47,5 +51,3 @@ app.post("/login", async (req, res) => {
     }
 });
 
-const PORT = 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
