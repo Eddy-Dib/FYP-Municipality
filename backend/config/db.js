@@ -1,8 +1,8 @@
-const mysql = require("mysql2");
-const dotenv = require("dotenv");
+import { createPool } from "mysql2";
+import { config } from "dotenv";
 
 // stores credentials and secrets of the database connection
-dotenv.config();
+config();
 
 /**
  * Database pool configuration
@@ -16,7 +16,7 @@ dotenv.config();
  *   console.log(results);
  * });
  */
-const db = mysql.createPool(
+const db = createPool(
     {
         host: process.env.DB_HOST,
         user: process.env.DB_USER,
@@ -28,4 +28,4 @@ const db = mysql.createPool(
     }
 );
 
-module.exports = db;
+export default db;

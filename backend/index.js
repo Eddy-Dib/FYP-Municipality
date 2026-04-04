@@ -1,53 +1,15 @@
-const express = require("express");
-const cors = require("cors");
-const db = require("./config/db");
+import express, { json } from "express";
+import cors from "cors";
+import authRoutes from "./routes/authRoutes.js";
 
 const app = express();
 
 app.use(cors());
-app.use(express.json());
+app.use(json());
 
-const PORT = 5000;
+// Sends all requests starting with /auth to authRoutes
+app.use("/auth", authRoutes);
+
+// Start server. Backup port: 5000
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
-
-// login endpoint
-app.post("/login", async (req, res) => {
-    const { username, password } = req.body;
-
-    if (!username || !password) {
-        return res.status(400).json({ error: "Please enter a Username and Password." });
-    }
-
-    try {
-        const [rows] = await db.promise().query(
-            `SELECT U_ID, Username, Password
-     FROM USERS
-     WHERE Username = ?`,
-            [username]
-        );
-
-        if (rows.length === 0) {
-            return res.status(401).json({ error: "Wrong username or password!" });
-        }
-
-        const user = rows[0];
-
-        if (user.Password !== password) {
-            return res.status(401).json({ error: "Invalid username or password" });
-        }
-
-        res.json({
-            message: "Login successful",
-            user: {
-                id: user.U_ID,
-                username: user.Username,
-                roleId: user.Role_ID,
-            },
-        });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: "Server error" });
-    }
-});
-
