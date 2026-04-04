@@ -101,21 +101,20 @@ INSERT INTO LOCATION (Floor, Size, Building_ID, LocT_ID) VALUES
 (0, 400.00, 6, 6);   -- public building
 
 -- Dummy user data, one for each role
-INSERT INTO USERS (Username, Password, Email, Phone_Num, RegDate) VALUES
-('guest', '1234', 'guest@example.com', '00-000000', '2026-04-01 10:00:00'),
-('admin', '1234', 'admin@example.com', '11-111111', '2026-04-01 10:05:00'),
-('mayor', '1234', 'mayor@example.com', '22-222222', '2026-04-01 10:10:00'),
-('secretary', '1234', 'secretary@example.com', '33-333333', '2026-04-01 10:15:00'),
-('lawyer', '1234', 'lawyer@example.com', '44-444444', '2026-04-01 10:20:00'),
-('engineer', '1234', 'engineer@example.com', '55-555555', '2026-04-01 10:25:00'),
-('financial', '1234', 'financial@example.com', '66-666666', '2026-04-01 10:30:00'),
-('staff', '1234', 'staff@example.com', '77-777777', '2026-04-01 10:35:00');
+INSERT INTO USERS (Username, Password, RegDate) VALUES
+('guest', '1234', '2026-04-01 10:00:00'),
+('admin', '1234', '2026-04-01 10:05:00'),
+('mayor', '1234', '2026-04-01 10:10:00'),
+('secretary', '1234', '2026-04-01 10:15:00'),
+('lawyer', '1234', '2026-04-01 10:20:00'),
+('engineer', '1234', '2026-04-01 10:25:00'),
+('financial', '1234', '2026-04-01 10:30:00'),
+('staff', '1234', '2026-04-01 10:35:00');
 
 -- Dummy citizen date, one registered one not
-INSERT INTO CITIZEN (First_Name, Last_Name, BirthDate, U_ID, Location_ID)
-VALUES 
-('Guest', 'Citizen', '1990-01-01', 1, 1),
-('Outsider', 'Citizen', '1985-06-15', NULL, 2);
+INSERT INTO CITIZEN (First_Name, Last_Name, BirthDate, Email, Phone_Num, U_ID, Location_ID) VALUES
+('Guest', 'Citizen', '1990-01-01', 'guest@example.com', '00-000000', 1, 1),
+('Outsider', 'Citizen', '1985-06-15', 'outsider@example.com', '88-888888', NULL, 2);
 
 -- Dummy employee data, one for each role
 INSERT INTO EMPLOYEE (First_Name, Last_Name, BirthDate, DateHired, U_ID, Role_ID)

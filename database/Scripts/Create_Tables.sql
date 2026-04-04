@@ -115,9 +115,8 @@ CREATE TABLE USERS (
     U_ID INT NOT NULL AUTO_INCREMENT,
     Username VARCHAR(50) NOT NULL UNIQUE,
     Password VARCHAR(255) NOT NULL,
-    Email VARCHAR(100) NOT NULL UNIQUE,
-    Phone_Num VARCHAR(20),
     RegDate DATETIME NOT NULL,
+    Active_Flg TINYINT DEFAULT 1 NOT NULL, -- flag for if user is active (1) or delted (0)
     PRIMARY KEY (U_ID)
 );
 
@@ -127,6 +126,8 @@ CREATE TABLE CITIZEN (
     First_Name VARCHAR(50) NOT NULL,
     Last_Name VARCHAR(50) NOT NULL,
     BirthDate DATE NOT NULL,
+    Email VARCHAR(100) NOT NULL UNIQUE,
+    Phone_Num VARCHAR(20),
     U_ID INT UNIQUE,				-- can be a user or not (NULL => not registered)
     Location_ID INT,
     PRIMARY KEY (C_ID),
@@ -168,7 +169,7 @@ CREATE TABLE DOCUMENT (
     ExpDate DATE,
     FilePath VARCHAR(255),
     C_ID INT NOT NULL,
-    IsValid TINYINT(1) DEFAULT 1,	-- 1 = valid, 0 = invalid
+    IsValid TINYINT DEFAULT 1,	-- 1 = valid, 0 = invalid
     PRIMARY KEY (Doc_ID),
     FOREIGN KEY (C_ID) REFERENCES CITIZEN(C_ID)
         ON UPDATE CASCADE
@@ -195,7 +196,7 @@ CREATE TABLE REQUEST (
     DateMade DATETIME NOT NULL,
     DateCompleted DATETIME,
     Description JSON,
-    FlagRejected TINYINT(1) DEFAULT 0,  -- 0 = not rejected, 1 = rejected
+    FlagRejected TINYINT DEFAULT 0,  -- 0 = not rejected, 1 = rejected
     Priority INT DEFAULT 0,
     RType_ID INT NOT NULL,
     RStat_Code INT NOT NULL,
