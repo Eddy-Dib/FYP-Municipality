@@ -38,6 +38,10 @@ function Login() {
                     </p>
                 )}
 
+                {isRegister && (
+                    <p className={styles.registerLink} onClick={() => setIsRegister(false)}> &lt; Back to Login  </p>
+                )}
+
             </div>
         </div>
     );

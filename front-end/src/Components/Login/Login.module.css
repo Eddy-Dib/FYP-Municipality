@@ -25,7 +25,7 @@
     transform: translateY(-50%);
     width: 400px;
     padding: 50px;
-    background: rgba(255, 255, 255, 0.33);
+    background: rgba(102, 102, 102, 0.33);
     backdrop-filter: blur(10px);
     border-radius: 20px;
     color: white;
@@ -40,6 +40,7 @@
     color: #ffffff;
     letter-spacing: 0.5px;
     margin-bottom: 5px;
+    text-shadow: 0 0 6px rgba(0, 0, 0, 0.4);
 }
 
 .rightBox h3 {
@@ -49,6 +50,7 @@
     color: #ffffff;
     letter-spacing: 0.5px;
     margin-bottom: 5px;
+    text-shadow: 0 0 6px rgba(0, 0, 0, 0.4);
 }
 
 .rightBox p {
@@ -57,6 +59,7 @@
     font-size: 17px;
     color: #f3f5f9;
     margin-bottom: 25px;
+    text-shadow: 0 0 6px rgba(0, 0, 0, 0.4);
 }
 
 .loginForm .inputGroup {
@@ -69,13 +72,14 @@
     margin-bottom: 6px;
     font-size: 19px;
     color: #f6f6f6;
+    text-shadow: 0 0 6px rgba(0, 0, 0, 0.4);
 }
 
 .loginForm input {
     padding: 12px 14px;
     border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    background: rgba(255, 255, 255, 0.262);
+    border: 1px solid rgba(210, 210, 210, 0.3);
+    background: rgba(204, 204, 204, 0.25);
     color: white;
     font-size: 14px;
     outline: none;
@@ -83,8 +87,8 @@
 }
 
 .loginForm input:focus {
-    border: 1px solid #1e3a5f;
-    background: rgba(255, 255, 255, 0.2);
+    border: 1.5px solid #265a9e;
+    background: rgba(255, 255, 255, 0.25);
 }
 
 .loginForm input::placeholder {
@@ -108,7 +112,7 @@
     transform: translateY(-50%);
     cursor: pointer;
     font-size: 1.2rem;
-    color: #666;
+    color: #bebebe;
     display: flex;
     align-items: center;
 }
@@ -118,7 +122,7 @@
     padding: 12px;
     border: none;
     border-radius: 12px;
-    background: linear-gradient(135deg, #1e3a5f, #c3d7ef);
+    background: linear-gradient(135deg, #1e3a5f, #38649d);
     color: white;
     font-size: 17px;
     cursor: pointer;
@@ -140,15 +144,17 @@
     display: inline-block;
 }
 
-.registerLink {
-    color: #254b7d;
+.rightBox .registerLink {
+    color: #79b0f9;
     cursor: pointer;
     font-weight: 500;
     transition: 0.3s;
+    text-shadow: 0 0 0;
 }
 
 .registerLink:hover {
     color: #ffffff;
+    text-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
 }
 
 .rightBox.register {
@@ -161,6 +167,15 @@
     animation: fadeIn 0.6s ease;
 }
 
+.rightBox .error {
+    color: #ff2d2d;
+    margin-top: 10px;
+    text-align: center;
+    font-weight: 500;
+    letter-spacing: -0.2px;
+    text-shadow: 0 0 6px #00000030;
+}
+
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -170,5 +185,79 @@
     to {
         opacity: 1;
         transform: translateX(0);
+    }
+}
+
+@media (max-width: 767px) {
+
+    html, body {
+        overflow: hidden;
+    }
+
+    * {
+        max-width: 100%;
+    }
+
+    .background {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-size: cover;
+        background-position: center;
+        z-index: -1;
+    }
+
+    .container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100dvh;
+        width: auto;
+        padding: 0;
+    }
+
+    .rightBox {
+        position: static;
+        transform: none;
+        width: 80%;
+        margin: 0 auto;
+        padding: 30px 20px;
+    }
+
+    .rightBox.register {
+        width: 95%;
+    }
+
+    .rightBox h2 {
+        font-size: 28px;
+    }
+
+    .rightBox h3 {
+        font-size: 22px;
+    }
+
+    .rightBox p {
+        font-size: 15px;
+    }
+
+    .loginForm label {
+        font-size: 16px;
+    }
+
+    .loginForm input {
+        font-size: 13px;
+        padding: 10px 12px;
+    }
+
+    .loginButton {
+        font-size: 15px;
+        padding: 10px;
+        margin-top: 30px;
+    }
+
+    .eye {
+        font-size: 1rem;
     }
 }
