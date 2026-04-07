@@ -13,7 +13,9 @@ export const login = async (req, res) => {
     try {
         const [rows] = await db.promise().query(
             `SELECT 
-                u.U_ID, u.Username, u.Password, u.Active_Flg, e.Emp_ID, r.Role_ID, r.Role_Type, c.C_ID
+                u.U_ID, u.Username, u.Password, u.Active_Flg, e.Emp_ID, r.Role_ID, r.Role_Type, c.C_ID,
+                CONCAT(e.First_Name, ' ', e.Last_Name) AS Emp_Name,
+                CONCAT(c.First_Name, ' ', c.Last_Name) AS C_Name
             FROM USERS u
             LEFT JOIN EMPLOYEE e ON u.U_ID = e.U_ID
             LEFT JOIN ROLES r ON e.Role_ID = r.Role_ID
@@ -38,12 +40,19 @@ export const login = async (req, res) => {
         }
 
         let role = null;
-        if (user.Emp_ID) role = user.Role_Type;
-        else if (user.C_ID) role = "citizen";
+        let name = "";
+        if (user.Emp_ID){
+            role = user.Role_Type;
+            name = user.Emp_Name;
+        }
+        else if (user.C_ID) {
+            role = "citizen";
+            name = user.C_Name;
+        }
         else return sendError(res, 403, "Access denied. Please contact an administrator or use a different account.", "ACCESS_DENIED");
 
         return sendSuccess(res, "Login successful", {
-            user: { id: user.U_ID, username: user.Username, role }
+            user: { id: user.U_ID, username: user.Username, name, role }
         });
 
     } catch (err) {
