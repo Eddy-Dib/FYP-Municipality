@@ -1,4 +1,5 @@
 import db from "../config/db.js";
+import { generateToken } from "../utils/jwt.js";
 import { sendSuccess, sendError } from "../utils/responses.js";
 
 export const login = async (req, res) => {
@@ -51,8 +52,18 @@ export const login = async (req, res) => {
         }
         else return sendError(res, 403, "Access denied. Please contact an administrator or use a different account.", "ACCESS_DENIED");
 
+        const payload = {
+            id: user.U_ID,
+            username: user.Username,
+            role,
+            name
+        }
+
+        const token = generateToken(payload, "2h");
+
         return sendSuccess(res, "Login successful", {
-            user: { id: user.U_ID, username: user.Username, name, role }
+            user: { id: user.U_ID, username: user.Username, name, role },
+            token
         });
 
     } catch (err) {
