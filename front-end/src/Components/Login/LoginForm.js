@@ -16,6 +16,7 @@ function LoginForm() {
     const submitHandler = async (e) => {
         e.preventDefault();
         setLoading(true);
+        setErrorMsg("");
 
         try {
             const res = await axios.post(`${API_URL}/auth/login`, { username, password });
@@ -23,7 +24,15 @@ function LoginForm() {
             const data = res.data;
 
             if (data.success) {
+                const {token, user} = data.data;
+                localStorage.setItem("token", token); // stores token to remember login
+
+                // stores role and name for easy access when needed
+                localStorage.setItem("role", user.role);
+                localStorage.setItem("name", user.name);
+
                 alert(`Welcome, ${data.data.user.name}! Your role is: ${data.data.user.role}`);
+                
                 // Redirect happens her
                 // Welcome message and post-login actions can be defined later
 
