@@ -60,7 +60,7 @@ function LoginForm() {
                     <label>Username</label>
                     <input
                         type="text"
-                        placeholder="Enter your UserName"
+                        placeholder="Enter your Username"
                         value={username}
                         onChange={(e) => setUsername(e.target.value)} />
                 </div>
