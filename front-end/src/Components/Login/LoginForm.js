@@ -1,7 +1,9 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import styles from "../../Pages/Login.module.css"; 
 import axios from "axios";
+
 
 function LoginForm() {
     const API_URL = process.env.REACT_APP_API_URL;
@@ -12,6 +14,8 @@ function LoginForm() {
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [errorMsg, setErrorMsg] = useState("");
+
+    const navigate = useNavigate();
 
     const submitHandler = async (e) => {
         e.preventDefault();
@@ -25,16 +29,15 @@ function LoginForm() {
 
             if (data.success) {
                 const {token, user} = data.data;
+
                 localStorage.setItem("token", token); // stores token to remember login
+                localStorage.setItem("user", JSON.stringify(user));  // stores the user data as a json string
 
-                // stores role and name for easy access when needed
-                localStorage.setItem("role", user.role);
-                localStorage.setItem("name", user.name);
-
-                alert(`Welcome, ${data.data.user.name}! Your role is: ${data.data.user.role}`);
-                
-                // Redirect happens her
-                // Welcome message and post-login actions can be defined later
+                if (user.role === "citizen") {
+                    navigate("/citizen");
+                } else {
+                    navigate("/employee");
+                }
 
             }
         } catch (err) {
