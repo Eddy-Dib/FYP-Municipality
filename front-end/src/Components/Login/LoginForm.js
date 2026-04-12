@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { replace, useNavigate } from "react-router-dom";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
-import styles from "../../Pages/Login.module.css"; 
+import styles from "../../Pages/Login.module.css";
 import axios from "axios";
 
 
@@ -28,20 +28,20 @@ function LoginForm() {
             const data = res.data;
 
             if (data.success) {
-                const {token, user} = data.data;
+                const { token, user } = data.data;
 
                 localStorage.setItem("token", token); // stores token to remember login
                 localStorage.setItem("user", JSON.stringify(user));  // stores the user data as a json string
 
                 if (user.role === "citizen") {
-                    navigate("/citizen");
+                    navigate("/citizen", { replace: true });
                 } else {
-                    navigate("/employee");
+                    navigate("/employee", { replace: true });
                 }
 
             }
         } catch (err) {
-            if(err.response){  // the server responded with our error message
+            if (err.response) {  // the server responded with our error message
                 setErrorMsg(err.response.data.message);
             } else { // unexpected error
                 setErrorMsg("Network error. Try again later.");
