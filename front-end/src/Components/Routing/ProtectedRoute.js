@@ -1,13 +1,9 @@
 import { Navigate } from "react-router-dom";
 
-function ProtectedRoute({ children, allowedRoles }) {
+function ProtectedRoute({ children }) {
     const user = JSON.parse(localStorage.getItem("user"));
 
-    if (!user) {
-        return <Navigate to="/" replace />;
-    }
-
-    if (allowedRoles && !allowedRoles.includes(user.role)) {
+    if (!user || !user.isEmployee) {
         return <Navigate to="/" replace />;
     }
 
