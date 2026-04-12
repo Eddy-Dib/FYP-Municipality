@@ -1,4 +1,4 @@
-import styles from "./Login.module.css";
+import styles from "../../Pages/Login.module.css"; 
 
 function RegisterForm() {
     return (

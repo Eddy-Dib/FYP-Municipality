@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
-import styles from "./Login.module.css";
+import styles from "../../Pages/Login.module.css"; 
 import axios from "axios";
 
 function LoginForm() {

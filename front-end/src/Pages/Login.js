@@ -1,9 +1,9 @@
 import { useState } from "react";
-import Background from "../../Assets/Background.png";
+import Background from "../Assets/Background.png";
 import styles from  "./Login.module.css";
 
-import RegisterForm from "./RegisterForm";
-import LoginForm from "./LoginForm";
+import RegisterForm from "../Components/Login/RegisterForm";
+import LoginForm from "../Components/Login/LoginForm";
 
 function Login() {
     const [isRegister, setIsRegister] = useState(false);
