@@ -34,3 +34,8 @@
     background: var(--primary-hover);
     transform: translateX(4px);
 }
+
+.active{
+    background: var(--primary-active);
+    transform: translateX(4px);
+}
