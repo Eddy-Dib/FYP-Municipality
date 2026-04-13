@@ -4,9 +4,12 @@
 
 :root {
   --topbar-height: 64px;
+  --sidebar-width: 240px;
 
   --primary: #1c63bf;
+  --primary-light: #64a0ee;
   --primary-dark: #1856a6;
+  --primary-darker: #10376a;
   --primary-hover: #15498e;
 
   --text-light: #ffffff;
