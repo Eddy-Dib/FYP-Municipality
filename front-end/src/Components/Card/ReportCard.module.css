@@ -1,0 +1,46 @@
+.report {
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.middle {
+    flex: 1;
+}
+
+.title {
+    margin: 0;
+}
+
+.type {
+    font-size: 12px;
+    color: #888;
+    margin-bottom: 6px;
+}
+
+.right {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+}
+
+.iconBtn {
+    background: transparent;
+    border: none;
+    padding: 6px;
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 22px;
+    color: var(--primary);
+
+    transition: 0.2s ease;
+}
+
+.iconBtn:hover {
+    transform: scale(1.15);
+    opacity: 0.85;
+}

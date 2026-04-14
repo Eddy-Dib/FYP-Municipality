@@ -1,4 +1,5 @@
 import db from "../config/db.js";
+import { generateToken } from "../utils/jwt.js";
 import { sendSuccess, sendError } from "../utils/responses.js";
 
 export const login = async (req, res) => {
@@ -30,7 +31,7 @@ export const login = async (req, res) => {
 
         const user = rows[0];
 
-        if (user.Active_Flg === 0) {
+        if (user.Active_Flg === 0 || (!user.Emp_ID && !user.C_ID)) {
             return sendError(res, 403, "Access denied. Please contact an administrator or use a different account.", "ACCESS_DENIED");
         }
 
@@ -39,20 +40,24 @@ export const login = async (req, res) => {
             return sendError(res, 401, "Wrong username or password.", "INVALID_CREDENTIALS");
         }
 
-        let role = null;
-        let name = "";
-        if (user.Emp_ID){
-            role = user.Role_Type;
-            name = user.Emp_Name;
+        const isEmployee = !!user.Emp_ID;
+
+        const role = isEmployee ? user.Role_Type : "citizen";
+        const name = isEmployee ? user.Emp_Name : user.C_Name;
+
+        const payload = {
+            id: user.U_ID,
+            username: user.Username,
+            role,
+            name,
+            isEmployee
         }
-        else if (user.C_ID) {
-            role = "citizen";
-            name = user.C_Name;
-        }
-        else return sendError(res, 403, "Access denied. Please contact an administrator or use a different account.", "ACCESS_DENIED");
+
+        const token = generateToken(payload, "2h");
 
         return sendSuccess(res, "Login successful", {
-            user: { id: user.U_ID, username: user.Username, name, role }
+            user: { id: user.U_ID, username: user.Username, name, role, isEmployee },
+            token
         });
 
     } catch (err) {

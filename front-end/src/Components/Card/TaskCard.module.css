@@ -1,0 +1,62 @@
+.task {
+    justify-content: space-between;
+    cursor: pointer;
+    gap: 16px;
+}
+
+.left {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 90px;
+}
+
+.number {
+    font-weight: 600;
+}
+
+.priority {
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    background: #eee;
+}
+
+.priority.high {
+    background: #ffdddd;
+    color: #c00;
+}
+
+.priority.medium {
+    background: #fff3cd;
+    color: #b38b00;
+}
+
+.priority.low {
+    background: #ddf5dd;
+    color: #1a7f1a;
+}
+
+.middle {
+    flex: 1;
+}
+
+.middle h4 {
+    margin-bottom: 4px;
+}
+
+.middle p {
+    font-size: 12px;
+    color: #666;
+}
+
+.right {
+    min-width: 90px;
+    text-align: right;
+}
+
+.status {
+    font-size: 12px;
+    font-weight: 600;
+    color: #1c63bf;
+}

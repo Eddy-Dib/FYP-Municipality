@@ -1,0 +1,26 @@
+.summary {
+    justify-content: start;
+    gap: 12px;
+    cursor: pointer;
+}
+
+.left {
+    width: 25%;
+    font-size: 28px;
+    color: var(--primary-light);
+}
+
+.middle h3 {
+    font-size: 14px;
+    color: #666;
+}
+
+.middle h1 {
+    font-size: 28px;
+    margin: 4px 0;
+}
+
+.middle p {
+    font-size: 12px;
+    color: #888;
+}

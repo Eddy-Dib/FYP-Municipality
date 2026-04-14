@@ -18,43 +18,40 @@
 
 .rightBox {
     position: absolute;
-    flex-direction: column;
     display: flex;
+    flex-direction: column;
     top: 50%;
     right: 10%;
     transform: translateY(-50%);
-    width: 400px;
+    width: 33%;
     padding: 50px;
     background: rgba(102, 102, 102, 0.33);
     backdrop-filter: blur(10px);
     border-radius: 20px;
-    color: white;
+    color: var(--text-light);
     transition: all 0.6s ease-in-out;
 }
 
 .rightBox h2 {
-    font-family: "Poppins", sans-serif;
     text-align: center;
     font-size: 40px;
     font-weight: 600;
-    color: #ffffff;
+    color: var(--text-light);
     letter-spacing: 0.5px;
     margin-bottom: 5px;
     text-shadow: 0 0 6px rgba(0, 0, 0, 0.4);
 }
 
 .rightBox h3 {
-    font-family: "Poppins", sans-serif;
     text-align: left;
     font-size: 28px;
-    color: #ffffff;
+    color: var(--text-light);
     letter-spacing: 0.5px;
     margin-bottom: 5px;
     text-shadow: 0 0 6px rgba(0, 0, 0, 0.4);
 }
 
 .rightBox p {
-    font-family: "Poppins", sans-serif;
     text-align: left;
     font-size: 17px;
     color: #f3f5f9;
@@ -83,11 +80,12 @@
     color: white;
     font-size: 14px;
     outline: none;
+    letter-spacing: 0.5px;
     transition: all 0.3s ease;
 }
 
 .loginForm input:focus {
-    border: 1.5px solid #265a9e;
+    border: 1.5px solid var(--primary);
     background: rgba(255, 255, 255, 0.25);
 }
 
@@ -103,6 +101,7 @@
     width: 100%;
     padding-right: 2.5rem;
     box-sizing: border-box;
+    letter-spacing: 0.5px;
 }
 
 .eye {
@@ -149,17 +148,11 @@
     cursor: pointer;
     font-weight: 500;
     transition: 0.3s;
-    text-shadow: 0 0 0;
 }
 
 .registerLink:hover {
     color: #ffffff;
     text-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
-}
-
-.rightBox.register {
-    width: 520px;
-    right: 5%;
 }
 
 .loginForm {
@@ -190,7 +183,8 @@
 
 @media (max-width: 767px) {
 
-    html, body {
+    html,
+    body {
         overflow: hidden;
     }
 

@@ -1,0 +1,50 @@
+.badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: start;
+
+    width: fit-content;
+    padding: 4px 10px;
+    gap: 6px;
+
+    border-radius: 1000px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.icon {
+    display: flex;
+    align-items: center;
+}
+
+/* Priority styles */
+.high {
+    color: #c62828;
+    background: #fde2e2;
+}
+
+.medium {
+    color: #ef6c00;
+    background: #fff1dc;
+}
+
+.low {
+    color: #424242;
+    background: #eeeeee;
+}
+
+/* Status styles */
+.pending {
+    color: #ef6c00;
+    background: #fff3e0;
+}
+
+.inProgress {
+    color: #1565c0;
+    background: #e3f2fd;
+}
+
+.done {
+    color: #2e7d32;
+    background: #e8f5e9;
+}

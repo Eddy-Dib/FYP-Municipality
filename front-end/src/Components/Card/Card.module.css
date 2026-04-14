@@ -1,0 +1,14 @@
+.card {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+    padding: 16px;
+    transition: 0.2s ease;
+}
+
+.card:hover {
+    transform: translateX(2px) translateY(-5px);
+}
