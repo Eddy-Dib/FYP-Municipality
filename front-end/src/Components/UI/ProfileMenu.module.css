@@ -1,0 +1,32 @@
+.dropdown {
+    position: absolute;
+    top: var(--topbar-height);
+    right: 20px;
+
+    width: 160px;
+    z-index: 2000;
+    overflow: hidden;
+
+    background: white;
+    border-bottom-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+    box-shadow: var(--shadow);
+}
+
+.item {
+    width: 100%;
+    padding: 12px 14px;
+    
+    border: none;
+    background: none;
+    
+    font-size: 14px;
+    text-align: left;
+    
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.item:hover {
+    background: #f0f4ff;
+}

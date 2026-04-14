@@ -1,0 +1,41 @@
+.sidebar {
+    width: var(--sidebar-width);
+    height: calc(100vh - var(--topbar-height));
+    position: fixed;
+    top: var(--topbar-height);
+    left: 0;
+
+    background: #1b4f99;
+    padding: 16px 10px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    box-shadow: 4px 0 12px #00000025;
+}
+
+.item {
+    padding: 12px 14px;
+    border-radius: 10px;
+
+    background: transparent;
+    border: none;
+
+    color: var(--text-light);
+    text-align: left;
+    font-size: 14px;
+
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.item:hover {
+    background: var(--primary-hover);
+    transform: translateX(4px);
+}
+
+.active{
+    background: var(--primary-active);
+    transform: translateX(4px);
+}

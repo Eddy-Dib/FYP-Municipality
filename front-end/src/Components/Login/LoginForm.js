@@ -1,7 +1,9 @@
 import { useState } from "react";
+import { replace, useNavigate } from "react-router-dom";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
-import styles from "./Login.module.css";
+import styles from "../../Pages/Login.module.css";
 import axios from "axios";
+
 
 function LoginForm() {
     const API_URL = process.env.REACT_APP_API_URL;
@@ -13,9 +15,12 @@ function LoginForm() {
     const [showPassword, setShowPassword] = useState(false);
     const [errorMsg, setErrorMsg] = useState("");
 
+    const navigate = useNavigate();
+
     const submitHandler = async (e) => {
         e.preventDefault();
         setLoading(true);
+        setErrorMsg("");
 
         try {
             const res = await axios.post(`${API_URL}/auth/login`, { username, password });
@@ -23,13 +28,20 @@ function LoginForm() {
             const data = res.data;
 
             if (data.success) {
-                alert(`Welcome, ${data.data.user.name}! Your role is: ${data.data.user.role}`);
-                // Redirect happens her
-                // Welcome message and post-login actions can be defined later
+                const { token, user } = data.data;
+
+                localStorage.setItem("token", token); // stores token to remember login
+                localStorage.setItem("user", JSON.stringify(user));  // stores the user data as a json string
+
+                if (user.role === "citizen") {
+                    navigate("/citizen", { replace: true });
+                } else {
+                    navigate("/employee", { replace: true });
+                }
 
             }
         } catch (err) {
-            if(err.response){  // the server responded with our error message
+            if (err.response) {  // the server responded with our error message
                 setErrorMsg(err.response.data.message);
             } else { // unexpected error
                 setErrorMsg("Network error. Try again later.");
@@ -48,7 +60,7 @@ function LoginForm() {
                     <label>Username</label>
                     <input
                         type="text"
-                        placeholder="Enter your UserName"
+                        placeholder="Enter your Username"
                         value={username}
                         onChange={(e) => setUsername(e.target.value)} />
                 </div>

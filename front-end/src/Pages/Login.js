@@ -1,12 +1,28 @@
-import { useState } from "react";
-import Background from "../../Assets/Background.png";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import Background from "../Assets/Background.png";
 import styles from  "./Login.module.css";
 
-import RegisterForm from "./RegisterForm";
-import LoginForm from "./LoginForm";
+import RegisterForm from "../Components/Login/RegisterForm";
+import LoginForm from "../Components/Login/LoginForm";
 
 function Login() {
     const [isRegister, setIsRegister] = useState(false);
+    const navigate = useNavigate();
+
+    // to stay logged in
+    useEffect(() => {
+        const user = JSON.parse(localStorage.getItem("user"));
+
+        if (user) {
+            if (user.role === "citizen") {
+                navigate("/citizen", { replace: true });
+            } else {
+                navigate("/employee", { replace: true });
+            }
+        }
+    }, []);
+
     return (
         <div className={styles.container}>
 
