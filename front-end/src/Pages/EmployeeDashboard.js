@@ -1,6 +1,3 @@
-import EmployeeTopBar from "../Components/Layout/EmployeeTopbar";
-import EmployeeSideBar from "../Components/Layout/EmployeeSidebar";
-import WelcomeToast from "../Components/UI/WelcomeToast";
 import SummaryCard from "../Components/Card/SummaryCard";
 
 import { FaTasks, FaClock, FaBell, FaFileAlt } from "react-icons/fa";
@@ -15,25 +12,25 @@ function EmployeeDashboard() {
             title: "Assigned Tasks",
             value: 12,
             subtitle: "Tasks currently assigned to you",
-            icon: <FaTasks/>
+            icon: <FaTasks />
         },
         {
             title: "Pending Tasks",
             value: 5,
             subtitle: "Waiting for action",
-            icon: <FaClock/>
+            icon: <FaClock />
         },
         {
             title: "Notifications",
             value: 3,
             subtitle: "Unread updates",
-            icon: <FaBell/>
+            icon: <FaBell />
         },
         {
             title: "Reports",
             value: 2,
             subtitle: "Generated this week",
-            icon: <FaFileAlt/>
+            icon: <FaFileAlt />
         }
     ];
 
@@ -61,67 +58,109 @@ function EmployeeDashboard() {
             priority: "Low",
             requestId: "REQ-5499",
             dueDate: "2026-04-10"
+        },
+        {
+            id: 101,
+            name: "Inspect Water Pipeline",
+            status: "In Progress",
+            priority: "High",
+            requestId: "REQ-5532",
+            dueDate: "2026-04-15"
+        },
+        {
+            id: 102,
+            name: "Approve Building Permit",
+            status: "Pending",
+            priority: "Medium",
+            requestId: "REQ-5511",
+            dueDate: "2026-04-18"
+        },
+        {
+            id: 103,
+            name: "Road Damage Report Review",
+            status: "Done",
+            priority: "Low",
+            requestId: "REQ-5499",
+            dueDate: "2026-04-10"
+        },
+        {
+            id: 101,
+            name: "Inspect Water Pipeline",
+            status: "In Progress",
+            priority: "High",
+            requestId: "REQ-5532",
+            dueDate: "2026-04-15"
+        },
+        {
+            id: 102,
+            name: "Approve Building Permit",
+            status: "Pending",
+            priority: "Medium",
+            requestId: "REQ-5511",
+            dueDate: "2026-04-18"
+        },
+        {
+            id: 103,
+            name: "Road Damage Report Review",
+            status: "Done",
+            priority: "Low",
+            requestId: "REQ-5499",
+            dueDate: "2026-04-10"
         }
     ];
 
     return (
-        <div className={styles.page}>
-            <EmployeeTopBar />
-            <WelcomeToast />
-            <EmployeeSideBar />
+        <div >
+            <h1>Dashboard</h1>
 
-            <div className={styles.content}>
-                <h1>Dashboard</h1>
+            <div className={styles.summaryGrid}>
+                {summaryData.map((item, index) => (
+                    <SummaryCard
+                        key={index}
+                        title={item.title}
+                        value={item.value}
+                        subtitle={item.subtitle}
+                        icon={item.icon}
+                        onClick={() => console.log(item.title)}
+                    />
+                ))}
+            </div>
 
-                <div className={styles.summaryGrid}>
-                    {summaryData.map((item, index) => (
-                        <SummaryCard
-                            key={index}
-                            title={item.title}
-                            value={item.value}
-                            subtitle={item.subtitle}
-                            icon={item.icon}
-                            onClick={() => console.log(item.title)}
-                        />
-                    ))}
-                </div>
+            <h1>Recent Tasks</h1>
 
-                <h1>Recent Tasks</h1>
+            <div className={styles.tableWrapper}>
+                <table className={styles.table}>
+                    <thead>
+                        <tr>
+                            <th>Task ID</th>
+                            <th>Task Name</th>
+                            <th>Status</th>
+                            <th>Priority</th>
+                            <th>Request ID</th>
+                            <th>Due Date</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
 
-                <div className={styles.tableWrapper}>
-                    <table className={styles.table}>
-                        <thead>
-                            <tr>
-                                <th>Task ID</th>
-                                <th>Task Name</th>
-                                <th>Status</th>
-                                <th>Priority</th>
-                                <th>Request ID</th>
-                                <th>Due Date</th>
-                                <th>Action</th>
+                    <tbody>
+                        {recentTasks.map(task => (
+                            <tr key={task.id}>
+                                <td>#{task.id}</td>
+                                <td>{task.name}</td>
+                                <td><StatusBadge value={task.status} /></td>
+                                <td><PriorityBadge value={task.priority} /></td>
+                                <td>{task.requestId}</td>
+                                <td>{task.dueDate}</td>
+                                <td>
+                                    <button className={styles.viewBtn}
+                                        onClick={() => console.log("View task", task.id)}>
+                                        View Details
+                                    </button>
+                                </td>
                             </tr>
-                        </thead>
-
-                        <tbody>
-                            {recentTasks.map(task => (
-                                <tr key={task.id}>
-                                    <td>#{task.id}</td>
-                                    <td>{task.name}</td>
-                                    <td><StatusBadge value={task.status}/></td>
-                                    <td><PriorityBadge value={task.priority} /></td>
-                                    <td>{task.requestId}</td>
-                                    <td>{task.dueDate}</td>
-                                    <td>
-                                        <button className={styles.viewBtn}
-                                            onClick={() => console.log("View task", task.id)}>
-                                            View Details
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
+                        ))}
+                    </tbody>
+                </table>
             </div>
         </div>
     );

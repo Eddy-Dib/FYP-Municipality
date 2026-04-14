@@ -31,14 +31,24 @@
 }
 
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #bbb;
-  border-radius: 8px;
+  background: #00000058;
+  border-radius: 999px;
+  transition: all 0.2s ease;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #999;
+  background: linear-gradient(180deg, #1c63bfe6, #15498e);
+}
+
+::-webkit-scrollbar-thumb:active {
+  background: var(--primary-dark);
 }

@@ -1,5 +1,6 @@
 import Card from "./Card";
 import styles from "./ReportCard.module.css";
+import { FaEye, FaDownload } from "react-icons/fa";
 
 function ReportCard({
     title,
@@ -14,7 +15,7 @@ function ReportCard({
         <Card className={styles.report}>
 
             <div className={styles.middle}>
-                <h4>{title}</h4>
+                <h4 className={styles.title}>{title}</h4>
                 <p className={styles.type}>{type}</p>
 
                 <p>Request ID: {requestId}</p>
@@ -23,8 +24,13 @@ function ReportCard({
             </div>
 
             <div className={styles.right}>
-                <button onClick={onView}>View</button>
-                <button onClick={onDownload}>Download</button>
+                <button className={styles.iconBtn} onClick={onView} title="View Report">
+                    <FaEye />
+                </button>
+
+                <button className={styles.iconBtn} onClick={onDownload} title="Download Report">
+                    <FaDownload />
+                </button>
             </div>
 
         </Card>

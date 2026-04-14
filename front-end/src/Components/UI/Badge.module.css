@@ -1,11 +1,13 @@
 .badge {
     padding: 4px 10px;
-    border-radius: 999px;
+    border-radius: 1000px;
     font-size: 12px;
     font-weight: 600;
     display: inline-flex;
     align-items: center;
+    justify-content: start;
     gap: 6px;
+    width: fit-content;
 }
 
 .icon {

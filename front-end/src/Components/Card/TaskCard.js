@@ -1,5 +1,6 @@
 import Card from "./Card";
 import styles from "./TaskCard.module.css";
+import { PriorityBadge, StatusBadge } from "../UI/Badge";
 
 function TaskCard({
     number,
@@ -15,9 +16,8 @@ function TaskCard({
 
             <div className={styles.left}>
                 <span className={styles.number}>#{number}</span>
-                <span className={`${styles.priority} ${styles[priority.toLowerCase()]}`}>
-                    {priority}
-                </span>
+
+                <PriorityBadge value={priority} />
             </div>
 
             <div className={styles.middle}>
@@ -27,7 +27,7 @@ function TaskCard({
             </div>
 
             <div className={styles.right}>
-                <span className={styles.status}>{status}</span>
+                <StatusBadge value={status} />
             </div>
 
         </Card>

@@ -1,9 +1,16 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-import Login from "./Pages/Login";
-import EmployeeDashboard from "./Pages/EmployeeDashboard";
-import NotFound from "./Pages/404";
 import ProtectedRoute from "./Components/Routing/ProtectedRoute";
+
+// Login
+import Login from "./Pages/Login";
+import NotFound from "./Pages/404";
+
+// Employee
+import EmployeeLayout from "./Pages/EmployeeLayout";
+import EmployeeDashboard from "./Pages/EmployeeDashboard";
+import Tasks from "./Pages/Tasks";
+import Reports from "./Pages/Reports";
 
 function App() {
 	return (
@@ -16,12 +23,14 @@ function App() {
 					path="/employee"
 					element={
 						<ProtectedRoute>
-							<EmployeeDashboard />
+							<EmployeeLayout />
 						</ProtectedRoute>
 					}
-				/>
-
-				{/* To add more routes later, add them before NotFound ALWAYS!!*/}
+				>
+					<Route index element={<EmployeeDashboard />} />
+					<Route path="tasks" element={<Tasks />} />
+					<Route path="reports" element={<Reports />} />
+				</Route>
 
 				<Route path="*" element={<NotFound />} />
 

@@ -20,11 +20,12 @@ function EmployeeTopBar() {
                 <span className={styles.logoName}>Municipality System</span>
             </div>
 
+            {/*Search does nothing now, it's just a placeholder, might change it later*/}
             <div className={styles.searchContainer}>
                 <input
                     className={styles.searchInput}
                     type="text"
-                    placeholder="Search tasks..."
+                    placeholder="Search..."
                 />
             </div>
 
