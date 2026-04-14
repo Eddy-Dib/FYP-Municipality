@@ -2,15 +2,19 @@
     position: fixed;
     top: calc(var(--topbar-height) + 20px);
     left: 50%;
-    transform: translateX(-50%);
+
     min-width: 260px;
     max-width: 360px;
     padding: 16px 20px;
-    background-color: var(--toast-bg);
-    border-radius: 12px;
-    box-shadow: var(--toast-shadow);
     z-index: 1000;
+
+    border-radius: 12px;
+    background-color: var(--toast-bg);
+    box-shadow: var(--toast-shadow);
+    
     text-align: center;
+
+    transform: translateX(-50%);
 }
 
 .slideIn {

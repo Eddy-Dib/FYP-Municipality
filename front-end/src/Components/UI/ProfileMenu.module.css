@@ -2,22 +2,28 @@
     position: absolute;
     top: var(--topbar-height);
     right: 20px;
+
     width: 160px;
-    background: white;
-    border-radius: 10px;
-    box-shadow: var(--shadow);
-    overflow: hidden;
     z-index: 2000;
+    overflow: hidden;
+
+    background: white;
+    border-bottom-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+    box-shadow: var(--shadow);
 }
 
 .item {
     width: 100%;
     padding: 12px 14px;
+    
     border: none;
     background: none;
-    text-align: left;
-    cursor: pointer;
+    
     font-size: 14px;
+    text-align: left;
+    
+    cursor: pointer;
     transition: 0.2s ease;
 }
 

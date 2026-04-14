@@ -21,12 +21,7 @@ function App() {
 
 				<Route
 					path="/employee"
-					element={
-						<ProtectedRoute>
-							<EmployeeLayout />
-						</ProtectedRoute>
-					}
-				>
+					element={<ProtectedRoute><EmployeeLayout /></ProtectedRoute>}>
 					<Route index element={<EmployeeDashboard />} />
 					<Route path="tasks" element={<Tasks />} />
 					<Route path="reports" element={<Reports />} />

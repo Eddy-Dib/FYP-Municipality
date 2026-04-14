@@ -1,13 +1,15 @@
 .badge {
-    padding: 4px 10px;
-    border-radius: 1000px;
-    font-size: 12px;
-    font-weight: 600;
     display: inline-flex;
     align-items: center;
     justify-content: start;
-    gap: 6px;
+
     width: fit-content;
+    padding: 4px 10px;
+    gap: 6px;
+
+    border-radius: 1000px;
+    font-size: 12px;
+    font-weight: 600;
 }
 
 .icon {
@@ -15,7 +17,7 @@
     align-items: center;
 }
 
-/* PRIORITY */
+/* Priority styles */
 .high {
     color: #c62828;
     background: #fde2e2;
@@ -31,7 +33,7 @@
     background: #eeeeee;
 }
 
-/* STATUS */
+/* Status styles */
 .pending {
     color: #ef6c00;
     background: #fff3e0;

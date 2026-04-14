@@ -23,11 +23,10 @@ function EmployeeSideBar({ extraItems = [] }) {
     return (
         <aside className={styles.sidebar}>
             {items.map((item, index) => (
-                <button
-                    key={index}
+                <button key={index}
                     className={`${styles.item} ${isActive(item.path) ? styles.active : ""}`}
-                    onClick={() => navigate(item.path)}
-                >
+                    onClick={() => navigate(item.path)}>
+
                     {item.label}
                 </button>
             ))}

@@ -1,0 +1,90 @@
+.page {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    position: relative;
+    overflow: hidden;
+
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.page::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+
+    background: rgba(10, 20, 35, 0.45);
+
+    z-index: 1;
+}
+
+.card {
+    padding: 42px 52px;
+    border-radius: 16px;
+
+    background: rgba(16, 55, 106, 0.55);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+
+    border: 1px solid rgba(255, 255, 255, 0.12);
+
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+
+    text-align: center;
+
+    position: relative;
+    z-index: 2;
+
+    min-width: 320px;
+
+    animation: fadeIn 0.6s ease-out;
+}
+
+.code {
+    font-size: 72px;
+    font-weight: 800;
+    color: var(--text-light);
+
+    letter-spacing: 2px;
+}
+
+.text {
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 22px;
+}
+
+.button {
+    padding: 10px 16px;
+    border: none;
+    border-radius: 8px;
+
+    background: var(--primary);
+    color: var(--text-light);
+
+    cursor: pointer;
+    transition: 0.2s ease;
+
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
+}
+
+.button:hover {
+    background: var(--primary-light);
+    transform: translateY(-1px);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
