@@ -12,6 +12,10 @@ function ProtectedRoute({ children }) {
         return <Navigate to="/" replace />;
     }
 
+    if (location.pathname.startsWith("/citizen") && user.isEmployee) {
+        return <Navigate to="/" replace />;
+    }
+
     return children;
 }
 
