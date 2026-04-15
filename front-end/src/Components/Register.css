@@ -1,0 +1,77 @@
+.container {
+  width: 100%;
+  height: 100vh;
+  position: relative;
+}
+
+.background {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  z-index: -1;
+}
+
+.registerbox {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  
+  width: 650px;
+  padding: 40px;
+
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(15px);
+
+  border-radius: 20px;
+  color: white;
+
+  animation: slideIn 0.6s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translate(-30%, -50%);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+}
+
+.registerbox input {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+
+  border-radius: 10px;
+  border: none;
+  outline: none;
+}
+
+.row {
+  display: flex;
+  gap: 10px;
+}
+
+.row input {
+  flex: 1;
+}
+
+.sendButton {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+
+  background-color: #1e3a5f;
+  color: white;
+  cursor: pointer;
+}
+.backText span {
+  color: #ffd700;
+  cursor: pointer;
+}
