@@ -1,7 +1,7 @@
 .citizenContainer {
     width: 100%;
     min-height: 100vh;
-    background: var(--primary-darker);
+    background: var(--text-light);
     font-family: 'Poppins', sans-serif;
 }
 
@@ -18,7 +18,7 @@
     width: 90%;
     height: 60px;
 
-    background: rgba(255, 255, 255, 0.85);
+    background: var(--text-light);
     backdrop-filter: blur(10px);
 
     border-radius: 50px;
@@ -34,8 +34,8 @@
 }
 
 .headerIcon {
-    width: 70px;
-    height: 70px;
+    width: 80px;
+    height: 80px;
     object-fit: contain;
 }
 
@@ -48,12 +48,12 @@
     margin: 0 25px;
     cursor: pointer;
     font-weight: 500;
-    color: var(--primary-darker);
+    color: var(--Dark-black);
     transition: 0.25s ease;
 }
 
 .navLinks span:hover {
-    color: var(--primary-light);
+    color: var(--primary-darker);
 }
 
 .videoSection {
@@ -84,20 +84,103 @@
 
     text-shadow: 0 4px 10px rgba(0,0,0,0.4);
 }
-.contactLeft {
-    flex: 1;
+.introText{
+    margin: 25px;
+    font-family: 'Poppins', sans-serif;
+    text-align: center;
+}
+.introText h3{
+    font-size: 25px;
+}
+.introText p{
+    font-size: 15px;
+}
+.page {
+    background: #183b6b;
+    padding-bottom: 50px;
+}
+
+/* CONTACT */
+.contactSection {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+
+    width: 80%;
+    margin: auto;
+}
+
+/* LEFT */
+.left {
     display: flex;
     flex-direction: column;
-    gap: 20px;
-    width: 50%;
-    margin:20px;
+    gap: 15px;
 }
-.contactCard {
+
+/* CARD */
+.card {
+    width: 260px;
+    padding: 15px;
+
     background: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    border-radius: 12px;
 }
-.contactLeft :hover{
-    background-color: #1e2a38;
+
+.dark {
+    background: #1e2a38;
+    color: white;
+}
+
+/* RIGHT */
+.right {
+    width: 350px;
+    background: white;
+
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: auto;
+}
+
+.right input,
+.right textarea {
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 10px;
+
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+.right textarea {
+    height: 100px;
+}
+
+.right button {
+    width: 100%;
+    padding: 10px;
+
+    background: #1e3a5f;
+    color: white;
+
+    border: none;
+    border-radius: 8px;
+}
+
+/* MAP */
+.map iframe {
+    width: 80%;
+    height: 300px;
+
+    margin: 40px auto;
+    display: block;
+
+    border-radius: 20px;
+}
+.topSection {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+
+    gap: 30px;
+    margin-top: 50px;
 }
