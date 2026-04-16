@@ -1,6 +1,7 @@
 import express, { json } from "express";
 import cors from "cors";
 import authRoutes from "./routes/authRoutes.js";
+import employeeRoutes from "./routes/employeeRoutes.js"
 
 const app = express();
 
@@ -9,6 +10,9 @@ app.use(json());
 
 // Sends all requests starting with /auth to authRoutes
 app.use("/auth", authRoutes);
+
+// Sends all requests starting with /employee to employeeRoutes
+app.use("/employee", employeeRoutes);
 
 // Start server. Backup port: 5000
 const PORT = process.env.PORT || 5000;

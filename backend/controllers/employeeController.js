@@ -3,10 +3,22 @@ import { sendSuccess, sendError } from "../utils/responses.js";
 
 export const getDashboard = async (req, res) => {
 
-    const empId = req.user.id;
+    const empId = req.user?.id;
+
+    if (!req.user) {
+        return sendError(res, 401, "Unauthorized access", "NO_USER_CONTEXT");
+    }
+
+    if (!req.user.isEmployee) {
+        return sendError(res, 403, "Access denied: employees only", "NOT_EMPLOYEE");
+    }
+
+    if (!empId) {
+        return sendError(res, 401, "Invalid user session", "INVALID_USER_ID");
+    }
 
     try {
-        const [taskStatsRows] = db.promise().query(
+        const [taskStatsRows] = await db.promise().query(
             `SELECT
                 COUNT(*) AS assignedTasks,
 
@@ -34,7 +46,16 @@ export const getDashboard = async (req, res) => {
             [empId]
         );
 
-        const [reportRows] = db.promise().query(
+        if (!taskStatsRows || taskStatsRows.length === 0) {
+            return sendError(
+                res,
+                404,
+                "No task statistics found",
+                "TASK_STATS_NOT_FOUND"
+            );
+        }
+
+        const [reportRows] = await db.promise().query(
             `SELECT COUNT(*) AS reports
             FROM REPORT r
             JOIN TASK t ON r.Task_ID = t.Task_ID
@@ -42,7 +63,16 @@ export const getDashboard = async (req, res) => {
             [empId]
         );
 
-        const [tasks] = db.promise().query(
+        if (!reportRows) {
+            return sendError(
+                res,
+                404,
+                "Report data not found",
+                "REPORTS_NOT_FOUND"
+            );
+        }
+
+        const [tasks] = await db.promise().query(
             `SELECT 
                 t.Task_ID,
                 t.Name,
@@ -72,6 +102,15 @@ export const getDashboard = async (req, res) => {
             LIMIT 10`,
             [empId]
         );
+
+        if (!tasks) {
+            return sendError(
+                res,
+                404,
+                "Tasks not found",
+                "TASKS_NOT_FOUND"
+            );
+        }
 
         const taskStats = taskStatsRows[0];
         const reports = reportRows[0];
@@ -105,11 +144,12 @@ export const getDashboard = async (req, res) => {
         });
 
     } catch (err) {
+        //console.error("Dashboard Error:", err);
         return sendError(
             res,
             500,
             "Failed to load dashboard",
-            err.message
+            "DASHBOARD_SERVER_ERROR"
         );
     }
 };
