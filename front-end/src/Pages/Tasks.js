@@ -3,10 +3,12 @@ import { useState } from "react";
 import TaskCard from "../Components/Card/TaskCard";
 
 import styles from "./Tasks.module.css";
+import { useNavigate } from "react-router-dom";
 
 function Tasks() {
 
     const [filter, setFilter] = useState("All");
+    const navigate = useNavigate();
 
     const tasks = [
         {
@@ -70,7 +72,7 @@ function Tasks() {
                         requestId={task.requestId}
                         dueDate={task.dueDate}
                         status={task.status}
-                        onClick={() => console.log("Open task", task.number)}
+                        onClick={() => navigate(`/employee/tasks/${task.number}`)}
                     />
                 ))}
             </div>

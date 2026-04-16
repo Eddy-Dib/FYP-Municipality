@@ -10,6 +10,8 @@ import NotFound from "./Pages/404";
 import EmployeeLayout from "./Pages/EmployeeLayout";
 import EmployeeDashboard from "./Pages/EmployeeDashboard";
 import Tasks from "./Pages/Tasks";
+import TaskDetails from "./Components/Tasks/TaskDetails";
+import ReportEditor from "./Components/Tasks/ReportEditor";
 import Reports from "./Pages/Reports";
 
 // Citizen
@@ -31,7 +33,9 @@ function App() {
           element={<ProtectedRoute><EmployeeLayout /></ProtectedRoute>}>
           <Route index element={<EmployeeDashboard />} />
           <Route path="tasks" element={<Tasks />} />
-          <Route path="reports" element={<Reports />} />
+          <Route path="tasks/:id" element={<TaskDetails />} />
+          <Route path="tasks/:id/report" element={<ReportEditor />} />
+          <Route path="history" element={<Reports />} />
         </Route>
 
         <Route

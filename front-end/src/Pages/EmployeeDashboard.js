@@ -4,6 +4,7 @@ import { FaTasks, FaClock, FaBell, FaFileAlt } from "react-icons/fa";
 import { PriorityBadge, StatusBadge } from "../Components/UI/Badge";
 
 import styles from "./EmployeeDashboard.module.css";
+import { useNavigate } from "react-router-dom";
 
 function EmployeeDashboard() {
 
@@ -109,6 +110,8 @@ function EmployeeDashboard() {
         }
     ];
 
+    const navigate = useNavigate();
+
     return (
         <div >
             <h1>Dashboard</h1>
@@ -153,7 +156,7 @@ function EmployeeDashboard() {
                                 <td>{task.dueDate}</td>
                                 <td>
                                     <button className={styles.viewBtn}
-                                        onClick={() => console.log("View task", task.id)}>
+                                        onClick={() => navigate(`/employee/tasks/${task.id}`)}>
                                         View Details
                                     </button>
                                 </td>
