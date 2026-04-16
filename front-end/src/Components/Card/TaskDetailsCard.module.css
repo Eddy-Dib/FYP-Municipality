@@ -1,0 +1,56 @@
+.task {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+
+    padding: 16px;
+    gap: 12px;
+
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: var(--shadow);
+
+    transition: all 0.2s ease;
+}
+
+.task:hover {
+    transform: translateY(-2px);
+}
+
+.middle {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+}
+
+.title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 6px;
+}
+
+.middle p {
+    font-size: 13px;
+    color: var(--text-dark-muted);
+    line-height: 1.4;
+}
+
+.middle strong {
+    color: var(--text-dark);
+    font-weight: 600;
+}
+
+.middle p:nth-last-child(3) {
+    color: var(--primary-dark);
+    font-weight: 500;
+}
+
+.middle p:nth-last-child(4) {
+    color: var(--text-dark-muted);
+}
+
+.middle p strong:contains("Completed") {
+    color: var(--primary);
+}

@@ -4,6 +4,12 @@
     color: var(--text-dark);
 }
 
+.cardContainer{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
 .title {
     font-size: 28px;
     margin-bottom: 20px;

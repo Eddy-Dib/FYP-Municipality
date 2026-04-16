@@ -63,7 +63,7 @@ export const getDashboard = async (req, res) => {
             [empId]
         );
 
-        if (!reportRows) {
+        if (!reportRows || reportRows.length === 0) {
             return sendError(
                 res,
                 404,
@@ -73,19 +73,25 @@ export const getDashboard = async (req, res) => {
         }
 
         const [tasks] = await db.promise().query(
-            `SELECT 
+            `SELECT
                 t.Task_ID,
                 t.Name,
                 t.Priority,
                 t.DateAssigned,
                 s.TStat_Name AS Status,
                 r.Req_ID,
+                rt.RType_ID,
                 rt.RType_Duration,
-
-                CASE 
-                    WHEN t.DateAssigned >= DATE_SUB(NOW(), INTERVAL 7 DAY)
-                    THEN 1 ELSE 0
-                END AS IsRecentWindow
+                CONCAT(
+                    DATE_FORMAT(t.DateAssigned, '%y'),
+                    LPAD(t.Task_ID, 3, '0')
+                ) AS TaskNumber,
+                CONCAT(
+                    'REQ-',
+                    DATE_FORMAT(t.DateAssigned, '%y'),
+                    LPAD(rt.RType_ID, 2, '0'),
+                    LPAD(r.Req_ID, 3, '0')
+                ) AS RequestNumber
 
             FROM TASK t
             JOIN TASK_STATUSES s ON t.TStat_Code = s.TStat_Code
@@ -95,15 +101,11 @@ export const getDashboard = async (req, res) => {
             WHERE t.Emp_ID = ?
             AND s.TStat_Name != 'Done'
 
-            ORDER BY 
-                IsRecentWindow DESC,
-                t.DateAssigned DESC
-
-            LIMIT 10`,
+            ORDER BY t.DateAssigned DESC;`,
             [empId]
         );
 
-        if (!tasks) {
+        if (!tasks || tasks.length === 0) {
             return sendError(
                 res,
                 404,
@@ -122,12 +124,15 @@ export const getDashboard = async (req, res) => {
 
             return {
                 id: task.Task_ID,
+                number: task.TaskNumber,
                 name: task.Name,
                 status: task.Status,
                 priority:
                     task.Priority >= 2 ? "High" :
                         task.Priority === 1 ? "Medium" : "Low",
-                requestId: `REQ-${task.Req_ID}`,
+
+                requestId: task.RequestNumber,
+
                 dueDate: dueDate.toISOString().split("T")[0]
             };
         });
@@ -144,7 +149,6 @@ export const getDashboard = async (req, res) => {
         });
 
     } catch (err) {
-        //console.error("Dashboard Error:", err);
         return sendError(
             res,
             500,

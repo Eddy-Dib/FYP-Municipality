@@ -12,10 +12,10 @@ function EmployeeDashboard() {
     const navigate = useNavigate();
     const API_URL = process.env.REACT_APP_API_URL;
 
-
     const [summaryData, setSummaryData] = useState([]);
     const [recentTasks, setRecentTasks] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
         const fetchDashboard = async () => {
@@ -61,6 +61,7 @@ function EmployeeDashboard() {
 
             } catch (err) {
                 console.error("Dashboard fetch error:", err);
+                setError(err.response?.data?.message || "Failed to load dashboard");
 
                 if (err.response?.status === 401) {
                     localStorage.clear();
@@ -73,9 +74,10 @@ function EmployeeDashboard() {
         };
 
         fetchDashboard();
-    }, [navigate]);
+    }, [navigate, API_URL]);
 
     if (loading) return <h1>Loading dashboard...</h1>;
+    if (error) return <h1>{error}</h1>;
 
     return (
         <div>
@@ -113,11 +115,11 @@ function EmployeeDashboard() {
                     <tbody>
                         {recentTasks.map(task => (
                             <tr key={task.id}>
-                                <td>#{task.id}</td>
+                                <td>#{task.number}</td>
                                 <td>{task.name}</td>
                                 <td><StatusBadge value={task.status} /></td>
                                 <td><PriorityBadge value={task.priority} /></td>
-                                <td>{task.requestId}</td>
+                                <td>{task.requestNumber}</td>
                                 <td>{task.dueDate}</td>
                                 <td>
                                     <button

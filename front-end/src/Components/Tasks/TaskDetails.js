@@ -2,87 +2,73 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
 
-import { StatusBadge, PriorityBadge } from "../UI/Badge";
+import TaskDetailsCard from "../Card/TaskDetailsCard";
+import RequestDetailsCard from "../Card/RequestDetailsCard";
+import ReportDetailsCard from "../Card/ReportDetailsCard";
+
 import styles from "./TaskDetails.module.css";
+import axios from "axios";
 
 function TaskDetails() {
+    const API_URL = process.env.REACT_APP_API_URL;
+    const token = localStorage.getItem("token");
+
     const { id } = useParams();
     const navigate = useNavigate();
 
     const user = JSON.parse(localStorage.getItem("user"));
 
-    const [task, setTask] = useState(null);
+    const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
-    const fakeTasks = [
-        {
-            id: "101",
-            name: "Inspect Water Pipeline",
-            status: "In Progress",
-            priority: "High",
-            assignedDate: "2026-04-01",
-            assignedRole: "Engineer",
-            request: {
-                id: "REQ-5532",
-                type: "Maintenance Request",
-                status: "Submitted",
-                description: {
-                    location: "District A",
-                    issue: "Water leak in main pipeline",
-                    severity: "High"
-                }
-            }
-        },
-        {
-            id: "102",
-            name: "Approve Building Permit",
-            status: "Pending",
-            priority: "Medium",
-            assignedDate: "2026-04-02",
-            assignedRole: "Mayor",
-            request: {
-                id: "REQ-5511",
-                type: "Building Permit",
-                status: "Under Review",
-                description: {
-                    property_address: "123 Elm St",
-                    contractor: "John Doe"
-                }
-            }
-        }
-    ];
-
     useEffect(() => {
-        const foundTask = fakeTasks.find(t => t.id === id);
+        const fetchTask = async () => {
+            try {
+                setLoading(true);
+                setError("");
+                setData(null);
 
-        if (!foundTask) {
-            setError("Task not found");
-            setLoading(false);
-            return;
-        }
+                const res = await axios.get(
+                    `${API_URL}/employee/tasks/${id}`,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`
+                        }
+                    }
+                );
 
-        if (foundTask.assignedRole !== user?.role) {
-            setError("You are not authorised to view this task");
-            setLoading(false);
-            return;
-        }
+                setData(res?.data?.data || null);
 
-        setTask(foundTask);
-        setLoading(false);
+            } catch (err) {
+                const backendMessage =
+                    err?.response?.data?.message ||
+                    "Failed to load task details";
 
-    }, [id, user?.role]);
+                setError(backendMessage);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchTask();
+    }, [id]);
 
     const updateStatus = (newStatus) => {
-        setTask(prev => {
+        setData(prev => {
             if (!prev) return prev;
-            return { ...prev, status: newStatus };
+            return {
+                ...prev,
+                task: {
+                    ...prev.task,
+                    status: newStatus
+                }
+            };
         });
     };
 
     const renderActions = () => {
         switch (user?.role) {
-
             case "Engineer":
                 return (
                     <>
@@ -90,11 +76,15 @@ function TaskDetails() {
                             Start Task
                         </button>
 
-                        <button onClick={() => navigate(`/employee/tasks/${task.id}/report`)}>
+                        <button
+                            onClick={() =>
+                                navigate(`/employee/tasks/${id}/report`)
+                            }
+                        >
                             Write Technical Report
                         </button>
 
-                        <button onClick={() => updateStatus("Done")}>
+                        <button onClick={() => updateStatus("Completed")}>
                             Mark Completed
                         </button>
                     </>
@@ -137,8 +127,6 @@ function TaskDetails() {
         );
     }
 
-    const requestDetails = task.request.description;
-
     return (
         <div className={styles.container}>
 
@@ -147,33 +135,10 @@ function TaskDetails() {
             </button>
 
             <h1 className={styles.title}>Task Details</h1>
-
-            <div className={styles.card}>
-                <h2>{task.name}</h2>
-
-                <p><strong>ID:</strong> #{task.id}</p>
-
-                <div className={styles.badges}>
-                    <StatusBadge value={task.status} />
-                    <PriorityBadge value={task.priority} />
-                </div>
-
-                <p><strong>Assigned:</strong> {task.assignedDate}</p>
-            </div>
-
-            <div className={styles.card}>
-                <h2>Request</h2>
-
-                <p><strong>Type:</strong> {task.request.type}</p>
-                <p><strong>Status:</strong> {task.request.status}</p>
-
-                <div className={styles.requestDetails}>
-                    {Object.entries(requestDetails).map(([k, v]) => (
-                        <p key={k}>
-                            <strong>{k.replaceAll("_", " ")}:</strong> {v}
-                        </p>
-                    ))}
-                </div>
+            <div className={styles.cardContainer}>
+            <TaskDetailsCard task={data?.task} />
+            <RequestDetailsCard request={data?.request} />
+            <ReportDetailsCard report={data?.report} />
             </div>
 
             <div className={styles.actions}>

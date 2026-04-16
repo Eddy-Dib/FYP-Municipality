@@ -1,41 +1,67 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 import TaskCard from "../Components/Card/TaskCard";
-
 import styles from "./Tasks.module.css";
-import { useNavigate } from "react-router-dom";
 
 function Tasks() {
+    const navigate = useNavigate();
+    const API_URL = process.env.REACT_APP_API_URL;
 
     const [filter, setFilter] = useState("All");
-    const navigate = useNavigate();
+    const [tasks, setTasks] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-    const tasks = [
-        {
-            number: 101,
-            priority: "High",
-            title: "Inspect Water Pipeline",
-            requestId: "REQ-5532",
-            dueDate: "2026-04-15",
-            status: "In Progress"
-        },
-        {
-            number: 102,
-            priority: "Medium",
-            title: "Approve Building Permit",
-            requestId: "REQ-5511",
-            dueDate: "2026-04-18",
-            status: "Pending"
-        },
-        {
-            number: 103,
-            priority: "Low",
-            title: "Road Damage Report Review",
-            requestId: "REQ-5499",
-            dueDate: "2026-04-10",
-            status: "Done"
-        }
-    ];
+    useEffect(() => {
+        const fetchTasks = async () => {
+            try {
+                const token = localStorage.getItem("token");
+
+                const res = await axios.get(
+                    `${API_URL}/employee/dashboard`,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`
+                        }
+                    }
+                );
+
+                const backendTasks = res.data.data.recentTasks;
+
+                const formattedTasks = backendTasks.map(task => ({
+                    id: task.id,
+                    number: task.taskNumber,
+                    priority: task.priority,
+                    title: task.name,
+                    requestId: task.requestId,
+                    dueDate: task.dueDate,
+                    status: task.status
+                }));
+
+                setTasks(formattedTasks);
+
+            } catch (err) {
+                console.error("Tasks fetch error:", err);
+                setError(
+                    err?.response?.data?.message ||
+                    err?.response?.data?.error ||
+                    "Failed to load tasks"
+                );
+
+                if (err.response?.status === 401) {
+                    localStorage.clear();
+                    sessionStorage.clear();
+                    navigate("/");
+                }
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchTasks();
+    }, [navigate]);
 
     const filteredTasks = tasks.filter(task => {
         if (filter === "All") return true;
@@ -45,9 +71,11 @@ function Tasks() {
         return true;
     });
 
+    if (loading) return <h1>Loading tasks...</h1>;
+    if (error) return <h1>{error}</h1>;
+
     return (
         <div>
-
             <h1 className={styles.title}>Tasks</h1>
 
             <div className={styles.ribbon}>
@@ -65,18 +93,19 @@ function Tasks() {
             <div className={styles.list}>
                 {filteredTasks.map(task => (
                     <TaskCard
-                        key={task.number}
+                        key={task.id}
                         number={task.number}
                         priority={task.priority}
                         title={task.title}
                         requestId={task.requestId}
                         dueDate={task.dueDate}
                         status={task.status}
-                        onClick={() => navigate(`/employee/tasks/${task.number}`)}
+                        onClick={() =>
+                            navigate(`/employee/tasks/${task.id}`)
+                        }
                     />
                 ))}
             </div>
-
         </div>
     );
 }
