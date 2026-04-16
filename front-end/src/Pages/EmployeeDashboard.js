@@ -1,119 +1,84 @@
-import SummaryCard from "../Components/Card/SummaryCard";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
-import { FaTasks, FaClock, FaBell, FaFileAlt } from "react-icons/fa";
+import SummaryCard from "../Components/Card/SummaryCard";
+import { FaTasks, FaClock, FaExclamationTriangle, FaFileAlt } from "react-icons/fa";
 import { PriorityBadge, StatusBadge } from "../Components/UI/Badge";
 
 import styles from "./EmployeeDashboard.module.css";
 import { useNavigate } from "react-router-dom";
 
 function EmployeeDashboard() {
-
-    const summaryData = [
-        {
-            title: "Assigned Tasks",
-            value: 12,
-            subtitle: "Tasks currently assigned to you",
-            icon: <FaTasks />
-        },
-        {
-            title: "Pending Tasks",
-            value: 5,
-            subtitle: "Waiting for action",
-            icon: <FaClock />
-        },
-        {
-            title: "Notifications",
-            value: 3,
-            subtitle: "Unread updates",
-            icon: <FaBell />
-        },
-        {
-            title: "Reports",
-            value: 2,
-            subtitle: "Generated this week",
-            icon: <FaFileAlt />
-        }
-    ];
-
-    const recentTasks = [
-        {
-            id: 101,
-            name: "Inspect Water Pipeline",
-            status: "In Progress",
-            priority: "High",
-            requestId: "REQ-5532",
-            dueDate: "2026-04-15"
-        },
-        {
-            id: 102,
-            name: "Approve Building Permit",
-            status: "Pending",
-            priority: "Medium",
-            requestId: "REQ-5511",
-            dueDate: "2026-04-18"
-        },
-        {
-            id: 103,
-            name: "Road Damage Report Review",
-            status: "Done",
-            priority: "Low",
-            requestId: "REQ-5499",
-            dueDate: "2026-04-10"
-        },
-        {
-            id: 101,
-            name: "Inspect Water Pipeline",
-            status: "In Progress",
-            priority: "High",
-            requestId: "REQ-5532",
-            dueDate: "2026-04-15"
-        },
-        {
-            id: 102,
-            name: "Approve Building Permit",
-            status: "Pending",
-            priority: "Medium",
-            requestId: "REQ-5511",
-            dueDate: "2026-04-18"
-        },
-        {
-            id: 103,
-            name: "Road Damage Report Review",
-            status: "Done",
-            priority: "Low",
-            requestId: "REQ-5499",
-            dueDate: "2026-04-10"
-        },
-        {
-            id: 101,
-            name: "Inspect Water Pipeline",
-            status: "In Progress",
-            priority: "High",
-            requestId: "REQ-5532",
-            dueDate: "2026-04-15"
-        },
-        {
-            id: 102,
-            name: "Approve Building Permit",
-            status: "Pending",
-            priority: "Medium",
-            requestId: "REQ-5511",
-            dueDate: "2026-04-18"
-        },
-        {
-            id: 103,
-            name: "Road Damage Report Review",
-            status: "Done",
-            priority: "Low",
-            requestId: "REQ-5499",
-            dueDate: "2026-04-10"
-        }
-    ];
-
     const navigate = useNavigate();
+    const API_URL = process.env.REACT_APP_API_URL;
+
+
+    const [summaryData, setSummaryData] = useState([]);
+    const [recentTasks, setRecentTasks] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchDashboard = async () => {
+            try {
+                const token = localStorage.getItem("token");
+
+                const res = await axios.get(`${API_URL}/employee/dashboard`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+
+                const data = res.data.data;
+
+                setSummaryData([
+                    {
+                        title: "Assigned Tasks",
+                        value: data.summary.assignedTasks,
+                        subtitle: "Tasks currently assigned to you",
+                        icon: <FaTasks />
+                    },
+                    {
+                        title: "Pending Tasks",
+                        value: data.summary.pendingTasks,
+                        subtitle: "Waiting for action",
+                        icon: <FaClock />
+                    },
+                    {
+                        title: "Outstanding Tasks",
+                        value: data.summary.overdueTasks,
+                        subtitle: "Tasks past due date",
+                        icon: <FaExclamationTriangle />
+                    },
+                    {
+                        title: "Reports",
+                        value: data.summary.reports,
+                        subtitle: "Generated reports",
+                        icon: <FaFileAlt />
+                    }
+                ]);
+
+                setRecentTasks(data.recentTasks);
+
+            } catch (err) {
+                console.error("Dashboard fetch error:", err);
+
+                if (err.response?.status === 401) {
+                    localStorage.clear();
+                    sessionStorage.clear();
+                    navigate("/");
+                }
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchDashboard();
+    }, [navigate]);
+
+    if (loading) return <h1>Loading dashboard...</h1>;
 
     return (
-        <div >
+        <div>
             <h1>Dashboard</h1>
 
             <div className={styles.summaryGrid}>
@@ -155,8 +120,10 @@ function EmployeeDashboard() {
                                 <td>{task.requestId}</td>
                                 <td>{task.dueDate}</td>
                                 <td>
-                                    <button className={styles.viewBtn}
-                                        onClick={() => navigate(`/employee/tasks/${task.id}`)}>
+                                    <button
+                                        className={styles.viewBtn}
+                                        onClick={() => navigate(`/employee/tasks/${task.id}`)}
+                                    >
                                         View Details
                                     </button>
                                 </td>
