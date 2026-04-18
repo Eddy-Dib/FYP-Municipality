@@ -128,7 +128,7 @@ export const getTaskDetails = async (req, res) => {
                             ? "Medium"
                             : "Low",
                 assignedDate: data.DateAssigned.toISOString().split("T")[0],
-                completedDate: data.DateCompleted,
+                completedDate: data.DateCompleted.toISOString().split("T")[0],
                 dueDate: dueDate.toISOString().split("T")[0]
             },
 
@@ -221,6 +221,13 @@ export const updateTaskStatus = async (req, res) => {
             `UPDATE TASK SET TStat_Code = ? WHERE Task_ID = ?`,
             [statusCode, taskId]
         );
+
+        if (status === "Completed") {
+            await db.promise().query(
+                `UPDATE TASK SET DateCompleted = NOW() WHERE Task_ID = ?`,
+                [taskId]
+            );
+        }
 
         return sendSuccess(res, "Task status updated", {
             taskId,
