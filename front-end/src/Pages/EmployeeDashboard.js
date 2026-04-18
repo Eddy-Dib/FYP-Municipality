@@ -58,7 +58,7 @@ function EmployeeDashboard() {
                 ]);
 
                 setRecentTasks(data.recentTasks);
-
+                
             } catch (err) {
                 console.error("Dashboard fetch error:", err);
                 setError(err.response?.data?.message || "Failed to load dashboard");
@@ -119,7 +119,7 @@ function EmployeeDashboard() {
                                 <td>{task.name}</td>
                                 <td><StatusBadge value={task.status} /></td>
                                 <td><PriorityBadge value={task.priority} /></td>
-                                <td>{task.requestNumber}</td>
+                                <td>{task.requestId}</td>
                                 <td>{task.dueDate}</td>
                                 <td>
                                     <button

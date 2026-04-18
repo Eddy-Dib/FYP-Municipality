@@ -32,7 +32,7 @@ function Tasks() {
 
                 const formattedTasks = backendTasks.map(task => ({
                     id: task.id,
-                    number: task.taskNumber,
+                    number: task.number,
                     priority: task.priority,
                     title: task.name,
                     requestId: task.requestId,

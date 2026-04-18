@@ -1,6 +1,7 @@
 import db from "../config/db.js";
 import { sendSuccess, sendError } from "../utils/responses.js";
 
+// returns task details
 export const getTaskDetails = async (req, res) => {
     const empId = req.user?.id;
     const taskId = req.params.id;
@@ -163,5 +164,72 @@ export const getTaskDetails = async (req, res) => {
     } catch (err) {
         console.error("TASK DETAILS ERROR:", err);
         return sendError(res, 500, "Failed to load task", "TASK_SERVER_ERROR");
+    }
+};
+
+
+// updates task status in database
+export const updateTaskStatus = async (req, res) => {
+    const empId = req.user?.id;
+    const taskId = req.params.id;
+    const { status } = req.body;
+
+    if (!req.user) {
+        return sendError(res, 401, "Unauthorized", "NO_USER_CONTEXT");
+    }
+
+    if (!req.user.isEmployee) {
+        return sendError(res, 403, "Employees only", "NOT_EMPLOYEE");
+    }
+
+    if (!taskId || isNaN(taskId)) {
+        return sendError(res, 400, "Invalid task id", "BAD_TASK_ID");
+    }
+
+    if (!status) {
+        return sendError(res, 400, "Status is required", "MISSING_STATUS");
+    }
+
+    try {
+        const statusMap = {
+            "Pending": 1,
+            "In Progress": 2,
+            "Escalated": 3,
+            "On Hold": 4,
+            "Completed": 5,
+            "Rejected": 6,
+            "Cancelled": 7
+        };
+
+        const statusCode = statusMap[status];
+
+        if (!statusCode) {
+            return sendError(res, 400, "Invalid status value", "INVALID_STATUS");
+        }
+
+        // makes sure the employee is assigned to the task first
+        const [taskRows] = await db.promise().query(
+            `SELECT Task_ID FROM TASK WHERE Task_ID = ? AND Emp_ID = ?`,
+            [taskId, empId]
+        );
+
+        if (!taskRows.length) {
+            return sendError(res, 404, "Task not found", "TASK_NOT_FOUND");
+        }
+
+        await db.promise().query(
+            `UPDATE TASK SET TStat_Code = ? WHERE Task_ID = ?`,
+            [statusCode, taskId]
+        );
+
+        return sendSuccess(res, "Task status updated", {
+            taskId,
+            status,
+            statusCode
+        });
+
+    } catch (err) {
+        console.error("UPDATE TASK STATUS ERROR:", err);
+        return sendError(res, 500, "Failed to update task status", "TASK_UPDATE_ERROR");
     }
 };

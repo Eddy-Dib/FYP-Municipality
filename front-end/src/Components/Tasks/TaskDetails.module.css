@@ -84,28 +84,28 @@
     transition: 0.2s ease;
 }
 
-.actions button:nth-child(1) {
+.startTaskBtn {
     background: var(--primary-darker);
 }
 
-.actions button:nth-child(1):hover {
+.startTaskBtn:hover {
     background: var(--primary-hover);
 }
 
-.actions button:nth-child(2) {
-    background: #8e44ad;
-}
-
-.actions button:nth-child(2):hover {
-    background: #7d3c98;
-}
-
-.actions button:nth-child(3) {
+.completeTaskBtn {
     background: #27ae60;
 }
 
-.actions button:nth-child(3):hover {
+.completeTaskBtn:hover {
     background: #1e8449;
+}
+
+.writeReportBtn {
+    background: #8e44ad;
+}
+
+.writeReportBtn:hover {
+    background: #7d3c98;
 }
 
 .backBtn {
@@ -130,7 +130,7 @@
     color: var(--text-light);
 }
 
-@media (max-width: 768px) {
+/* @media (max-width: 768px) {
     .container {
         padding: 16px;
     }
@@ -142,4 +142,4 @@
     .actions button {
         width: 100%;
     }
-}
+} */

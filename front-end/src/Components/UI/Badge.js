@@ -42,8 +42,8 @@ export function StatusBadge({ value }) {
             className: "pending",
             icon: <FaClock />
         },
-        Done: {
-            label: "Done",
+        Completed: {
+            label: "Completed",
             className: "done",
             icon: <FaCheckCircle />
         }

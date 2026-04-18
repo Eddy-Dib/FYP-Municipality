@@ -29,16 +29,12 @@ function TaskDetails() {
                 setError("");
                 setData(null);
 
-                const res = await axios.get(
-                    `${API_URL}/employee/tasks/${id}`,
-                    {
-                        headers: {
-                            Authorization: `Bearer ${token}`
-                        }
-                    }
+                const res = await axios.get(`${API_URL}/employee/tasks/${id}`,
+                    { headers: { Authorization: `Bearer ${token}` } }
                 );
 
                 setData(res?.data?.data || null);
+                console.log("FULL BACKEND RESPONSE:", res.data);
 
             } catch (err) {
                 const backendMessage =
@@ -54,40 +50,41 @@ function TaskDetails() {
         fetchTask();
     }, [id]);
 
-    const updateStatus = (newStatus) => {
-        setData(prev => {
-            if (!prev) return prev;
-            return {
-                ...prev,
-                task: {
-                    ...prev.task,
-                    status: newStatus
-                }
-            };
-        });
+    const updateStatus = async (newStatus) => {
+        try {
+            await axios.patch(`${API_URL}/employee/tasks/${id}/status`,
+                { status: newStatus },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+
+            setData(prev => {
+                if (!prev) return prev;
+                return {
+                    ...prev,
+                    task: {
+                        ...prev.task,
+                        status: newStatus
+                    }
+                };
+            });
+        } catch (err) {
+            console.error(err?.response?.data);
+            setError("Failed to update status");
+        }
     };
 
     const renderActions = () => {
         switch (user?.role) {
             case "Engineer":
                 return (
-                    <>
-                        <button onClick={() => updateStatus("In Progress")}>
-                            Start Task
-                        </button>
-
-                        <button
-                            onClick={() =>
-                                navigate(`/employee/tasks/${id}/report`)
-                            }
-                        >
-                            Write Technical Report
-                        </button>
-
-                        <button onClick={() => updateStatus("Completed")}>
-                            Mark Completed
-                        </button>
-                    </>
+                    <button
+                        className={styles.writeReportBtn}
+                        onClick={() =>
+                            navigate(`/employee/tasks/${id}/report`)
+                        }
+                    >
+                        Write Technical Report
+                    </button>
                 );
 
             case "Mayor":
@@ -136,12 +133,30 @@ function TaskDetails() {
 
             <h1 className={styles.title}>Task Details</h1>
             <div className={styles.cardContainer}>
-            <TaskDetailsCard task={data?.task} />
-            <RequestDetailsCard request={data?.request} />
-            <ReportDetailsCard report={data?.report} />
+                <TaskDetailsCard task={data?.task} />
+                <RequestDetailsCard request={data?.request} />
+                <ReportDetailsCard report={data?.report} />
             </div>
 
             <div className={styles.actions}>
+                {data?.task?.status === "Pending" && (
+                    <button
+                        className={styles.startTaskBtn}
+                        onClick={() => updateStatus("In Progress")}
+                    >
+                        Start Task
+                    </button>
+                )}
+
+                {data?.task?.status === "In Progress" && (
+                    <button
+                        className={styles.completeTaskBtn}
+                        onClick={() => updateStatus("Completed")}
+                    >
+                        Mark Completed
+                    </button>
+                )}
+
                 {renderActions()}
             </div>
 
