@@ -127,7 +127,7 @@ export const getTaskDetails = async (req, res) => {
                         : data.Priority === 1
                             ? "Medium"
                             : "Low",
-                assignedDate: data.DateAssigned,
+                assignedDate: data.DateAssigned.toISOString().split("T")[0],
                 completedDate: data.DateCompleted,
                 dueDate: dueDate.toISOString().split("T")[0]
             },

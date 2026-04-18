@@ -68,6 +68,12 @@ function Tasks() {
         if (filter === "High Priority") return task.priority === "High";
         if (filter === "Pending") return task.status === "Pending";
         if (filter === "In Progress") return task.status === "In Progress";
+        if (filter === "Overdue") {
+            const today = new Date();
+            const dueDate = new Date(task.dueDate);
+
+            return ( task.status !== "Completed" && dueDate <= today);
+        }
         return true;
     });
 
@@ -79,7 +85,7 @@ function Tasks() {
             <h1 className={styles.title}>Tasks</h1>
 
             <div className={styles.ribbon}>
-                {["All", "High Priority", "Pending", "In Progress"].map(tab => (
+                {["All", "High Priority", "Pending", "In Progress", "Overdue"].map(tab => (
                     <button
                         key={tab}
                         className={`${styles.tab} ${filter === tab ? styles.active : ""}`}
