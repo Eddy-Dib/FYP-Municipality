@@ -55,7 +55,25 @@ function ReportPrint() {
             </div>
 
             <div className={styles.content}>
-                <p>{report.description}</p>
+                {report.description.split("\n").map((line, i) => {
+                    const trimmed = line.trim();
+
+                    if (trimmed.startsWith("# ")) {
+                        return <h1 key={i}>{trimmed.replace("#", "").trim()}</h1>;
+                    }
+
+                    if (trimmed.startsWith("## ")) {
+                        return <h2 key={i}>{trimmed.replace("##", "").trim()}</h2>;
+                    }
+
+                    if (trimmed.startsWith("### ")) {
+                        return <h3 key={i}>{trimmed.replace("###", "").trim()}</h3>;
+                    }
+
+                    if (!trimmed) return <br key={i} />;
+
+                    return <p key={i}>{trimmed}</p>;
+                })}
             </div>
         </div>
     );
