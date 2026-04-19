@@ -39,6 +39,7 @@ export const getTaskDetails = async (req, res) => {
                 rs.RStat_Name AS RequestStatus,
                 rt.RType_Name,
                 rt.RType_Duration,
+                rpt.RepType_Name AS ReportTypeName,
 
                 CONCAT(
                     DATE_FORMAT(t.DateAssigned, '%y'),
@@ -81,6 +82,7 @@ export const getTaskDetails = async (req, res) => {
             LEFT JOIN CITY city ON s.City_ID = city.City_ID
 
             LEFT JOIN REPORT rep ON rep.Task_ID = t.Task_ID
+            LEFT JOIN REP_TYPE rpt on rep.RepType_ID = rpt.RepType_ID
 
             WHERE t.Task_ID = ?
             AND t.Emp_ID = ?`,
@@ -156,7 +158,7 @@ export const getTaskDetails = async (req, res) => {
                 ? {
                     title: data.ReportTitle,
                     description: data.ReportDescription,
-                    type: data.RepType_ID
+                    type: data.ReportTypeName
                 }
                 : null
         });

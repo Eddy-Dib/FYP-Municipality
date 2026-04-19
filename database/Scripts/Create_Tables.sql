@@ -41,6 +41,14 @@ CREATE TABLE REP_TYPE (
     PRIMARY KEY (RepType_ID)
 );
 
+-- Storing states of issued documents (Draft, Approved ...)
+CREATE TABLE ISSDOC_STATUSES (
+    IssStat_Code INT NOT NULL,
+    IssStat_Name VARCHAR(100) NOT NULL,
+    IssStat_Desc VARCHAR(255),
+    PRIMARY KEY (IssStat_Code)
+);
+
 -- Stores types of requests (Building permit, Business license ...), duration: expected time to be done
 CREATE TABLE REQUEST_TYPES (
     RType_ID INT NOT NULL,
@@ -279,6 +287,38 @@ CREATE TABLE REPORT (
     FOREIGN KEY (Task_ID) REFERENCES TASK(Task_ID)
         ON UPDATE CASCADE
         ON DELETE CASCADE
+);
+
+-- Official documents issued to citizens (final output of a request)
+CREATE TABLE ISSUED_DOCUMENT (
+    IssDoc_ID INT NOT NULL AUTO_INCREMENT,
+    Title VARCHAR(150) NOT NULL,
+    Content TEXT,
+    DateIssued DATETIME,
+
+    IssStat_Code INT NOT NULL DEFAULT 1, -- default = Draft
+
+    Req_ID INT NOT NULL,
+    Created_By INT NOT NULL,
+    Approved_By INT,
+
+    PRIMARY KEY (IssDoc_ID),
+
+    FOREIGN KEY (IssStat_Code) REFERENCES ISSDOC_STATUSES(IssStat_Code)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT,
+
+    FOREIGN KEY (Req_ID) REFERENCES REQUEST(Req_ID)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+
+    FOREIGN KEY (Created_By) REFERENCES EMPLOYEE(Emp_ID)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+
+    FOREIGN KEY (Approved_By) REFERENCES EMPLOYEE(Emp_ID)
+        ON UPDATE CASCADE
+        ON DELETE SET NULL
 );
 
 -- stores amount needed per location for each fee type. TBD: automation (backend or database?)
