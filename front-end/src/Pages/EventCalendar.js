@@ -6,7 +6,7 @@ import styles from "./EventCalendar.module.css";
 function EventCalendar() {
 
     const [date, setDate] = useState(new Date());
-    const [expanded, setExpanded] = useState(false);
+    //const [expanded, setExpanded] = useState(false);
 
     const events = [
 
@@ -38,59 +38,51 @@ function EventCalendar() {
 
     ];
 
-    const getEvent = (dateObj) => {
-        const d = dateObj.toISOString().split("T")[0];
-        return events.find(e => e.date === d);
-    };
+    const getEvents = (dateObj) => {
+    const d = dateObj.toISOString().split("T")[0];
+    return events.filter(e => e.date === d); // ✅ ALWAYS ARRAY
+};
 
-    const handleDateChange = (selectedDate) => {
-        setDate(selectedDate);
+    //const handleDateChange = (selectedDate) => {
+        //setDate(selectedDate);
 
-        const event = getEvent(selectedDate);
-        if (event) {
-            setExpanded(true); // 🔥 expand ONLY if event exists
-        }
-    };
+        //const event = getEvent(selectedDate);
+       // if (event) {
+            //setExpanded(true); // 🔥 expand ONLY if event exists
+        //}
+    //};
 
-    const selectedEvent = getEvent(date);
+    const selectedEvents = getEvents(date);
 
     return (
-        <div className={styles.wrapper}>
-
-            <div className={`${styles.container} ${expanded ? styles.expanded : ""}`}>
-
-                {/* 🔙 BACK BUTTON */}
-                {expanded && (
-                    <button 
-                        className={styles.backBtn}
-                        onClick={() => setExpanded(false)}
-                    >
-                        ← Back
-                    </button>
-                )}
+       <div className={styles.wrapper}>
+            <div className={styles.container}>
 
                 {/* 📅 CALENDAR */}
                 <div className={styles.calendarBox}>
                     <Calendar
-                        onChange={handleDateChange}
+                        onChange={setDate}
                         value={date}
-                        tileClassName={({ date }) => {
-                            return getEvent(date) ? styles.eventDay : "";
-                        }}
+                        tileClassName={({ date }) =>
+                            getEvents(date).length > 0 ? styles.eventDay : ""
+                        }
                     />
                 </div>
 
-                {/* 📄 DETAILS */}
-                {expanded && selectedEvent && (
-                    <div className={styles.detailsBox}>
-                        <h2>{selectedEvent.title}</h2>
-                        <p>🕒 {selectedEvent.time}</p>
-                        <p>{selectedEvent.details}</p>
+                {/* 📌 EVENT BOX (NOW BELOW) */}
+                {selectedEvents.length > 0 && (
+                    <div className={styles.eventBox}>
+                        {selectedEvents.map((ev, i) => (
+                            <div key={i} className={styles.eventItem}>
+                                <h3>{ev.title}</h3>
+                                <p>🕒 {ev.time}</p>
+                                <p>{ev.details}</p>
+                            </div>
+                        ))}
                     </div>
                 )}
 
             </div>
-
         </div>
     );
 }
