@@ -1,5 +1,6 @@
 import db from "../config/db.js";
 import { sendSuccess, sendError } from "../utils/responses.js";
+import { formatDate } from "../utils/formats.js";
 
 // returns task details
 export const getTaskDetails = async (req, res) => {
@@ -129,9 +130,9 @@ export const getTaskDetails = async (req, res) => {
                         : data.Priority === 1
                             ? "Medium"
                             : "Low",
-                assignedDate: data.DateAssigned.toISOString().split("T")[0],
-                completedDate: data.DateCompleted.toISOString().split("T")[0],
-                dueDate: dueDate.toISOString().split("T")[0]
+                assignedDate: formatDate(data.DateAssigned),
+                completedDate: formatDate(data.DateCompleted),
+                dueDate: formatDate(dueDate)
             },
 
             request: {
@@ -140,7 +141,7 @@ export const getTaskDetails = async (req, res) => {
                 type: data.RType_Name,
                 description: requestDescription,
                 status: data.RequestStatus,
-                dueDate: dueDate.toISOString().split("T")[0]
+                dueDate: formatDate(dueDate)
             },
 
             citizen: {
