@@ -65,6 +65,7 @@ export const getTaskDetails = async (req, res) => {
                     l.Floor
                 ) AS Address,
 
+                rep.Report_ID AS Report_ID,
                 rep.Title AS ReportTitle,
                 rep.Description AS ReportDescription,
                 rep.RepType_ID
@@ -155,8 +156,9 @@ export const getTaskDetails = async (req, res) => {
                 address: data.Address
             },
 
-            report: data.ReportTitle
+            report: data.Report_ID
                 ? {
+                    reportID: data.Report_ID,
                     title: data.ReportTitle,
                     description: data.ReportDescription,
                     type: data.ReportTypeName
@@ -228,6 +230,11 @@ export const updateTaskStatus = async (req, res) => {
         if (status === "Completed") {
             await db.promise().query(
                 `UPDATE TASK SET DateCompleted = NOW() WHERE Task_ID = ?`,
+                [taskId]
+            );
+        } else {
+            await db.promise().query(
+                `UPDATE TASK SET DateCompleted = NULL WHERE Task_ID = ?`,
                 [taskId]
             );
         }

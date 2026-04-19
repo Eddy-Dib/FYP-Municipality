@@ -3,6 +3,7 @@ import { getDashboard } from "../controllers/employeeController.js";
 import { authMiddleware } from "../middleware/authMiddleware.js";
 import { getTaskDetails, updateTaskStatus } from "../controllers/taskController.js";
 import {createComplaint, getComplaints, approveComplaint, rejectComplaint} from "../controllers/complaintsController.js";
+import { getReportByTask, updateReport } from "../controllers/reportController.js";
 
 const router = express.Router();
 
@@ -14,5 +15,8 @@ router.post("/complaints", authMiddleware, createComplaint);
 router.get("/complaints", authMiddleware, getComplaints);
 router.patch("/complaints/:id/approve", authMiddleware, approveComplaint);
 router.delete("/complaints/:id", authMiddleware, rejectComplaint);
+
+router.get("/report/:id", authMiddleware, getReportByTask);
+router.post("/report/:taskId", authMiddleware, updateReport);
 
 export default router;

@@ -59,11 +59,13 @@ function TaskDetails() {
 
             setData(prev => {
                 if (!prev) return prev;
+                const isCompleted = newStatus === "Completed";
                 return {
                     ...prev,
                     task: {
                         ...prev.task,
-                        status: newStatus
+                        status: newStatus,
+                        completedDate: isCompleted ? new Date().toISOString().split("T")[0] : null
                     }
                 };
             });
@@ -77,14 +79,8 @@ function TaskDetails() {
         switch (user?.role) {
             case "Engineer":
                 return (
-                    <button
-                        className={styles.writeReportBtn}
-                        onClick={() =>
-                            navigate(`/employee/tasks/${id}/report`)
-                        }
-                    >
-                        Write Technical Report
-                    </button>
+                    <>
+                    </>
                 );
 
             case "Mayor":
@@ -154,6 +150,26 @@ function TaskDetails() {
                         onClick={() => updateStatus("Completed")}
                     >
                         Mark Completed
+                    </button>
+                )}
+
+                {data?.task?.status === "Completed" && (
+                    <button
+                        className={styles.completeTaskBtn}
+                        onClick={() => updateStatus("In Progress")}
+                    >
+                        Undo Completion
+                    </button>
+                )}
+
+                {user?.isEmployee && (
+                    <button
+                        className={styles.writeReportBtn}
+                        onClick={() =>
+                            navigate(`/employee/tasks/${id}/report`)
+                        }
+                    >
+                        {data?.report ? "Edit Report" : "Write Report"}
                     </button>
                 )}
 

@@ -1,9 +1,14 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FaArrowLeft } from "react-icons/fa";
+import SuccessToast from "../UI/SuccessToast";
+import axios from "axios";
 import styles from "./ReportEditor.module.css";
 
 function ReportEditor() {
+    const API_URL = process.env.REACT_APP_API_URL;
+    const token = localStorage.getItem("token");
+
     const { id } = useParams();
     const navigate = useNavigate();
 
@@ -11,6 +16,9 @@ function ReportEditor() {
 
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
+    const [showToast, setShowToast] = useState(false);
 
     const getDefaultType = () => {
         switch (user?.role) {
@@ -27,21 +35,61 @@ function ReportEditor() {
         }
     };
 
-    const handleSubmit = () => {
-        const newReport = {
-            taskId: id,
-            title,
-            content,
-            type: getDefaultType(),
-            date: new Date().toISOString().split("T")[0]
+    useEffect(() => {
+        const fetchReport = async () => {
+            try {
+                setLoading(true);
+                setError("");
+
+                const res = await axios.get(
+                    `${API_URL}/employee/report/${id}`,
+                    { headers: { Authorization: `Bearer ${token}` } }
+                );
+
+                const report = res?.data?.data?.report;
+
+                if (report) {
+                    setTitle(report.title || "");
+                    setContent(report.description || "");
+                }
+
+            } catch (err) {
+                console.error(err?.response?.data);
+                setError("Failed to load report");
+            } finally {
+                setLoading(false);
+            }
         };
 
-        console.log("Saved report:", newReport);
+        fetchReport();
+    }, [id]);
 
-        // later: send to backend here
+    const handleSubmit = async () => {
+        try {
+            await axios.post(
+                `${API_URL}/employee/report/${id}`,
+                {
+                    title,
+                    description: content,
+                    type: getDefaultType()
+                },
+                {
+                    headers: { Authorization: `Bearer ${token}` }
+                }
+            );
 
-        navigate("/employee/history");
+            setShowToast(true);
+
+
+        } catch (err) {
+            console.error(err?.response?.data);
+            setError("Failed to save report");
+        }
     };
+
+    if (loading) return <h1>Loading...</h1>
+
+    if (error) return <h1>{error}</h1>
 
     return (
         <div className={styles.container}>
@@ -75,7 +123,12 @@ function ReportEditor() {
                     Submit Report
                 </button>
             </div>
-
+            {showToast && (
+                <SuccessToast
+                    message="Success"
+                    onClose={() => setShowToast(false)}
+                />
+            )}
         </div>
     );
 }
