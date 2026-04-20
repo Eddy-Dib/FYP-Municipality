@@ -320,37 +320,55 @@
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    gap: 60px;
+    gap: 80px;
+    margin: 0 auto;
+    padding: 160px 20px 80px 20px;
     flex-wrap: wrap;
 }
 .calendarLeft {
-    padding: 180px;
-    flex: 2;
-    min-width: 320px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    padding-top: 70px;
+
 }
 
 .calendarRight {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     background: #fff;
-    padding: 140px;
-    margin-right: auto;
     flex: 1;
+    min-width: 400px;
+    position: relative;
 }
 
 .calendarRight img {
-    width: 400px;
+    width: 100%;
+    max-width: 660px;
+    height: auto;
 
 }
 
 .calendarText {
-    margin-top: 15px;
     text-align: center;
+    /*margin-right: 300px;*/
+    margin-top: -110px;
+    max-width: 600px; 
+    margin-right: 90px;
 }
 
 .calendarText h3 {
+    color: #183b6b;
     margin-bottom: 8px;
+    font-size: 30px;
 }
 
 .calendarText p {
+    width: 100%;
     color: #666;
-    font-size: 14px;
+    font-size: 15px;
+    line-height: 1.8;
 }

@@ -89,6 +89,9 @@ function CitizenDashboard() {
             </div>
 
 
+            <Map/>
+
+
 
 
             {/* <div className={styles.contactSection}>
