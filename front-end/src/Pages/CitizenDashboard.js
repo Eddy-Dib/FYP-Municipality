@@ -2,11 +2,12 @@ import styles from "./CitizenLayout.module.css";
 import videoFile from "../Assets/Video.mp4";
 import calendarImg from "../Assets/Municipality.jpg";
 
-import { FaCity, FaUsers, FaHardHat } from "react-icons/fa";
+import { FaCity, FaUsers, FaHardHat, FaFacebookF, FaInstagram, FaTiktok } from "react-icons/fa";
 
 import Map from "./Map.js";
 import EventCalendar from "./EventCalendar.js";
 import WeatherBox from "./WeatherBox.js";
+import Footer from "./Footer.js";
 
 function CitizenDashboard() {
     return (
@@ -89,7 +90,26 @@ function CitizenDashboard() {
             </div>
 
 
-            <Map/>
+            <Map />
+
+            <div className={styles.contactBar}>
+
+                {/* Opening Hours */}
+                <div className={styles.opening}>
+                    <p><strong>Mon - Friday:</strong> 9:00 AM – 6:00 PM</p>
+                    <p><strong>Saturday:</strong> 9:00 AM – 2:00 PM</p>
+                </div>
+
+                {/* Social Icons */}
+                <div className={styles.socials}>
+                    <FaFacebookF />
+                    <FaInstagram />
+                    <FaTiktok />
+                </div>
+
+            </div>
+
+            <Footer />
 
 
 

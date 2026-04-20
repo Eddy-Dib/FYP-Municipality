@@ -1,7 +1,7 @@
 .citizenContainer {
     width: 100%;
     min-height: 100vh;
-    background:var(--primary-darker);
+    background: var(--primary-darker);
     font-family: 'Poppins', sans-serif;
 }
 
@@ -55,7 +55,7 @@
 }
 
 .navLinks span:hover {
-    color:var(--primary-darker);
+    color: var(--primary-darker);
     font-weight: bold;
 }
 
@@ -75,7 +75,7 @@
     object-fit: cover;
 }
 
-.introText{
+.introText {
     margin: 40px;
     font-family: 'Poppins', sans-serif;
     padding: 30px;
@@ -83,25 +83,30 @@
     color: white;
     text-shadow: var(--shadoww);
 }
-.introText h1{
+
+.introText h1 {
     font-size: 72px;
     font-family: 'Poppins', sans-serif;
 }
-.introText p{
+
+.introText p {
     margin: 10px;
     font-size: 25px;
     font-weight: bold;
-    font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
 }
+
 .page {
     background: #183b6b;
     padding-bottom: 50px;
 }
+
 .weatherSection {
-  height: 767px;
-  padding: 60px 80px;
-  background: #f5f7fb;
+    height: 767px;
+    padding: 60px 80px;
+    background: #f5f7fb;
 }
+
 .eventSection {
     background-color: white;
     justify-content: center;
@@ -109,6 +114,7 @@
     flex-direction: row-reverse;
     align-items: center;
 }
+
 /*
 .card {
   display: flex;
@@ -228,28 +234,33 @@
 
     border-radius: 20px;
 }
+
 .overlay {
-  position: absolute;
-  inset: 0;
+    position: absolute;
+    inset: 0;
 
-  /* blur effect */
-  backdrop-filter: blur(10px);
+    /* blur effect */
+    backdrop-filter: blur(10px);
 
 }
+
 .wave {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  height: 100px;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 100px;
 }
+
 .hero {
-  position: relative;
-  height: 350px;
-  overflow: hidden;
+    position: relative;
+    height: 350px;
+    overflow: hidden;
 }
+
 .section {
-  position: relative;
-  padding-top: 150px; /* space for overlap */
+    position: relative;
+    padding-top: 150px;
+    /* space for overlap */
 }
 
 /* Blue background 
@@ -260,62 +271,65 @@
 
 /* Cards container */
 .cardscontainer {
-  position: absolute;
-  top: 80px;
-  left: 50%;
-  transform: translateX(-50%);
-  
-  display: flex;
-  gap: 50px;
+    position: absolute;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+
+    display: flex;
+    gap: 50px;
 }
 
 .card {
-  width: 310px;
-  height: 200px;
-  background: #f2f2f2;
-  border-radius: 15px;
-  
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    width: 310px;
+    height: 200px;
+    background: #f2f2f2;
+    border-radius: 15px;
 
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
 }
 
 .card:hover {
-  transform: translateY(-5px);
+    transform: translateY(-5px);
 }
+
 .icons {
-  font-size: 35px;
-  color:black;
+    font-size: 35px;
+    color: black;
 
-  background: #f2f2f2;
-  padding: 15px;
-  border-radius: 50%;
+    background: #f2f2f2;
+    padding: 15px;
+    border-radius: 50%;
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .text h3 {
-  margin: 0;
-  font-size: 20px;
-  font-weight: 600;
-  color: var(--primary-darker);
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--primary-darker);
 }
+
 .text p {
-  margin: 5px 0 0;
-  font-size: 15px;
-  color:var(--primary-darker);
-  line-height: 1.4;
+    margin: 5px 0 0;
+    font-size: 15px;
+    color: var(--primary-darker);
+    line-height: 1.4;
 }
 
 
-.calendarSectionWrapper{
+.calendarSectionWrapper {
     background-color: white;
     padding-right: 10px;
 }
+
 .calendarContent {
     display: flex;
     justify-content: center;
@@ -325,13 +339,14 @@
     padding: 160px 20px 80px 20px;
     flex-wrap: wrap;
 }
+
 .calendarLeft {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     flex: 1;
-    padding-top: 70px;
+    padding-top: 100px;
 
 }
 
@@ -356,7 +371,7 @@
     text-align: center;
     /*margin-right: 300px;*/
     margin-top: -110px;
-    max-width: 600px; 
+    max-width: 600px;
     margin-right: 90px;
 }
 
@@ -371,4 +386,73 @@
     color: #666;
     font-size: 15px;
     line-height: 1.8;
+}
+
+/* OUTSIDE (for centering after map) */
+
+/* ICONS 
+.icons {
+  display: flex;
+  gap: 15px;
+}
+
+
+.icons a {
+  width: 45px;
+  height: 45px;
+  background: #f1f3f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: #1e3a5f;
+  font-size: 18px;
+  transition: 0.3s;
+}
+
+HOVER EFFECT 🔥 
+.icons a:hover {
+  background: #1e3a5f;
+  color: white;
+  transform: translateY(-4px) scale(1.1);
+}*/
+.contactBar {
+    width: 100%;
+    background: white;
+    padding: 40px 0;
+    text-align: center;
+}
+
+/* Opening hours (FIRST LINE) */
+.opening {
+    font-size: 15px;
+    color: #333;
+    margin-bottom: 25px;
+}
+
+.opening p {
+    margin: 6px 0;
+}
+
+/* Social icons (SECOND LINE) */
+.socials {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.socials svg {
+    font-size: 20px;
+    color: #555;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+/* Hover effects */
+.socials svg:hover {
+    background-color: var(--primary-darker);
+    border-radius: 50%;
+    gap: 40px;
+    color: white;
+    transform: scale(1.2);
 }
