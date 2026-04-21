@@ -1,0 +1,123 @@
+.container {
+    padding: 24px;
+    min-height: calc(100vh - var(--topbar-height));
+    color: var(--text-dark);
+    background: #f5f7fb;
+}
+
+/* PAGE TITLE */
+.title {
+    font-size: 28px;
+    margin-bottom: 20px;
+    color: var(--text-dark);
+}
+
+/* LIST WRAPPER */
+.cardContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+/* CARD */
+.card {
+    background: white;
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+    padding: 18px 20px;
+    transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* hover lift */
+.card:hover {
+    transform: translateY(-3px);
+    background: #f9fbff;
+    box-shadow: 0 10px 18px rgba(0,0,0,0.08);
+}
+
+/* TEXT */
+.card h2 {
+    font-size: 18px;
+    margin-bottom: 10px;
+    color: var(--text-dark);
+}
+
+.card h3 {
+    font-size: 15px;
+    margin-top: 10px;
+    margin-bottom: 6px;
+    color: var(--text-dark-muted);
+}
+
+.card p {
+    margin: 6px 0;
+    color: var(--text-dark-muted);
+    font-size: 14px;
+}
+
+.card strong {
+    color: var(--text-dark);
+}
+
+/* BADGES / STATUS AREA */
+.badges {
+    display: flex;
+    gap: 10px;
+    margin: 10px 0;
+}
+
+/* ACTIONS */
+.actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 14px;
+}
+
+/* BASE BUTTON */
+.actions button {
+    padding: 9px 14px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--text-light);
+    box-shadow: var(--shadow);
+    transition: 0.2s ease;
+}
+
+/* APPROVE */
+.approve {
+    background: var(--primary-darker);
+}
+
+.approve:hover {
+    background: var(--primary-hover);
+    transform: scale(1.03);
+}
+
+/* DELETE */
+.reject {
+    background: #ef4444;
+}
+
+.reject:hover {
+    background: #dc2626;
+    transform: scale(1.03);
+}
+
+/* EMPTY STATE */
+.empty {
+    text-align: center;
+    color: var(--text-dark-muted);
+    margin-top: 30px;
+    font-size: 15px;
+}
+
+/* LOADING / ERROR */
+.stateMessage {
+    text-align: center;
+    font-size: 18px;
+    margin-top: 40px;
+    color: var(--text-dark);
+}
