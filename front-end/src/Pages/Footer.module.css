@@ -8,7 +8,6 @@
     margin: auto;
 }
 
-/* TOP */
 .top {
     text-align: center;
     margin-bottom: 30px;
@@ -23,7 +22,6 @@
     margin-top: 10px;
 }
 
-/* MAIN LAYOUT */
 .content {
     display: flex;
     justify-content: space-between;
@@ -32,7 +30,6 @@
     flex-wrap: wrap;
 }
 
-/* LEFT (MESSAGE) */
 .left {
     display: flex;
     flex-direction: column;
@@ -61,7 +58,6 @@
     background: #2f5c90;
 }
 
-/* CENTER (LOGO) */
 .center {
     flex: 1;
     display: flex;
@@ -71,10 +67,8 @@
 .center img {
     width: 120px;
     opacity: 0.2;
-    /* 🔥 transparent logo */
 }
 
-/* RIGHT (CONTACT) */
 .right {
     display: flex;
     flex-direction: column;
@@ -92,7 +86,6 @@
     font-size: 18px;
 }
 
-/* BOTTOM */
 .bottom {
     margin-top: 25px;
     text-align: center;
@@ -108,15 +101,12 @@
     gap: 10px;
 }
 
-/* ICON LOGO */
 .logoIcon {
     font-size: 70px;
     opacity: 0.2;
-    /* transparent like you wanted */
     color: white;
 }
 
-/* OPTIONAL TEXT UNDER ICON */
 .center h4 {
     font-weight: 500;
     opacity: 0.7;

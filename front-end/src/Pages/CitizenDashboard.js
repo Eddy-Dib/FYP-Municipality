@@ -67,20 +67,17 @@ function CitizenDashboard() {
 
                 <div className={styles.calendarContent}>
 
-                    {/* LEFT → CALENDAR */}
                     <div className={styles.calendarLeft}>
                         <EventCalendar />
                     </div>
 
-                    {/* RIGHT → IMAGE + TEXT UNDER */}
                     <div className={styles.calendarRight}>
                         <img src={calendarImg} alt="calendar visual" />
 
                         <div className={styles.calendarText}>
-                            <h3>Stay Informed</h3>
+                            <h3>Your Community at a Glance</h3>
                             <p>
-                                Check upcoming municipality events, maintenance schedules,
-                                and community activities. Click on any date to view details.
+                                Access information on upcoming municipal events, maintenance plans, and community programs. Choose a date to view full details.
                             </p>
                         </div>
                     </div>
@@ -89,18 +86,18 @@ function CitizenDashboard() {
 
             </div>
 
-
-            <Map />
+            <div className={styles.Map}>
+                <Map/>
+            </div>
 
             <div className={styles.contactBar}>
 
-                {/* Opening Hours */}
                 <div className={styles.opening}>
-                    <p><strong>Mon - Friday:</strong> 9:00 AM – 6:00 PM</p>
-                    <p><strong>Saturday:</strong> 9:00 AM – 2:00 PM</p>
+                    <p><strong> Opening Hours: </strong></p>
+                    <p><strong>Mon - Friday:</strong> 9:00 AM – 2:00 PM</p>
+                    <p><strong>Saturday:</strong> 10:00 AM – 12:00 PM</p>
                 </div>
 
-                {/* Social Icons */}
                 <div className={styles.socials}>
                     <FaFacebookF />
                     <FaInstagram />
@@ -111,39 +108,6 @@ function CitizenDashboard() {
 
             <Footer />
 
-
-
-
-            {/* <div className={styles.contactSection}>
-
-                <div className={styles.left}>
-                    <div className={styles.card}>
-                        <h4> 🕿 Call Us</h4>
-                        <p>+961 76 001 001</p>
-                    </div>
-
-                    <div className={`${styles.card} ${styles.dark}`}>
-                        <h4>✉️ Send Email</h4>
-                        <p>municipality@email.com</p>
-                    </div>
-
-                    <div className={styles.card}>
-                        <h4>📅 Book Appointment</h4>
-                        <p>Your Local Municipality Office</p>
-                    </div>
-                </div>
-
-                <div className={styles.right}>
-                    <h2>Send a Message</h2>
-
-                    <input type="text" placeholder="Your Name" />
-                    <input type="email" placeholder="Email" />
-                    <textarea placeholder="Message"></textarea>
-
-                    <button>Send</button>
-                </div>
-
-            </div>*/}
 
         </div>
     );

@@ -65,7 +65,6 @@ const WeatherBox = () => {
 
       <div className={styles.overlay}></div>
 
-      {/* LEFT */}
       <div className={styles.left}>
         <h1 className={styles.title}>Weather in {weather.name}</h1>
         <p className={styles.subtitle}>
@@ -76,7 +75,6 @@ const WeatherBox = () => {
           <ResponsiveContainer width="100%" height={160}>
             <AreaChart data={forecastData}>
 
-              {/* gradient */}
               <defs>
                 <linearGradient id="colorTemp" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor="#ffffff" stopOpacity={0.4} />
@@ -100,7 +98,6 @@ const WeatherBox = () => {
                 }}
               />
 
-              {/* smooth curve */}
               <Area
                 type="monotone"
                 dataKey="temp"
@@ -115,7 +112,6 @@ const WeatherBox = () => {
         </div>
       </div>
 
-      {/* RIGHT */}
       <div className={styles.right}>
         <p className={styles.date}>
           {new Date().toLocaleString("en-US", {
@@ -136,10 +132,9 @@ const WeatherBox = () => {
           <div>🌬 {weather.wind.speed} km/h</div>
         </div>
 
-        {/* small cities (fake for now) */}
         <div className={styles.cities}>
-          <div className={styles.cityCard}>Tripoli 20°C</div>
-          <div className={styles.cityCard}>Sidon 19°C</div>
+          <div className={styles.cityCard}>Fanar 20°C</div>
+          <div className={styles.cityCard}>Bekaa 19°C</div>
           <div className={styles.cityCard}>Byblos 18°C</div>
         </div>
       </div>

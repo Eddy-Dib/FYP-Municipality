@@ -8,7 +8,6 @@ function CitizenLayout() {
     return (
         <div className={styles.citizenContainer}>
 
-            {/* 🔥 ONLY PERMANENT PART: NAVBAR */}
             <div className={styles.header}>
                 <img src={logo} alt="logo" className={styles.headerIcon} />
 
@@ -20,7 +19,6 @@ function CitizenLayout() {
                 </div>
             </div>
 
-            {/* CHILD PAGES RENDER HERE */}
             <Outlet />
 
         </div>

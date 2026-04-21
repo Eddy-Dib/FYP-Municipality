@@ -6,7 +6,6 @@ function Footer() {
     return (
         <footer className={styles.footer}>
 
-            {/* TOP TEXT */}
             <div className={styles.top}>
                 <h3>We're always here to help you</h3>
                 <p>
@@ -15,17 +14,14 @@ function Footer() {
                 </p>
             </div>
 
-            {/* MAIN CONTENT */}
             <div className={styles.content}>
 
-                {/* LEFT - SEND MESSAGE */}
                 <div className={styles.left}>
                     <h4>Send Message</h4>
                     <textarea placeholder="Your Message"></textarea>
                     <button>Send</button>
                 </div>
 
-                {/* CENTER - LOGO */}
                 <div className={styles.center}>
                     <div className={styles.center}>
                         <FaLandmark className={styles.logoIcon} />
@@ -33,7 +29,6 @@ function Footer() {
                     </div>
                 </div>
 
-                {/* RIGHT - CONTACT INFO */}
                 <div className={styles.right}>
                     <div className={styles.item}>
                         <FaPhone />
@@ -52,8 +47,7 @@ function Footer() {
                 </div>
 
             </div>
-
-            {/* BOTTOM */}
+            
             <div className={styles.bottom}>
                 © 2026 Municipality. All rights reserved.
             </div>
