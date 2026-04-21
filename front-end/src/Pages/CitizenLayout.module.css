@@ -81,7 +81,7 @@
 
 /*  INTRO TEXT  */
 .introText {
-    margin: 40px;
+    margin: 80px;
     font-family: 'Poppins', sans-serif;
     padding: 30px;
     text-align: center;
@@ -104,7 +104,7 @@
 
 /*  WEATHER SECTION  */
 .weatherSection {
-    height: 767px;
+    height: 820px;
     padding: 60px 80px;
     background: var(--white-background);
 }
@@ -222,14 +222,14 @@
 .calendarText h3 {
     color: #183b6b;
     margin-bottom: 8px;
-    font-size: 30px;
+    font-size: 33px;
 }
 
 .calendarText p {
     width: 100%;
     color: #666;
-    font-size: 15px;
-    line-height: 1.8;
+    font-size: 18px;
+    line-height: 1.9;
 }
 
 
