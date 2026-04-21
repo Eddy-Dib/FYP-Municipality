@@ -7,56 +7,69 @@ function Request() {
     const [data, setData] = useState({
         title: "",
         type: "",
+        otherType: "",
         fullName: "",
-        phone: "",
+        phones: ["", ""],
         email: "",
         address: "",
-        district: "",
-        construction: "",
         description: "",
         urgency: "",
-        idFront: null,
-        idBack: null
+        files: []
     });
 
-    const [previewFront, setPreviewFront] = useState(null);
-    const [previewBack, setPreviewBack] = useState(null);
+    const [previews, setPreviews] = useState([]);
+    const [reference] = useState(Math.floor(100000 + Math.random() * 900000));
 
-    const handleChange = (e) => {
+    const handleChange = (e, index = null) => {
         const { name, value, files } = e.target;
 
         if (files) {
-            const file = files[0];
+            const newFiles = Array.from(files);
 
-            setData(prev => ({ ...prev, [name]: file }));
+            setData(prev => {
+                const combined = [...prev.files, ...newFiles].slice(0, 3);
+                return { ...prev, files: combined };
+            });
 
-            if (name === "idFront") {
-                setPreviewFront(URL.createObjectURL(file));
-            }
+            setPreviews(prev => {
+                const newPreviews = newFiles.map(file => URL.createObjectURL(file));
+                return [...prev, ...newPreviews].slice(0, 3);
+            });
+        }
 
-            if (name === "idBack") {
-                setPreviewBack(URL.createObjectURL(file));
-            }
-        } else {
+        else if (name === "phones") {
+            const updated = [...data.phones];
+            updated[index] = value;
+            setData(prev => ({ ...prev, phones: updated }));
+        }
+
+        else {
             setData(prev => ({ ...prev, [name]: value }));
         }
     };
 
-    const progress = (step / 4) * 100;
+    const removeImage = (index) => {
+        setData(prev => ({
+            ...prev,
+            files: prev.files.filter((_, i) => i !== index)
+        }));
+
+        setPreviews(prev => prev.filter((_, i) => i !== index));
+    };
+
+    const progress = (step / 2) * 100;
+    const handlePrint = () => window.print();
 
     return (
         <div className={styles.requestPage}>
 
-            {/* TOP SECTION */}
             <div className={styles.topSection}>
                 <h1>Submit a Request</h1>
                 <p>Fill the form to contact your municipality</p>
             </div>
 
-            {/* FORM CARD */}
             <div className={styles.formCard}>
 
-                {/* PROGRESS */}
                 <div className={styles.progressBar}>
                     <div style={{ width: `${progress}%` }} />
                 </div>
@@ -64,26 +77,33 @@ function Request() {
                 {/* STEP 1 */}
                 {step === 1 && (
                     <>
-                        <h3>Request & Personal Info</h3>
+                        <h3>Request Information</h3>
 
                         <div className={styles.formGroup}>
                             <label>Request Title</label>
-                            <input name="title" onChange={handleChange} />
+                            <input placeholder="e.g. Building Permit for House" name="title" onChange={handleChange} />
                         </div>
 
                         <div className={styles.formGroup}>
                             <label>Full Name *</label>
-                            <input name="fullName" onChange={handleChange} />
+                            <input placeholder="Enter your full name" name="fullName" onChange={handleChange} />
                         </div>
 
-                        <div className={styles.formGroup}>
-                            <label>Phone *</label>
-                            <input name="phone" onChange={handleChange} />
+                        <div className={styles.phoneRow}>
+                            <div className={styles.formGroup}>
+                                <label>Phone 1 *</label>
+                                <input placeholder="Primary phone number" value={data.phones[0]} onChange={(e) => handleChange(e, 0)} name="phones" />
+                            </div>
+
+                            <div className={styles.formGroup}>
+                                <label>Phone 2</label>
+                                <input placeholder="Optional phone number" value={data.phones[1]} onChange={(e) => handleChange(e, 1)} name="phones" />
+                            </div>
                         </div>
 
                         <div className={styles.formGroup}>
                             <label>Email *</label>
-                            <input type="email" name="email" onChange={handleChange} />
+                            <input type="email" placeholder="example@email.com" name="email" onChange={handleChange} />
                         </div>
 
                         <div className={styles.formGroup}>
@@ -92,128 +112,104 @@ function Request() {
                                 <option value="">Select request type</option>
                                 <option>Building Permit</option>
                                 <option>Renovation Permit</option>
-                                <option>Demolition Request</option>
-                                <option>Business License Request</option>
+                                <option>Business License</option>
+                                <option value="Other">Other</option>
                             </select>
+                        </div>
+
+                        {data.type === "Other" && (
+                            <div className={styles.formGroup}>
+                                <label>Specify Type</label>
+                                <input placeholder="Describe your request type" name="otherType" onChange={handleChange} />
+                            </div>
+                        )}
+
+                        <div className={styles.formGroup}>
+                            <label>Address *</label>
+                            <input placeholder="Enter your full address" name="address" onChange={handleChange} />
+                        </div>
+
+                        <div className={styles.formGroup}>
+                            <label>Description</label>
+                            <textarea placeholder="Provide additional details about your request..." name="description" onChange={handleChange} />
+                        </div>
+
+                        <div className={styles.formGroup}>
+                            <label>Urgency</label>
+                            <div className={styles.urgencyGroup}>
+                                {["Low", "Medium", "High", "Emergency"].map(level => (
+                                    <label key={level}>
+                                        <input type="radio" name="urgency" value={level} onChange={handleChange} />
+                                        {level}
+                                    </label>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className={styles.formGroup}>
+                            <label>Upload Documents (max 3)</label>
+                            <input type="file" multiple accept="image/*" onChange={handleChange} />
+                        </div>
+
+                        <div className={styles.previewContainer}>
+                            {previews.map((src, i) => (
+                                <div key={i} className={styles.imageWrapper}>
+                                    <img src={src} className={styles.preview} />
+                                    <button type="button" className={styles.removeBtn} onClick={() => removeImage(i)}>×</button>
+                                </div>
+                            ))}
                         </div>
                     </>
                 )}
 
                 {/* STEP 2 */}
                 {step === 2 && (
-                    <>
-                        <h3>Location & Details</h3>
+                    <div className={styles.voucher} id="voucher">
+                        <h3>Request Voucher</h3>
 
-                        <div className={styles.formGroup}>
-                            <label>Address *</label>
-                            <input name="address" onChange={handleChange} />
-                        </div>
+                        <div className={styles.voucherBox}>
+                            <p><b>Title:</b> {data.title}</p>
+                            <p><b>Name:</b> {data.fullName}</p>
 
-                        <div className={styles.formGroup}>
-                            <label>District *</label>
-                            <input name="district" onChange={handleChange} />
-                        </div>
+                            <p><b>Phones:</b></p>
+                            <ul>
+                                {data.phones.map((p, i) => p && <li key={i}>{p}</li>)}
+                            </ul>
 
-                        <div className={styles.mapBox}>
-                            📍 Map will be here
-                        </div>
+                            <p><b>Email:</b> {data.email}</p>
+                            <p><b>Type:</b> {data.type === "Other" ? data.otherType : data.type}</p>
+                            <p><b>Address:</b> {data.address}</p>
+                            <p><b>Urgency:</b> {data.urgency}</p>
+                            <p><b>Description:</b> {data.description}</p>
 
-                        <div className={styles.formGroup}>
-                            <label>Construction Type</label>
-                            <select name="construction" onChange={handleChange}>
-                                <option value="">Select type</option>
-                                <option>Residential</option>
-                                <option>Commercial</option>
-                                <option>Industrial</option>
-                            </select>
-                        </div>
-
-                        <div className={styles.formGroup}>
-                            <label>Description</label>
-                            <textarea name="description" onChange={handleChange} />
-                        </div>
-
-                        <div className={styles.formGroup}>
-                            <label>Urgency</label>
-
-                            <div className={styles.urgencyGroup}>
-                                {["Low", "Medium", "High", "Emergency"].map(level => (
-                                    <label key={level}>
-                                        <input
-                                            type="radio"
-                                            name="urgency"
-                                            value={level}
-                                            onChange={handleChange}
-                                        />
-                                        {level}
-                                    </label>
+                            <div className={styles.voucherImages}>
+                                {previews.map((src, i) => (
+                                    <img key={i} src={src} />
                                 ))}
                             </div>
 
-                            {data.urgency === "Emergency" && (
-                                <p className={styles.warning}>
-                                    ⚠ Emergency detected — contact services immediately
-                                </p>
-                            )}
-                        </div>
-                    </>
-                )}
-
-                {/* STEP 3 */}
-                {step === 3 && (
-                    <>
-                        <h3>Upload ID</h3>
-
-                        <div className={styles.formGroup}>
-                            <label>ID Front</label>
-                            <input type="file" name="idFront" onChange={handleChange} />
-                            {previewFront && (
-                                <img src={previewFront} className={styles.preview} />
-                            )}
+                            <p className={styles.reference}>
+                                Reference ID: #{reference}
+                            </p>
                         </div>
 
-                        <div className={styles.formGroup}>
-                            <label>ID Back</label>
-                            <input type="file" name="idBack" onChange={handleChange} />
-                            {previewBack && (
-                                <img src={previewBack} className={styles.preview} />
-                            )}
-                        </div>
-                    </>
-                )}
+                        <button className={styles.submitBtn}>Submit Request</button>
 
-                {/* STEP 4 */}
-                {step === 4 && (
-                    <div className={styles.reviewBox}>
-                        <h3>Review</h3>
-
-                        <p><b>Type:</b> {data.type}</p>
-                        <p><b>Name:</b> {data.fullName}</p>
-                        <p><b>Phone:</b> {data.phone}</p>
-                        <p><b>Email:</b> {data.email}</p>
-                        <p><b>Address:</b> {data.address}</p>
-                        <p><b>District:</b> {data.district}</p>
-                        <p><b>Description:</b> {data.description}</p>
-                        <p><b>Urgency:</b> {data.urgency}</p>
-
-                        <button className={styles.submitBtn}>
-                            Submit Request
+                        <button className={styles.printBtn} onClick={handlePrint}>
+                            Print as PDF
                         </button>
+
+                        {/* NEW MESSAGE */}
+                        <p className={styles.printNote}>
+                            Please print this voucher and present it at the municipality office to complete your request process or for further discussion with our staff.
+                        </p>
                     </div>
                 )}
             </div>
 
-            {/* NAV BUTTONS */}
             <div className={styles.navButtons}>
-                <button disabled={step === 1} onClick={() => setStep(step - 1)}>
-                    Back
-                </button>
-
-                {step < 4 && (
-                    <button onClick={() => setStep(step + 1)}>
-                        Next
-                    </button>
-                )}
+                {step === 2 && <button onClick={() => setStep(1)}>Back</button>}
+                {step === 1 && <button onClick={() => setStep(2)}>Next</button>}
             </div>
 
         </div>

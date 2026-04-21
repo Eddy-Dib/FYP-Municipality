@@ -60,7 +60,45 @@
     color: var(--primary-darker);
     font-weight: bold;
 }
+/* DROPDOWN */
+.dropdown {
+    position: relative;
+}
 
+.dropdownTitle {
+    cursor: pointer;
+    font-weight: 500;
+}
+
+/* MENU */
+.dropdownMenu {
+    position: absolute;
+    top: 35px;
+    left: 0;
+
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+
+    padding: 8px 0;
+    min-width: 160px;
+
+    display: flex;
+    flex-direction: column;
+
+    z-index: 1000;
+}
+
+/* ITEMS */
+.dropdownMenu span {
+    padding: 10px 16px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.dropdownMenu span:hover {
+    background: #f1f5f9;
+}
 
 /*  VIDEO SECTION  */
 .videoSection {
