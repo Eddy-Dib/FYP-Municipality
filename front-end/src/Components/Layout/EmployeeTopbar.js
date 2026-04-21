@@ -20,14 +20,14 @@ function EmployeeTopBar() {
                 <span className={styles.logoName}>Municipality System</span>
             </div>
 
-            {/*Search does nothing now, it's just a placeholder, might change it later*/}
+            {/*Search does nothing now, it's just a placeholder, might change it later
             <div className={styles.searchContainer}>
                 <input
                     className={styles.searchInput}
                     type="text"
                     placeholder="Search..."
                 />
-            </div>
+            </div>*/}
 
             <div className={styles.profileContainer} onClick={handleProfileMenu}>
                 <div className={styles.profileIcon}> <HiMiniUser /> </div>

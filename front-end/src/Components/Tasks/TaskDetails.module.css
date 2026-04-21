@@ -1,0 +1,145 @@
+.container {
+    padding: 24px;
+    min-height: calc(100vh - var(--topbar-height));
+    color: var(--text-dark);
+}
+
+.cardContainer{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.title {
+    font-size: 28px;
+    margin-bottom: 20px;
+    color: var(--text-dark);
+}
+
+.card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    padding: 20px;
+    margin-bottom: 18px;
+    transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    background: #f9fbff;
+}
+
+.card h2 {
+    font-size: 18px;
+    margin-bottom: 12px;
+    color: var(--text-dark);
+}
+
+.card h3 {
+    font-size: 15px;
+    margin-top: 14px;
+    margin-bottom: 8px;
+    color: var(--text-dark-muted);
+}
+
+.card p {
+    margin: 6px 0;
+    color: var(--text-dark-muted);
+    font-size: 14px;
+}
+
+.card strong {
+    color: var(--text-dark);
+}
+
+.badges {
+    display: flex;
+    gap: 10px;
+    margin: 10px 0;
+}
+
+.requestDetails {
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid #eee;
+}
+
+.actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.actions button {
+    padding: 10px 14px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--text-light);
+    box-shadow: var(--shadow);
+    transition: 0.2s ease;
+}
+
+.startTaskBtn {
+    background: var(--primary-darker);
+}
+
+.startTaskBtn:hover {
+    background: var(--primary-hover);
+}
+
+.completeTaskBtn {
+    background: #27ae60;
+}
+
+.completeTaskBtn:hover {
+    background: #1e8449;
+}
+
+.writeReportBtn {
+    background: #8e44ad;
+}
+
+.writeReportBtn:hover {
+    background: #7d3c98;
+}
+
+.backBtn {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around;
+    gap: 4px;
+    background: none;
+    margin-bottom: 16px;
+    padding: 6px 10px;
+    border: none;
+    border-radius: 10px;
+    color: var(--primary-darker);
+    cursor: pointer;
+    font-size: 14px;
+    transition: 0.2s ease;
+}
+
+.backBtn:hover {
+    background: var(--primary-darker);
+    color: var(--text-light);
+}
+
+/* @media (max-width: 768px) {
+    .container {
+        padding: 16px;
+    }
+
+    .actions {
+        flex-direction: column;
+    }
+
+    .actions button {
+        width: 100%;
+    }
+} */
