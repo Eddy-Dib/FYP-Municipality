@@ -13,9 +13,17 @@
   --primary-hover: #15498e;
   --primary-active: rgb(63, 120, 194);
 
-  --white-background:#f5f5f5f6;
-  --Dark-black:black;
-  --Light-Beige:#fdf6f1;
+  --white-background: #f5f5f5f6;
+  /* in request page */
+  --bg-light: #f8fafc;
+  --text-main: #1e293b;
+  --text-muted: #64748b;
+  --border-color: #e2e8f0;
+  /**/
+
+
+  --Dark-black: black;
+  --Light-Beige: #fdf6f1;
 
   --text-light: #ffffff;
   --text-muted: #cacaca;
@@ -24,7 +32,7 @@
 
   --shadow: 0 6px 12px #00000058;
   --shadoww: 0 6px 12px #000000e0;
-  
+
 
   --toast-bg: #265a9e4d;
   --toast-shadow: -3px 8px 24px #265a9e83;
