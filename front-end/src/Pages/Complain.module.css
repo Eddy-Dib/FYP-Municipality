@@ -1,82 +1,78 @@
-:root {
-    --bg-light: #f8fafc;
-    --primary: #2563eb;
-    --primary-hover: #1d4ed8;
-    --text-main: #1e293b;
-    --text-muted: #64748b;
-    --border-color: #e2e8f0;
-    --card-shadow: 0 10px 25px -5px rgba(0,0,0,0.1),
-                   0 8px 10px -6px rgba(0,0,0,0.1);
-}
-
-/* PAGE */
 .complainPage {
-    background: var(--bg-light);
+    background-color: var(--bg-light);
     min-height: 100vh;
-    font-family: 'Inter', sans-serif;
-    padding-bottom: 50px;
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+    color: var(--text-main);
+    padding-bottom: 80px;
 }
 
-/* TOP */
 .topSection {
     text-align: center;
-    padding: 80px 20px 120px;
-    background: #0f172a;
+    padding: 120px 20px 180px;
+    background: var(--primary-darker);
     color: white;
 }
 
 .topSection h1 {
     font-size: 2.5rem;
     font-weight: 700;
+    margin-bottom: 10px;
 }
 
 .topSection p {
     opacity: 0.8;
-    margin-top: 10px;
+    font-size: 1.1rem;
 }
 
-/* CARD */
 .formCard {
     max-width: 700px;
     width: 90%;
-    margin: -80px auto 30px;
+    margin: -100px auto 30px;
     background: white;
     padding: 48px;
     border-radius: 20px;
-    box-shadow: var(--card-shadow);
+    box-shadow: var(--shadow);
+    position: relative;
+    z-index: 10;
 }
 
 h3 {
     font-size: 1.5rem;
     margin-bottom: 25px;
     font-weight: 600;
+    color: #0f172a;
+    border-left: 4px solid var(--primary);
+    padding-left: 15px;
+    display: flex;
+    align-items: center;
+    line-height: 1.2;
 }
 
-/* FORM */
 .formGroup {
     display: flex;
     flex-direction: column;
-    margin-bottom: 18px;
+    margin-bottom: 20px;
 }
 
 .formGroup label {
-    font-size: 0.85rem;
-    font-weight: 600;
+    font-size: 0.875rem;
     margin-bottom: 8px;
+    font-weight: 600;
 }
 
 .formGroup input,
 .formGroup select,
 .formGroup textarea {
-    padding: 12px 14px;
+    padding: 12px 16px;
     border-radius: 10px;
     border: 1px solid var(--border-color);
     font-size: 0.95rem;
     transition: 0.2s;
+    background: #fcfdfe;
 }
 
 .formGroup textarea {
-    height: 110px;
+    height: 120px;
     resize: none;
 }
 
@@ -85,25 +81,24 @@ h3 {
 .formGroup textarea:focus {
     outline: none;
     border-color: var(--primary);
-    box-shadow: 0 0 0 4px rgba(37,99,235,0.1);
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+    background: white;
 }
 
-/* PRIORITY */
 .priorityGroup {
-    display: flex;
-    gap: 10px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 12px;
 }
 
 .priorityGroup label {
-    padding: 10px 14px;
     border: 1px solid var(--border-color);
-    border-radius: 10px;
+    padding: 10px;
+    border-radius: 8px;
+    text-align: center;
     cursor: pointer;
     transition: 0.2s;
-}
-
-.priorityGroup input {
-    display: none;
+    font-size: 0.9rem;
 }
 
 .priorityGroup label:has(input:checked) {
@@ -113,59 +108,73 @@ h3 {
     font-weight: 600;
 }
 
-/* PREVIEW */
+.priorityGroup input {
+    display: none;
+}
+
 .previewContainer {
     display: flex;
     gap: 10px;
     flex-wrap: wrap;
-    margin-bottom: 10px;
+    margin-top: 10px;
 }
 
 .imageWrapper {
     position: relative;
+    display: inline-block;
 }
 
 .imageWrapper img {
-    width: 90px;
-    height: 90px;
+    width: 100px;
+    height: 100px;
     object-fit: cover;
-    border-radius: 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
 }
 
-.imageWrapper button {
+.removeBtn {
     position: absolute;
     top: -6px;
     right: -6px;
     width: 22px;
     height: 22px;
-    background: red;
+    background: #ef4444;
     color: white;
     border: none;
     border-radius: 50%;
+    font-size: 14px;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
-/* REFERENCE */
 .reference {
-    margin: 15px 0;
+    margin: 25px 0 15px;
     font-weight: 700;
     color: var(--primary);
     text-align: center;
+    font-size: 1.1rem;
 }
 
-/* BUTTON */
 .submitBtn {
     width: 100%;
+    margin-top: 10px;
+    background: var(--primary);
+    color: white;
     padding: 14px;
     border: none;
     border-radius: 12px;
-    background: var(--primary);
-    color: white;
     font-weight: 700;
+    font-size: 1rem;
     cursor: pointer;
-    transition: 0.2s;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
 }
 
 .submitBtn:hover {
     background: var(--primary-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
 }

@@ -18,6 +18,7 @@ import CitizenDashboard from "./Pages/CitizenDashboard";
 import Request from "./Pages/Request";
 import Complain from "./Pages/Complain";
 import PayFees from "./Pages/PayFees";
+import Profile from "./Pages/Profile";
 
 function App() {
   return (
@@ -41,6 +42,8 @@ function App() {
           <Route path="request" element={<Request />} />
           <Route path="complain" element={<Complain />} />
           <Route path="payfees" element={<PayFees />} />
+          <Route path="profile" element={<Profile/>} />
+
         </Route>
 
         <Route path="*" element={<NotFound />} />
