@@ -1,6 +1,7 @@
 import express, { json } from "express";
 import cors from "cors";
 import authRoutes from "./routes/authRoutes.js";
+import requestRoutes from "./routes/requestRoutes.js";
 
 const app = express();
 
@@ -9,6 +10,13 @@ app.use(json());
 
 // Sends all requests starting with /auth to authRoutes
 app.use("/auth", authRoutes);
+
+// Requests system (citizen submissions)
+app.use("/api/requests", requestRoutes);
+
+app.get("/test", (req, res) => {
+    res.send("API WORKS");
+});
 
 // Start server. Backup port: 5000
 const PORT = process.env.PORT || 5000;

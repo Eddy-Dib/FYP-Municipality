@@ -1,5 +1,5 @@
 import db from "../config/db.js";
-import { successResponse, errorResponse } from "../utilities/responses.js";
+import { sendSuccess, sendError } from "../utils/responses.js";
 
 
 export const createRequest = (req, res) => {//create request
@@ -39,20 +39,20 @@ export const createRequest = (req, res) => {//create request
                 jsonData,
                 urgency || 0,
                 type,
-                1, 
+                1,
                 citizenId || 1
             ],
             (err, result) => {
                 if (err) {
-                    return errorResponse(res, "Database error", err.message);
+                    return sendError(res, 500, "Database error", err.message);
                 }
 
-                return successResponse(res, "Request created successfully", result);
+                return sendSuccess(res, "Request created successfully", result);
             }
         );
 
     } catch (err) {
-        return errorResponse(res, "Server error", err.message);
+        return sendError(res, 500, "Database error", err.message);
     }
 };
 
@@ -61,9 +61,9 @@ export const getRequests = (req, res) => {//to get request
 
     db.query(query, (err, results) => {
         if (err) {
-            return errorResponse(res, "Database error", err.message);
+            console.log("🔥 MYSQL ERROR:", err);
+            return sendError(res, 500, "Database error", err.sqlMessage || err.message);
         }
-
-        return successResponse(res, "Requests fetched", results);
+        return sendSuccess(res, "Request created successfully", result);
     });
 };

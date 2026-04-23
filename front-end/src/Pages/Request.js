@@ -1,5 +1,6 @@
 import styles from "./Request.module.css";
 import { useState } from "react";
+import axios from "axios";
 
 function Request() {
     const [step, setStep] = useState(1);
@@ -58,6 +59,7 @@ function Request() {
     };
 
     const progress = (step / 2) * 100;
+
     const handlePrint = () => {
         const content = document.getElementById("voucherPrint").innerHTML;
 
@@ -85,27 +87,45 @@ function Request() {
         printWindow.print();
     };
 
+
+
     const handleSubmit = async () => {
         try {
+            const priorityMap = {
+                Low: 1,
+                Medium: 2,
+                High: 3,
+                Emergency: 4
+            };
+            const typeMap = {
+                "Building Permit": 1,
+                "Renovation Permit": 2,
+                "Business License": 3,
+                "Other": 4
+            };
             const payload = {
                 title: data.title,
-                type: data.type,
+                type: typeMap[data.type],
                 otherType: data.otherType,
                 fullName: data.fullName,
                 phones: data.phones,
                 email: data.email,
                 address: data.address,
                 description: data.description,
-                urgency: data.urgency,
-                citizenId: 1 
+                urgency: priorityMap[data.urgency],
+                citizenId: 1
             };
+
+            console.log("PAYLOAD:", payload);
 
             await axios.post("http://localhost:5000/api/requests", payload);
 
             alert("Request sent!");
         } catch (err) {
-            console.log(err);
-            alert("Error sending request");
+            console.log("FULL ERROR:", err);
+            console.log("RESPONSE DATA:", err.response?.data);
+            console.log("ERROR MESSAGE:", err.response?.data?.error);
+            alert(err.response?.data?.error || "Error sending request");
         }
     };
 
@@ -214,7 +234,7 @@ function Request() {
                 {/* STEP 2 */}
                 {step === 2 && (
                     <>
-                        
+
                         <div id="voucherPrint" className={styles.hiddenVoucher}>
                             <h3>Request Voucher</h3>
 
@@ -241,7 +261,7 @@ function Request() {
                             </div>
                         </div>
 
-                        
+
                         <div className={styles.voucher}>
                             <h3>Request Voucher</h3>
 
@@ -271,7 +291,9 @@ function Request() {
                                 </p>
                             </div>
 
-                            <button className={styles.submitBtn}>Submit Request</button>
+                            <button className={styles.submitBtn} onClick={handleSubmit}>
+                                Submit Request
+                            </button>
 
                             <button className={styles.printBtn} onClick={handlePrint}>
                                 Print as PDF
