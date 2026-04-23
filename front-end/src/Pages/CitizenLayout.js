@@ -46,7 +46,8 @@ function CitizenLayout() {
 
                     {/*<span onClick={() => navigate("/citizen/request")}>Request</span>
                     <span onClick={() => navigate("/citizen/complain")}>Complain</span>*/}
-                    <span onClick={() => navigate("/citizen/payfees")}>Pay Fees</span>
+                    <span onClick={() => navigate("/citizen/payfees")}>Fees</span>
+                    <span onClick={() => navigate("/citizen/profile")}>Profile</span>
                 </div>
             </div>
 

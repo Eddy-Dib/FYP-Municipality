@@ -1,0 +1,63 @@
+.container {
+    padding: 24px;
+    color: var(--text-dark);
+    height: 100vh;
+}
+
+.card {
+    background: white;
+    padding: 16px;
+    border-radius: 10px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow);
+}
+
+input,
+textarea {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    font-family: inherit;
+}
+
+textarea {
+    min-height: 150px;
+    resize: vertical;
+}
+
+.actions button {
+    background: var(--primary-darker);
+    color: white;
+    padding: 10px 14px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.actions button:hover {
+    background: var(--primary-light);
+}
+
+.backBtn {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around;
+    gap: 4px;
+    background: none;
+    margin-bottom: 16px;
+    padding: 6px 10px;
+    border: none;
+    border-radius: 10px;
+    color: var(--primary-darker);
+    cursor: pointer;
+    font-size: 14px;
+    transition: 0.2s ease;
+}
+
+.backBtn:hover {
+    background: var(--primary-darker);
+    color: var(--text-light);
+}
