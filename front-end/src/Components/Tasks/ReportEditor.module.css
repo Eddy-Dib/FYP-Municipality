@@ -1,6 +1,7 @@
 .container {
     padding: 24px;
     color: var(--text-dark);
+    height: 100vh;
 }
 
 .card {

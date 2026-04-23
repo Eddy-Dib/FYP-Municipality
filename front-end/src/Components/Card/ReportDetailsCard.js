@@ -17,14 +17,39 @@ function ReportDetailsCard({ report }) {
                         <p><strong>Type:</strong> {report.type}</p>
 
                         <p><strong>Description:</strong></p>
-                        <p className={styles.description}>{report.description}</p>
+                            <p className={styles.description}>
+                                {report.description.split("\n").map((line, i) => {
+                                    const text = line.trim();
+
+                                    if (!text) return null;
+
+                                    if (
+                                        text.startsWith("#") ||
+                                        text.startsWith("##") ||
+                                        text.startsWith("###")
+                                    ) {
+                                        return (
+                                            <strong key={i} style={{ display: "block", marginTop: 6 }}>
+                                                {text.replace(/^#+/, "").trim()}
+                                            </strong>
+                                        );
+                                    }
+
+                                    return (
+                                        <span key={i} style={{ display: "block", marginTop: 2 }}>
+                                            {text}
+                                        </span>
+                                    );
+                                })}
+                            </p>
                     </>
                 )}
             </div>
 
+            {/* Print functionality moved to Report Page
             <div className={styles.right}>
                 <FaFileAlt />
-            </div>
+            </div> */}
 
         </Card>
     );

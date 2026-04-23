@@ -29,6 +29,9 @@ import MayorComplaints from "./Pages/MayorComplaints";
 import MayorAlerts from "./Pages/MayorAlerts";
 import MayorReports from "./Pages/MayorReports";
 
+// Print
+import ReportPrint from "./Pages/ReportPrint";
+
 function App() {
   return (
     <BrowserRouter>
@@ -49,6 +52,7 @@ function App() {
           <Route path="mayor/complaints" element={<ProtectedRoute allowedRoles={["Mayor"]}><MayorComplaints /></ProtectedRoute>} />
           <Route path="mayor/alerts" element={<ProtectedRoute allowedRoles={["Mayor"]}><MayorAlerts /></ProtectedRoute>} />
           <Route path="mayor/reports" element={<ProtectedRoute allowedRoles={["Mayor"]}><MayorReports /></ProtectedRoute>} />
+          <Route path="reports" element={<Reports />} />
         </Route>
 
 
@@ -62,6 +66,9 @@ function App() {
           <Route path="profile" element={<Profile/>} />
 
         </Route>
+
+        <Route path="/employee/report/print/:id" element={<ReportPrint />} />
+
 
         <Route path="*" element={<NotFound />} />
 

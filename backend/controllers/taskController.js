@@ -1,5 +1,6 @@
 import db from "../config/db.js";
 import { sendSuccess, sendError } from "../utils/responses.js";
+import { formatDate } from "../utils/formats.js";
 
 // returns task details
 export const getTaskDetails = async (req, res) => {
@@ -39,6 +40,7 @@ export const getTaskDetails = async (req, res) => {
                 rs.RStat_Name AS RequestStatus,
                 rt.RType_Name,
                 rt.RType_Duration,
+                rpt.RepType_Name AS ReportTypeName,
 
                 CONCAT(
                     DATE_FORMAT(t.DateAssigned, '%y'),
@@ -63,6 +65,7 @@ export const getTaskDetails = async (req, res) => {
                     l.Floor
                 ) AS Address,
 
+                rep.Report_ID AS Report_ID,
                 rep.Title AS ReportTitle,
                 rep.Description AS ReportDescription,
                 rep.RepType_ID
@@ -81,6 +84,7 @@ export const getTaskDetails = async (req, res) => {
             LEFT JOIN CITY city ON s.City_ID = city.City_ID
 
             LEFT JOIN REPORT rep ON rep.Task_ID = t.Task_ID
+            LEFT JOIN REP_TYPE rpt on rep.RepType_ID = rpt.RepType_ID
 
             WHERE t.Task_ID = ?
             AND t.Emp_ID = ?`,
@@ -127,9 +131,9 @@ export const getTaskDetails = async (req, res) => {
                         : data.Priority === 1
                             ? "Medium"
                             : "Low",
-                assignedDate: data.DateAssigned.toISOString().split("T")[0],
-                completedDate: data.DateCompleted.toISOString().split("T")[0],
-                dueDate: dueDate.toISOString().split("T")[0]
+                assignedDate: formatDate(data.DateAssigned),
+                completedDate: formatDate(data.DateCompleted),
+                dueDate: formatDate(dueDate)
             },
 
             request: {
@@ -138,7 +142,7 @@ export const getTaskDetails = async (req, res) => {
                 type: data.RType_Name,
                 description: requestDescription,
                 status: data.RequestStatus,
-                dueDate: dueDate.toISOString().split("T")[0]
+                dueDate: formatDate(dueDate)
             },
 
             citizen: {
@@ -152,11 +156,12 @@ export const getTaskDetails = async (req, res) => {
                 address: data.Address
             },
 
-            report: data.ReportTitle
+            report: data.Report_ID
                 ? {
+                    reportID: data.Report_ID,
                     title: data.ReportTitle,
                     description: data.ReportDescription,
-                    type: data.RepType_ID
+                    type: data.ReportTypeName
                 }
                 : null
         });
@@ -225,6 +230,11 @@ export const updateTaskStatus = async (req, res) => {
         if (status === "Completed") {
             await db.promise().query(
                 `UPDATE TASK SET DateCompleted = NOW() WHERE Task_ID = ?`,
+                [taskId]
+            );
+        } else {
+            await db.promise().query(
+                `UPDATE TASK SET DateCompleted = NULL WHERE Task_ID = ?`,
                 [taskId]
             );
         }
