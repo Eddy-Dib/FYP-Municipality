@@ -77,7 +77,7 @@ function Request() {
                 {/* STEP 1 */}
                 {step === 1 && (
                     <>
-                        <h3>Request Information</h3>
+                        <h3 className={styles.sectionTitle}>Request Information</h3>
 
                         <div className={styles.formGroup}>
                             <label>Request Title</label>
