@@ -31,7 +31,7 @@
     background: white;
     padding: 48px;
     border-radius: 20px;
-    box-shadow: var(--shadow);
+    box-shadow: var(--card-shadow);
     position: relative;
     z-index: 10;
 }
