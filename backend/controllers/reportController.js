@@ -1,5 +1,6 @@
 import db from "../config/db.js";
 import { sendSuccess, sendError } from "../utils/responses.js";
+import { formatDate } from "../utils/formats.js";
 
 export const getReportByTask = async (req, res) => {
     const empId = req.user?.id;
@@ -118,5 +119,85 @@ export const updateReport = async (req, res) => {
     } catch (err) {
         console.error("UPSERT REPORT ERROR:", err);
         return sendError(res, 500, "Failed to save report", "REPORT_SAVE_ERROR");
+    }
+};
+
+
+export const getReportHistory = async (req, res) => {
+    const empId = req.user?.id;
+
+    if (!req.user || !req.user.isEmployee) {
+        return sendError(res, 403, "Employees only");
+    }
+
+    if (!empId) {
+        return sendError(res, 401, "Invalid user session");
+    }
+
+    try {
+        const [rows] = await db.promise().query(
+            `SELECT 
+                t.Task_ID,
+                t.Name AS TaskName,
+                t.DateCompleted,
+                ts.TStat_Name AS TaskStatus,
+
+                rep.Report_ID,
+                rep.Title,
+                rep.Description,
+                rpt.RepType_Name,
+
+                rt.RType_Name AS RequestType,
+
+                CONCAT(
+                    DATE_FORMAT(t.DateAssigned, '%y'),
+                    LPAD(t.Task_ID, 3, '0')
+                ) AS TaskNumber,
+
+                CONCAT(
+                    'REQ-',
+                    DATE_FORMAT(t.DateAssigned, '%y'),
+                    LPAD(r.Req_ID, 3, '0')
+                ) AS RequestNumber
+
+            FROM TASK t
+            JOIN TASK_STATUSES ts ON t.TStat_Code = ts.TStat_Code
+            JOIN REQUEST r ON t.Req_ID = r.Req_ID
+            JOIN REQUEST_TYPES rt ON r.RType_ID = rt.RType_ID
+
+            JOIN REPORT rep ON rep.Task_ID = t.Task_ID
+            JOIN REP_TYPE rpt ON rep.RepType_ID = rpt.RepType_ID
+
+            WHERE t.Emp_ID = ?
+              AND ts.TStat_Name = 'Completed'
+              AND rep.Report_ID IS NOT NULL
+
+            ORDER BY t.DateCompleted DESC`,
+            [empId]
+        );
+
+        const formatted = rows.map(row => ({
+            reportId: row.Report_ID,
+
+            title: row.Title,
+            description: row.Description,
+            type: row.RepType_Name,
+
+            taskNumber: row.TaskNumber,
+            taskName: row.TaskName,
+
+            requestNumber: row.RequestNumber,
+            requestType: row.RequestType,
+
+            status: row.TaskStatus,
+            completedDate: formatDate(row.DateCompleted)
+        }));
+
+        return sendSuccess(res, "Report history loaded", formatted);
+
+    } catch (err) {
+        console.error("GET REPORT HISTORY ERROR:", err);
+
+        return sendError(res, 500, "Failed to load report history", "REPORT_HISTORY_ERROR");
     }
 };

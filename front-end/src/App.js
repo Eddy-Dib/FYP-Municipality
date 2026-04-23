@@ -29,6 +29,9 @@ import MayorComplaints from "./Pages/MayorComplaints";
 import MayorAlerts from "./Pages/MayorAlerts";
 import MayorReports from "./Pages/MayorReports";
 
+// Print
+import ReportPrint from "./Pages/ReportPrint";
+
 function App() {
   return (
     <BrowserRouter>
@@ -62,6 +65,9 @@ function App() {
           <Route path="profile" element={<Profile/>} />
 
         </Route>
+
+        <Route path="employee/report/print" element={<ReportPrint />} />
+
 
         <Route path="*" element={<NotFound />} />
 
