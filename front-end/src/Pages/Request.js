@@ -58,7 +58,32 @@ function Request() {
     };
 
     const progress = (step / 2) * 100;
-    const handlePrint = () => window.print();
+    const handlePrint = () => {
+        const content = document.getElementById("voucherPrint").innerHTML;
+
+        const printWindow = window.open("", "", "width=800,height=600");
+
+        printWindow.document.write(`
+        <html>
+            <head>
+                <title>Request Voucher</title>
+                <style>
+                    body { font-family: Arial; padding: 40px; }
+                    h3 { margin-bottom: 20px; }
+                    p { margin: 6px 0; }
+                    img { width: 100px; margin: 5px; border-radius: 8px; }
+                    ul { margin-left: 20px; }
+                </style>
+            </head>
+            <body>
+                ${content}
+            </body>
+        </html>
+    `);
+
+        printWindow.document.close();
+        printWindow.print();
+    };
 
     return (
         <div className={styles.requestPage}>
@@ -164,10 +189,11 @@ function Request() {
 
                 {/* STEP 2 */}
                 {step === 2 && (
-                    <div className={styles.voucher} id="voucher">
-                        <h3>Request Voucher</h3>
+                    <>
+                        {/* ✅ HIDDEN PRINT VERSION (like PayFees invoice) */}
+                        <div id="voucherPrint" className={styles.hiddenVoucher}>
+                            <h3>Request Voucher</h3>
 
-                        <div className={styles.voucherBox}>
                             <p><b>Title:</b> {data.title}</p>
                             <p><b>Name:</b> {data.fullName}</p>
 
@@ -182,28 +208,56 @@ function Request() {
                             <p><b>Urgency:</b> {data.urgency}</p>
                             <p><b>Description:</b> {data.description}</p>
 
-                            <div className={styles.voucherImages}>
+                            <p><b>Reference ID:</b> #{reference}</p>
+
+                            <div>
                                 {previews.map((src, i) => (
                                     <img key={i} src={src} />
                                 ))}
                             </div>
-
-                            <p className={styles.reference}>
-                                Reference ID: #{reference}
-                            </p>
                         </div>
 
-                        <button className={styles.submitBtn}>Submit Request</button>
+                        {/* ✅ YOUR NORMAL UI (unchanged design) */}
+                        <div className={styles.voucher}>
+                            <h3>Request Voucher</h3>
 
-                        <button className={styles.printBtn} onClick={handlePrint}>
-                            Print as PDF
-                        </button>
+                            <div className={styles.voucherBox}>
+                                <p><b>Title:</b> {data.title}</p>
+                                <p><b>Name:</b> {data.fullName}</p>
 
-                        {/* NEW MESSAGE */}
-                        <p className={styles.printNote}>
-                            Please print this voucher and present it at the municipality office to complete your request process or for further discussion with our staff.
-                        </p>
-                    </div>
+                                <p><b>Phones:</b></p>
+                                <ul>
+                                    {data.phones.map((p, i) => p && <li key={i}>{p}</li>)}
+                                </ul>
+
+                                <p><b>Email:</b> {data.email}</p>
+                                <p><b>Type:</b> {data.type === "Other" ? data.otherType : data.type}</p>
+                                <p><b>Address:</b> {data.address}</p>
+                                <p><b>Urgency:</b> {data.urgency}</p>
+                                <p><b>Description:</b> {data.description}</p>
+
+                                <div className={styles.voucherImages}>
+                                    {previews.map((src, i) => (
+                                        <img key={i} src={src} />
+                                    ))}
+                                </div>
+
+                                <p className={styles.reference}>
+                                    Reference ID: #{reference}
+                                </p>
+                            </div>
+
+                            <button className={styles.submitBtn}>Submit Request</button>
+
+                            <button className={styles.printBtn} onClick={handlePrint}>
+                                Print as PDF
+                            </button>
+
+                            <p className={styles.printNote}>
+                                Please print this voucher and present it at the municipality office to complete your request process or for further discussion with our staff.
+                            </p>
+                        </div>
+                    </>
                 )}
             </div>
 
