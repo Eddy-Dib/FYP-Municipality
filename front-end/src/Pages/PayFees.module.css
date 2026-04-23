@@ -1,0 +1,216 @@
+.feesPage {
+    min-height: 100vh;
+    background: #f8fafc;
+    font-family: 'Inter', sans-serif;
+}
+
+.hero {
+    background: linear-gradient(135deg, #10376a 0%, #1e4a7a 100%);
+    padding: 120px 20px 60px;
+    /* keeps space under header */
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    color: white;
+    z-index: 0;
+}
+
+.hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+    animation: slowRotate 20s linear infinite;
+    z-index: 0;
+}
+
+.hero h1,
+.hero p {
+    position: relative;
+    z-index: 1;
+}
+
+@keyframes slowRotate {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.container {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+.actions {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.actions button {
+    flex: 1;
+    padding: 14px;
+    border: none;
+    border-radius: 12px;
+    background: #1e4a7a;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.actions button:hover {
+    background: #163a61;
+}
+
+.card {
+    background: white;
+    padding: 20px;
+    border-radius: 16px;
+    margin-bottom: 20px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+}
+
+.cardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.removeBtn {
+    background: red;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
+}
+
+.card input {
+    width: 100%;
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+.feesList {
+    margin-top: 15px;
+}
+
+.feeRow {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.totalBox {
+    margin-top: 30px;
+    padding: 20px;
+    background: white;
+    border-radius: 16px;
+    font-weight: bold;
+    text-align: right;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+.actions {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.actions button {
+    flex: 1;
+    padding: 14px;
+    border: none;
+    border-radius: 12px;
+    background: #1e4a7a;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+
+.card {
+    background: white;
+    padding: 20px;
+    border-radius: 16px;
+    margin-bottom: 20px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+}
+
+.cardHeader {
+    display: flex;
+    justify-content: space-between;
+}
+
+.removeBtn {
+    background: red;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
+}
+
+.card input,
+.card select {
+    width: 100%;
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+.feesList {
+    margin-top: 15px;
+}
+
+.feeRow {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+}
+
+.totalBox {
+    margin-top: 30px;
+    padding: 20px;
+    background: white;
+    border-radius: 16px;
+    text-align: right;
+    font-weight: bold;
+}
+
+.printBtn {
+    width: 100%;
+    margin-top: 20px;
+    padding: 14px;
+    border-radius: 12px;
+    border: none;
+    background: #2563eb;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.hiddenInvoice {
+    display: none;
+}
+.note {
+    margin-top: 10px;
+    text-align: center;
+    font-size: 13px;
+    color: #555;
+}
