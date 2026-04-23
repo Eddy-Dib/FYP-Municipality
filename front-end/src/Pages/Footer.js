@@ -12,7 +12,7 @@ function Footer() {
         try {
             const res = await axios.post("http://localhost:5000/api/complaints/message", {
                 message: message,
-                C_ID: 1 // ⚠️ temporary (replace with logged user id later)
+                C_ID: 1 
             });
 
             if (res.data.success) {
