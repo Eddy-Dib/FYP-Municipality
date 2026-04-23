@@ -53,6 +53,7 @@ function Profile() {
                     <div className={styles.info}>
                         <p><span>Name:</span> User</p>
                         <p><span>Email:</span> user@gmail.com</p>
+                        <p><span>Phone:</span> +000 000 000</p>
                     </div>
                 </div>
 
