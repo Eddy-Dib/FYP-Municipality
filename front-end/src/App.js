@@ -52,6 +52,7 @@ function App() {
           <Route path="mayor/complaints" element={<ProtectedRoute allowedRoles={["Mayor"]}><MayorComplaints /></ProtectedRoute>} />
           <Route path="mayor/alerts" element={<ProtectedRoute allowedRoles={["Mayor"]}><MayorAlerts /></ProtectedRoute>} />
           <Route path="mayor/reports" element={<ProtectedRoute allowedRoles={["Mayor"]}><MayorReports /></ProtectedRoute>} />
+          <Route path="reports" element={<Reports />} />
         </Route>
 
 
@@ -66,7 +67,7 @@ function App() {
 
         </Route>
 
-        <Route path="employee/report/print" element={<ReportPrint />} />
+        <Route path="/employee/report/print/:id" element={<ReportPrint />} />
 
 
         <Route path="*" element={<NotFound />} />

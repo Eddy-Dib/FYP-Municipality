@@ -8,11 +8,11 @@ function Reports() {
     const API_URL = process.env.REACT_APP_API_URL;
     const token = localStorage.getItem("token");
 
-    const user = JSON.parse(localStorage.getItem("user"));
-
     const [reports, setReports] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+
+    const user = JSON.parse(localStorage.getItem("user"));
 
     useEffect(() => {
         const fetchHistory = async () => {
@@ -43,17 +43,9 @@ function Reports() {
     }, [API_URL, token]);
 
     const openReport = (report) => {
-        const safeReport = {
-            ...report,
-
-            author: user?.name,
-            authorRole: user?.role,
-
-            generatedAt: new Date().toISOString()
-        };
-
-        const encoded = encodeURIComponent(JSON.stringify(safeReport));
-        window.open(`/employee/report/print?data=${encoded}`, "_blank");
+        window.open(
+            `/employee/report/print/${report.reportId}`, "_blank"
+        );
     };
 
     if (loading) return <p style={{ padding: 20 }}>Loading history...</p>;
@@ -69,7 +61,7 @@ function Reports() {
                 ) : (
                     reports.map((report) => (
                         <ReportCard
-                            key={report.reportId || report.taskNumber}
+                            key={report.reportId}
 
                             title={report.title}
                             type={report.type}
@@ -79,6 +71,7 @@ function Reports() {
 
                             date={report.completedDate}
 
+                            onView={() => openReport(report)}
                             onDownload={() => openReport(report)}
                         />
                     ))

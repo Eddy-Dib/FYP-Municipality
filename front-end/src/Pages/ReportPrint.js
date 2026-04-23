@@ -1,28 +1,51 @@
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { LuPrinter } from "react-icons/lu";
+import { useParams } from "react-router-dom";
+import axios from "axios";
 
+import { LuPrinter } from "react-icons/lu";
 import styles from "./ReportPrint.module.css";
 
 function ReportPrint() {
-    const location = useLocation();
-    const navigate = useNavigate();
+    const { id } = useParams();
+    const API_URL = process.env.REACT_APP_API_URL;
+    const user = JSON.parse(localStorage.getItem("user"));
 
     const [report, setReport] = useState(null);
 
     useEffect(() => {
-        const params = new URLSearchParams(location.search);
-        const data = params.get("data");
-
-        if (data) {
+        const fetchReport = async () => {
             try {
-                const parsed = JSON.parse(decodeURIComponent(data));
-                setReport(parsed);
+                const res = await axios.get(
+                    `${API_URL}/employee/reports/${id}`,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${localStorage.getItem("token")}`
+                        }
+                    }
+                );
+
+                const data = res?.data?.data;
+
+                if (!data) {
+                    setReport(null);
+                    return;
+                }
+                
+                setReport({
+                    ...data,
+                    author: user?.name || "Unknown",
+                    authorRole: user?.role || "N/A",
+                    generatedAt: new Date().toISOString()
+                });
+
             } catch (err) {
-                console.error("Failed to parse report", err);
+                console.error("Failed to fetch report", err);
+                setReport(null);
             }
-        }
-    }, [location.search]);
+        };
+
+        if (id) fetchReport();
+    }, [id]);
 
     const handlePrint = () => {
         window.print();
@@ -31,8 +54,7 @@ function ReportPrint() {
     if (!report) {
         return (
             <div className={styles.page}>
-                <h2>No report found</h2>
-                <button onClick={() => navigate(-1)}>Go back</button>
+                <h1>Loading...</h1>
             </div>
         );
     }
@@ -43,15 +65,28 @@ function ReportPrint() {
 
             <div className={styles.header}>
                 <h1>{report.title}</h1>
+
                 <p><strong>Type:</strong> {report.type}</p>
-                <p><strong>Created by:</strong> {report.author || "Unknown"}</p>
-                <p><strong>Role:</strong> {report.authorRole || "N/A"}</p>
 
-                <p><strong>Task:</strong> {report.taskNumber} - {report.taskName}</p>
-                <p><strong>Request:</strong> {report.requestNumber} ({report.requestType})</p>
+                <p><strong>Created by:</strong> {report.author}</p>
+                <p><strong>Role:</strong> {report.authorRole}</p>
 
-                <p><strong>Completed:</strong> {report.completedDate || "N/A"}</p>
-                <p><strong>Generated:</strong> {new Date(report.generatedAt).toLocaleString()}</p>
+                <p>
+                    <strong>Task:</strong> {report.taskNumber} - {report.taskName}
+                </p>
+
+                <p>
+                    <strong>Request:</strong> {report.requestNumber} ({report.requestType})
+                </p>
+
+                <p>
+                    <strong>Completed:</strong> {report.completedDate || "N/A"}
+                </p>
+
+                <p>
+                    <strong>Generated:</strong>{" "}
+                    {new Date(report.generatedAt).toLocaleString()}
+                </p>
             </div>
 
             <div className={styles.content}>
