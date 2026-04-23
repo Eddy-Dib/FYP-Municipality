@@ -1,7 +1,29 @@
 {
   "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "multer": "^2.1.1",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-router-dom": "^6.30.3"
-  }
+  },
+  "name": "fyp-municipality",
+  "version": "1.0.0",
+  "description": "This project proposes the development of an automated Municipality Management System designed to digitalize and streamline core municipal services. The system provides a centralized platform for citizens, municipal employees and administrators to manage requests, documents, tasks and communications efficiently.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Eddy-Dib/FYP-Municipality.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Eddy-Dib/FYP-Municipality/issues"
+  },
+  "homepage": "https://github.com/Eddy-Dib/FYP-Municipality#readme"
 }

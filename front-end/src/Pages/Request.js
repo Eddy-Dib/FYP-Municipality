@@ -85,6 +85,30 @@ function Request() {
         printWindow.print();
     };
 
+    const handleSubmit = async () => {
+        try {
+            const payload = {
+                title: data.title,
+                type: data.type,
+                otherType: data.otherType,
+                fullName: data.fullName,
+                phones: data.phones,
+                email: data.email,
+                address: data.address,
+                description: data.description,
+                urgency: data.urgency,
+                citizenId: 1 
+            };
+
+            await axios.post("http://localhost:5000/api/requests", payload);
+
+            alert("Request sent!");
+        } catch (err) {
+            console.log(err);
+            alert("Error sending request");
+        }
+    };
+
     return (
         <div className={styles.requestPage}>
 
@@ -190,7 +214,7 @@ function Request() {
                 {/* STEP 2 */}
                 {step === 2 && (
                     <>
-                        {/* ✅ HIDDEN PRINT VERSION (like PayFees invoice) */}
+                        
                         <div id="voucherPrint" className={styles.hiddenVoucher}>
                             <h3>Request Voucher</h3>
 
@@ -217,7 +241,7 @@ function Request() {
                             </div>
                         </div>
 
-                        {/* ✅ YOUR NORMAL UI (unchanged design) */}
+                        
                         <div className={styles.voucher}>
                             <h3>Request Voucher</h3>
 
