@@ -1,6 +1,7 @@
 import express, { json } from "express";
 import cors from "cors";
 import authRoutes from "./routes/authRoutes.js";
+import requestRoutes from "./routes/requestRoutes.js";
 import complaintRoutes from "./routes/complaintRoutes.js";
 import employeeRoutes from "./routes/employeeRoutes.js"
 
@@ -13,6 +14,12 @@ app.use(json());
 // Sends all requests starting with /auth to authRoutes
 app.use("/auth", authRoutes);
 
+// Requests system (citizen submissions)
+app.use("/api/requests", requestRoutes);
+
+app.get("/test", (req, res) => {
+    res.send("API WORKS");
+});
 // Routes for handling complaints and citizen messages (stored in COMPLAINT table)
 app.use("/api/complaints", complaintRoutes);
 // Sends all requests starting with /employee to employeeRoutes
