@@ -2,20 +2,28 @@ import db from "../config/db.js";
 import { sendSuccess, sendError } from "../utils/responses.js";
 
 
-export const createRequest = (req, res) => {//create request
+export const createRequest = (req, res) => {
     try {
         const {
             title,
             type,
-            otherType,
             fullName,
             phones,
             email,
             address,
             description,
-            urgency,
-            citizenId
+            urgency
         } = req.body;
+
+        const citizenId = req.user?.id;
+
+        if (!citizenId) {
+            return sendError(res, 401, "Unauthorized", "NO_USER");
+        }
+
+        if (!type) {
+            return sendError(res, 400, "Request type is required", "NO_TYPE");
+        }
 
         const query = `
             INSERT INTO REQUEST 
@@ -25,7 +33,6 @@ export const createRequest = (req, res) => {//create request
 
         const jsonData = JSON.stringify({
             title,
-            otherType,
             fullName,
             phones,
             email,
@@ -40,14 +47,16 @@ export const createRequest = (req, res) => {//create request
                 urgency || 0,
                 type,
                 1,
-                citizenId || 1
+                citizenId
             ],
             (err, result) => {
                 if (err) {
                     return sendError(res, 500, "Database error", err.message);
                 }
 
-                return sendSuccess(res, "Request created successfully", result);
+                return sendSuccess(res, "Request created successfully", {
+                    insertId: result.insertId
+                });
             }
         );
 
@@ -56,14 +65,27 @@ export const createRequest = (req, res) => {//create request
     }
 };
 
-export const getRequests = (req, res) => {//to get request 
+export const getRequests = (req, res) => {
     const query = "SELECT * FROM REQUEST ORDER BY DateMade DESC";
 
     db.query(query, (err, results) => {
         if (err) {
-            console.log("🔥 MYSQL ERROR:", err);
-            return sendError(res, 500, "Database error", err.sqlMessage || err.message);
+            return sendError(res, 500, "Database error", err.message);
         }
-        return sendSuccess(res, "Request created successfully", result);
+
+        return sendSuccess(res, "Requests fetched successfully", results || []);
+    });
+};
+
+
+export const getRequestTypes = (req, res) => {
+    const query = "SELECT RType_ID, RType_Name FROM REQUEST_TYPES";
+
+    db.query(query, (err, results) => {
+        if (err) {
+            return sendError(res, 500, "Failed to fetch request types", err.message);
+        }
+
+        return sendSuccess(res, "Request types fetched successfully", results || []);
     });
 };

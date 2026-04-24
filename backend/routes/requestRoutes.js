@@ -1,9 +1,11 @@
 import express from "express";
-import { createRequest, getRequests } from "../controllers/requestController.js";
+import { createRequest, getRequests, getRequestTypes } from "../controllers/requestController.js";
+import { authMiddleware } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-router.post("/", createRequest);
-router.get("/", getRequests);
+router.post("/", authMiddleware, createRequest);
+router.get("/", authMiddleware, getRequests);
+router.get("/types", getRequestTypes);
 
 export default router;

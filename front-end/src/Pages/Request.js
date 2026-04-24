@@ -1,14 +1,30 @@
 import styles from "./Request.module.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 
 function Request() {
+    const API_URL = process.env.REACT_APP_API_URL;
+    const token = localStorage.getItem("token"); // 👈 where you store it
+
     const [step, setStep] = useState(1);
+    const [requestTypes, setRequestTypes] = useState([]);
+    const [profile, setProfile] = useState(null);
+    const [error, setError] = useState("");
+
+    const validateStep1 = () => {
+        if (!data.title) return "Request title is required";
+        if (!data.fullName) return "Full name is required";
+        if (!data.phones[0]) return "Primary phone number is required";
+        if (!data.email) return "Email is required";
+        if (!data.type) return "Request type is required";
+        if (!data.address) return "Address is required";
+
+        return "";
+    };
 
     const [data, setData] = useState({
         title: "",
         type: "",
-        otherType: "",
         fullName: "",
         phones: ["", ""],
         email: "",
@@ -20,6 +36,21 @@ function Request() {
 
     const [previews, setPreviews] = useState([]);
     const [reference] = useState(Math.floor(100000 + Math.random() * 900000));
+
+    useEffect(() => {
+        const fetchTypes = async () => {
+            try {
+                const res = await axios.get(`${API_URL}/api/requests/types`);
+                if (res.data.success) {
+                    setRequestTypes(res.data.data || []);
+                }
+            } catch (err) {
+                console.log("Error fetching request types:", err);
+            }
+        };
+
+        fetchTypes();
+    }, []);
 
     const handleChange = (e, index = null) => {
         const { name, value, files } = e.target;
@@ -46,6 +77,7 @@ function Request() {
 
         else {
             setData(prev => ({ ...prev, [name]: value }));
+            setError("");
         }
     };
 
@@ -87,7 +119,41 @@ function Request() {
         printWindow.print();
     };
 
+    useEffect(() => {
+        const fetchProfile = async () => {
+            try {
+                const res = await axios.get(`${API_URL}/api/citizen/me`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
 
+                console.log("PROFILE RESPONSE:", res.data);
+
+                if (res.data.success) {
+                    const p = res.data.data;
+
+                    setProfile(p);
+
+                    setData(prev => ({
+                        ...prev,
+
+                        fullName: p.FullName ?? "",
+
+                        email: p.Email ?? "",
+
+                        address: p.Address ?? "",
+
+                        phones: p.Phone_Num
+                            ? [p.Phone_Num, ""]
+                            : ["", ""]
+                    }));
+                }
+            } catch (err) {
+                console.log("Profile fetch error:", err);
+            }
+        };
+
+        fetchProfile();
+    }, []);
 
     const handleSubmit = async () => {
         try {
@@ -97,15 +163,9 @@ function Request() {
                 High: 3,
                 Emergency: 4
             };
-            const typeMap = {
-                "Building Permit": 1,
-                "Renovation Permit": 2,
-                "Business License": 3,
-                "Other": 4
-            };
             const payload = {
                 title: data.title,
-                type: typeMap[data.type],
+                type: data.type,
                 otherType: data.otherType,
                 fullName: data.fullName,
                 phones: data.phones,
@@ -113,13 +173,19 @@ function Request() {
                 address: data.address,
                 description: data.description,
                 urgency: priorityMap[data.urgency],
-                citizenId: 1
             };
 
             console.log("PAYLOAD:", payload);
 
-            await axios.post("http://localhost:5000/api/requests", payload);
-
+            await axios.post(
+                `${API_URL}/api/requests`,
+                payload,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            );
             alert("Request sent!");
         } catch (err) {
             console.log("FULL ERROR:", err);
@@ -149,13 +215,13 @@ function Request() {
                         <h3 className={styles.sectionTitle}>Request Information</h3>
 
                         <div className={styles.formGroup}>
-                            <label>Request Title</label>
-                            <input placeholder="e.g. Building Permit for House" name="title" onChange={handleChange} />
+                            <label>Request Title *</label>
+                            <input placeholder="e.g. Building Permit for House" name="title" onChange={handleChange} value={data.title}/>
                         </div>
 
                         <div className={styles.formGroup}>
                             <label>Full Name *</label>
-                            <input placeholder="Enter your full name" name="fullName" onChange={handleChange} />
+                            <input placeholder="Enter your full name" name="fullName" onChange={handleChange} value={data.fullName}/>
                         </div>
 
                         <div className={styles.phoneRow}>
@@ -172,30 +238,26 @@ function Request() {
 
                         <div className={styles.formGroup}>
                             <label>Email *</label>
-                            <input type="email" placeholder="example@email.com" name="email" onChange={handleChange} />
+                            <input type="email" placeholder="example@email.com" name="email" onChange={handleChange} value={data.email}/>
                         </div>
 
                         <div className={styles.formGroup}>
                             <label>Request Type *</label>
                             <select name="type" onChange={handleChange}>
                                 <option value="">Select request type</option>
-                                <option>Building Permit</option>
-                                <option>Renovation Permit</option>
-                                <option>Business License</option>
-                                <option value="Other">Other</option>
+
+                                {requestTypes.map(type => (
+                                    <option key={type.RType_ID} value={type.RType_ID}>
+                                        {type.RType_Name}
+                                    </option>
+                                ))}
+
                             </select>
                         </div>
 
-                        {data.type === "Other" && (
-                            <div className={styles.formGroup}>
-                                <label>Specify Type</label>
-                                <input placeholder="Describe your request type" name="otherType" onChange={handleChange} />
-                            </div>
-                        )}
-
                         <div className={styles.formGroup}>
                             <label>Address *</label>
-                            <input placeholder="Enter your full address" name="address" onChange={handleChange} />
+                            <input placeholder="Enter your full address" name="address" onChange={handleChange} value={data.address}/>
                         </div>
 
                         <div className={styles.formGroup}>
@@ -228,6 +290,13 @@ function Request() {
                                 </div>
                             ))}
                         </div>
+
+                        {error && (
+                            <p style={{ color: "red", marginTop: "10px" }}>
+                                {error}
+                            </p>
+                        )}
+
                     </>
                 )}
 
@@ -247,7 +316,7 @@ function Request() {
                             </ul>
 
                             <p><b>Email:</b> {data.email}</p>
-                            <p><b>Type:</b> {data.type === "Other" ? data.otherType : data.type}</p>
+                            <p><b>Type:</b> {requestTypes.find(t => t.RType_ID == data.type)?.RType_Name}</p>
                             <p><b>Address:</b> {data.address}</p>
                             <p><b>Urgency:</b> {data.urgency}</p>
                             <p><b>Description:</b> {data.description}</p>
@@ -309,7 +378,20 @@ function Request() {
 
             <div className={styles.navButtons}>
                 {step === 2 && <button onClick={() => setStep(1)}>Back</button>}
-                {step === 1 && <button onClick={() => setStep(2)}>Next</button>}
+                <button
+                    onClick={() => {
+                        const err = validateStep1();
+
+                        if (err) {
+                            setError(err);
+                            return;
+                        }
+
+                        setError("");
+                        setStep(2);
+                    }}>
+                    Next
+                </button>
             </div>
 
         </div>
