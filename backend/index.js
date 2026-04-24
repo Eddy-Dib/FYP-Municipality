@@ -2,7 +2,7 @@ import express, { json } from "express";
 import cors from "cors";
 import authRoutes from "./routes/authRoutes.js";
 import requestRoutes from "./routes/requestRoutes.js";
-import complaintRoutes from "./routes/complaintRoutes.js";
+import complaintRoutes from "./routes/ComplaintRoutes.js";
 import employeeRoutes from "./routes/employeeRoutes.js"
 import citizenRoutes from "./routes/citizenRoutes.js";
 
@@ -17,6 +17,7 @@ app.use("/auth", authRoutes);
 
 // Requests system (citizen submissions)
 app.use("/api/requests", requestRoutes);
+
 
 app.get("/test", (req, res) => {
     res.send("API WORKS");
