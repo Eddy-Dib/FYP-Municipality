@@ -148,6 +148,7 @@ export const getReportHistory = async (req, res) => {
                 rpt.RepType_Name,
 
                 rt.RType_Name AS RequestType,
+                CONCAT(c.First_Name, ' ', c.Last_Name) AS Full_Name,
 
                 CONCAT(
                     DATE_FORMAT(t.DateAssigned, '%y'),
@@ -164,9 +165,9 @@ export const getReportHistory = async (req, res) => {
             JOIN TASK_STATUSES ts ON t.TStat_Code = ts.TStat_Code
             JOIN REQUEST r ON t.Req_ID = r.Req_ID
             JOIN REQUEST_TYPES rt ON r.RType_ID = rt.RType_ID
-
             JOIN REPORT rep ON rep.Task_ID = t.Task_ID
             JOIN REP_TYPE rpt ON rep.RepType_ID = rpt.RepType_ID
+            JOIN CITIZEN c ON r.C_ID = c.C_ID
 
             WHERE t.Emp_ID = ?
               AND ts.TStat_Name = 'Completed'
@@ -186,6 +187,7 @@ export const getReportHistory = async (req, res) => {
             requestNumber: row.RequestNumber,
             requestType: row.RequestType,
             status: row.TaskStatus,
+            citizenName: row.Full_Name,
             completedDate: formatDate(row.DateCompleted)
         }));
 

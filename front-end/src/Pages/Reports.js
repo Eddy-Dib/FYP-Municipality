@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 
 import ReportCard from "../Components/Card/ReportCard";
+import TaskCard from "../Components/Card/TaskCard";
 import styles from "./Reports.module.css";
 
 function Reports() {
@@ -9,6 +10,7 @@ function Reports() {
     const token = localStorage.getItem("token");
 
     const [reports, setReports] = useState([]);
+    const [tasks, setTasks] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
@@ -38,9 +40,28 @@ function Reports() {
                 setLoading(false);
             }
         };
+        const fetchTasks = async () => {
+            try {
+                const res = await axios.get(
+                    `${API_URL}/employee/tasks/history`,
+                    {
+                        headers: { Authorization: `Bearer ${token}` }
+                    }
+                );
+
+                setTasks(res?.data?.data || []);
+            } catch (err) {
+                console.error(err);
+                setError(
+                    err?.response?.data?.message ||
+                    "Failed to load task history"
+                );
+            }
+        };
 
         fetchHistory();
-    }, [API_URL, token]);
+        fetchTasks();
+    }, []);
 
     const openReport = (report) => {
         window.open(
@@ -53,7 +74,7 @@ function Reports() {
 
     return (
         <>
-            <h1 className={styles.title}>History</h1>
+            <h1 className={styles.title}>Reports History</h1>
 
             <div className={styles.list}>
                 {reports.length === 0 ? (
@@ -67,12 +88,37 @@ function Reports() {
                             type={report.type}
 
                             requestId={report.requestNumber}
+                            requestName={report.requestType}
+
                             taskId={report.taskNumber}
+                            taskName={report.taskName}
+
+                            citizenName={report.citizenName}
 
                             date={report.completedDate}
 
-                            onView={() => openReport(report)}
                             onDownload={() => openReport(report)}
+                        />
+                    ))
+                )}
+            </div>
+
+            <h2 className={styles.title}>Tasks History</h2>
+
+            <div className={styles.list}>
+                {tasks.length === 0 ? (
+                    <p>No completed tasks yet.</p>
+                ) : (
+                    tasks.map((task) => (
+                        <TaskCard
+                            key={task.taskId}
+                            number={task.taskNumber}
+                            title={task.taskName}
+                            requestId={task.requestNumber}
+                            priority={task.priority}
+                            dueDate={task.completedDate}
+                            status={task.status}
+                            onClick={() => console.log(task)}
                         />
                     ))
                 )}

@@ -34,7 +34,7 @@ function ComplaintCard({ complaint, onResolve, onDelete }) {
                             className={styles.delete}
                             onClick={() => onDelete(complaint.Cmpt_ID)}
                         >
-                            Delete
+                            Reject
                         </button>
                     </div>
                 )}

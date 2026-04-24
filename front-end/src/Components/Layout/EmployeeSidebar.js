@@ -10,7 +10,7 @@ function EmployeeSideBar() {
     const baseItems = [
         { label: "Home", path: "/employee" },
         { label: "Tasks", path: "/employee/tasks" },
-        { label: "Reports", path: "/employee/reports"}
+        { label: "History", path: "/employee/reports"}
     ];
 
     let roleItems = [];

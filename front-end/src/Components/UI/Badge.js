@@ -2,6 +2,13 @@ import styles from "./Badge.module.css";
 import { FaExclamationTriangle, FaClock, FaSpinner, FaCheckCircle } from "react-icons/fa";
 
 export function PriorityBadge({ value }) {
+    const normalizedValue =
+        value === 2 || value === "2" || value === "High"
+            ? "High"
+            : value === 1 || value === "1" || value === "Medium"
+                ? "Medium"
+                : "Low";
+
     const priorityConfig = {
         High: {
             label: "High",
@@ -20,7 +27,7 @@ export function PriorityBadge({ value }) {
         }
     };
 
-    const config = priorityConfig[value] || priorityConfig.Low;
+    const config = priorityConfig[normalizedValue] || priorityConfig.Low;
 
     return (
         <span className={`${styles.badge} ${styles[config.className]}`}>
