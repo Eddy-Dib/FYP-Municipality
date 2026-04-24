@@ -1,0 +1,67 @@
+.request {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.request:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+}
+
+.middle {
+    flex: 1;
+}
+
+.title {
+    margin-bottom: 8px;
+    color: var(--text-main);
+}
+
+.description {
+    margin-top: 6px;
+    color: var(--text-muted);
+    font-size: 13px;
+}
+
+.right {
+    font-size: 26px;
+    color: var(--primary);
+    margin-left: 15px;
+}
+
+/* STATUS STYLES */
+.status {
+    padding: 2px 8px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+/* different statuses */
+.submitted {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.underreview {
+    background: #fef3c7;
+    color: #b45309;
+}
+
+.missingdocuments {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.assigned {
+    background: #e0e7ff;
+    color: #4338ca;
+}
+
+.inprogress {
+    background: #dcfce7;
+    color: #166534;
+}

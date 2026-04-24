@@ -29,6 +29,10 @@ import MayorComplaints from "./Pages/MayorComplaints";
 import MayorAlerts from "./Pages/MayorAlerts";
 import MayorReports from "./Pages/MayorReports";
 
+// Secretary
+import ManageRequests from "./Pages/Secretary/ManageRequests";
+import RequestDetailsPage from "./Pages/Secretary/RequestDetailsPage";
+
 // Print
 import ReportPrint from "./Pages/ReportPrint";
 
@@ -53,6 +57,10 @@ function App() {
           <Route path="mayor/alerts" element={<ProtectedRoute allowedRoles={["Mayor"]}><MayorAlerts /></ProtectedRoute>} />
           <Route path="mayor/reports" element={<ProtectedRoute allowedRoles={["Mayor"]}><MayorReports /></ProtectedRoute>} />
           <Route path="reports" element={<Reports />} />
+
+          {/* SECRETARY ROUTES*/}
+          <Route path="secretary/managereq" element={<ProtectedRoute allowedRoles={["Secretary"]}><ManageRequests /></ProtectedRoute>}/>
+          <Route path="secretary/managereq/:id" element={<ProtectedRoute allowedRoles={["Secretary"]}><RequestDetailsPage /></ProtectedRoute>} />
         </Route>
 
 

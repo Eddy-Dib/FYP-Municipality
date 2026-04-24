@@ -113,10 +113,12 @@ export const getTaskDetails = async (req, res) => {
 
         let requestDescription = data.RequestDescription;
 
-        if (typeof requestDescription === "object" && requestDescription !== null) {
-            requestDescription = Object.entries(requestDescription)
-                .map(([k, v]) => `${k}: ${v}`)
-                .join(", ");
+        if (typeof requestDescription === "string") {
+            try {
+                requestDescription = JSON.parse(requestDescription);
+            } catch (e) {
+                requestDescription = requestDescription;
+            }
         }
 
         return sendSuccess(res, "Task details loaded", {

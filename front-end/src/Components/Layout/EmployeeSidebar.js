@@ -39,7 +39,7 @@ function EmployeeSideBar() {
             roleItems = [
                 { label: "Register Request", path: "/employee/secretary/register" },
                 { label: "Verify Documents", path: "/employee/secretary/verify" },
-                { label: "Manage Requests", path: "/employee/secretary/requests" },
+                { label: "Manage Requests", path: "/employee/secretary/managereq" },
                 { label: "Events", path: "/employee/secretary/events" },
                 { label: "Announcements", path: "/employee/secretary/announcements" },
                 { label: "Print Documents", path: "/employee/secretary/print" }
