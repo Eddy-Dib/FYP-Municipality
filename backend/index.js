@@ -3,8 +3,11 @@ import cors from "cors";
 import authRoutes from "./routes/authRoutes.js";
 import requestRoutes from "./routes/requestRoutes.js";
 import complaintRoutes from "./routes/complaintRoutes.js";
+<<<<<<< HEAD
 import employeeRoutes from "./routes/employeeRoutes.js"
 import citizenRoutes from "./routes/citizenRoutes.js";
+=======
+>>>>>>> a9f156c (implement complaint frontend with loading state)
 
 const app = express();
 
@@ -17,6 +20,9 @@ app.use("/auth", authRoutes);
 
 // Requests system (citizen submissions)
 app.use("/api/requests", requestRoutes);
+
+//Complaints system (citizen submissions)
+app.use("/api/complaints", complaintRoutes);
 
 app.get("/test", (req, res) => {
     res.send("API WORKS");

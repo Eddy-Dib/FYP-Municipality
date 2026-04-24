@@ -1,5 +1,6 @@
 import styles from "./Complain.module.css";
 import { useState } from "react";
+import axios from "axios";
 
 function Complain() {
     const [data, setData] = useState({
@@ -14,6 +15,8 @@ function Complain() {
 
     const [previews, setPreviews] = useState([]);
     const [reference] = useState(Math.floor(100000 + Math.random() * 900000));
+
+    const [loading, setLoading] = useState(false);
 
     const handleChange = (e) => {
         const { name, value, files } = e.target;
@@ -46,6 +49,37 @@ function Complain() {
         setPreviews(prev => prev.filter((_, i) => i !== index));
     };
 
+    const handleSubmit = async () => {
+        try {
+            setLoading(true); // 🔥 start loading
+
+            const payload = {
+                subject: data.category,
+                details: `
+                         Name: ${data.fullName}
+                         Phone: ${data.phone}
+                         Location: ${data.location}
+                         Priority: ${data.priority}
+
+                        Description:
+                             ${data.description}
+            `,
+                citizenId: 1
+            };
+
+            console.log("PAYLOAD:", payload);
+
+            const res = await axios.post("http://localhost:5000/api/complaints", payload);
+
+            alert(res.data.message || "Complaint sent!");
+
+        } catch (err) {
+            console.log(err.response?.data);
+            alert(err.response?.data?.error || "Error sending complaint");
+        } finally {
+            setLoading(false); // 🔥 stop loading
+        }
+    };
     return (
         <div className={styles.complainPage}>
 
@@ -131,9 +165,12 @@ function Complain() {
                     Reference ID: #{reference}
                 </div>
 
-                {/* BUTTON */}
-                <button className={styles.submitBtn}>
-                    Submit Complaint
+                <button
+                    className={styles.submitBtn}
+                    onClick={handleSubmit}
+                    disabled={loading}
+                >
+                    {loading ? "Sending..." : "Submit Complaint"}
                 </button>
 
             </div>
