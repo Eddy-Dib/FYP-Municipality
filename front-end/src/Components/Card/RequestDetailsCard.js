@@ -2,6 +2,16 @@ import Card from "./Card";
 import styles from "./RequestDetailsCard.module.css";
 
 function RequestDetailsCard({ request }) {
+    let parsedDescription = request.description;
+
+    if (typeof parsedDescription === "string") {
+        try {
+            parsedDescription = JSON.parse(parsedDescription);
+        } catch (e) {
+            parsedDescription = null;
+        }
+    }
+
     return (
         <Card className={styles.request}>
 
@@ -10,11 +20,24 @@ function RequestDetailsCard({ request }) {
 
                 <p><strong>Request #:</strong> {request.requestNumber}</p>
                 <p><strong>Status:</strong> {request.status}</p>
+                <p><strong>Due Date:</strong> {request.dueDate}</p>
 
                 <p><strong>Description:</strong></p>
-                <p className={styles.description}>{request.description}</p>
+                {parsedDescription && typeof parsedDescription === "object" ? (
+                    <div className={styles.jsonBox}>
+                        {Object.entries(parsedDescription).map(([key, value]) => (
+                            <div key={key} className={styles.row}>
+                                <span className={styles.key}>{key}</span>
+                                <span className={styles.value}>{String(value)}</span>
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <p className={styles.descriptionText}>
+                        {request.description}
+                    </p>
+                )}
 
-                <p><strong>Due Date:</strong> {request.dueDate}</p>
             </div>
 
         </Card>

@@ -1,0 +1,38 @@
+.title {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: var(--text-main);
+}
+
+.ribbon {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.tab {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 8px;
+    background: #e9eef6;
+    cursor: pointer;
+    font-size: 14px;
+    transition: 0.2s ease;
+}
+
+.tab:hover {
+    background: #dbe6f5;
+}
+
+.active {
+    background: var(--primary);
+    color: white;
+}
+
+.list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}

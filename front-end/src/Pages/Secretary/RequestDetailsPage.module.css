@@ -1,0 +1,101 @@
+.container {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.backBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    background: transparent;
+    border: none;
+    cursor: pointer;
+
+    color: var(--primary);
+    font-weight: 500;
+
+    width: fit-content;
+    padding: 4px 0;
+}
+
+.sectionTitle {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-dark);
+
+    margin-top: 6px;
+}
+
+.docsBox {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.docCard {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 12px 14px;
+    border-radius: 12px;
+
+    background: #fff;
+    box-shadow: var(--shadow);
+
+    transition: 0.2s ease;
+}
+
+.docCard:hover {
+    transform: translateY(-2px);
+}
+
+.docInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.docTitle {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.meta {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.status {
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.valid {
+    color: #22c55e;
+}
+
+.invalid {
+    color: #ef4444;
+}
+
+.viewBtn {
+    padding: 6px 10px;
+    border-radius: 8px;
+
+    background: var(--primary);
+    color: white;
+
+    font-size: 13px;
+    text-decoration: none;
+
+    transition: 0.2s ease;
+}
+
+.viewBtn:hover {
+    background: var(--primary-dark);
+}
