@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
 
@@ -9,45 +10,93 @@ function RequestDetails() {
     const { id } = useParams();
     const navigate = useNavigate();
 
-    const dummyRequest = {
-        requestNumber: `REQ-${id}`,
-        type: "Building Permit",
-        status: "Submitted",
-        dueDate: "2026-05-01",
-        description: JSON.stringify({
-            property_address: "123 Elm St",
-            building_size: "20sqm",
-            contractor: "John Doe"
-        }),
-        citizenName: "Guest Citizen"
+    const API_URL = process.env.REACT_APP_API_URL;
+    const token = localStorage.getItem("token");
+
+    const [request, setRequest] = useState(null);
+    const [documents, setDocuments] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
+    const [approving, setApproving] = useState(false);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const [reqRes, docRes] = await Promise.all([
+                    axios.get(`${API_URL}/secretary/requests/${id}`, {
+                        headers: { Authorization: `Bearer ${token}` }
+                    }),
+
+                    axios.get(`${API_URL}/secretary/requests/${id}/documents`, {
+                        headers: { Authorization: `Bearer ${token}` }
+                    })
+                ]);
+
+                if (reqRes.data.success) {
+                    setRequest(reqRes.data.data);
+                } else {
+                    setError(reqRes.data.message);
+                }
+
+                if (docRes.data.success) {
+                    setDocuments(docRes.data.data);
+                } else {
+                    setError(docRes.data.message);
+                }
+
+            } catch (err) {
+                console.error(err);
+                setError(
+                    err.response?.data?.message ||
+                    "Failed to load request details"
+                );
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, [id]);
+
+    const handleApprove = async () => {
+        try {
+            setApproving(true);
+
+            const res = await axios.post(
+                `${API_URL}/secretary/requests/${id}/approve`,
+                {},
+                {
+                    headers: { Authorization: `Bearer ${token}` }
+                }
+            );
+
+            if (res.data.success) {
+                setRequest(prev => ({
+                    ...prev,
+                    status: "Assigned"
+                }));
+            } else {
+                setError(res.data.message);
+            }
+
+        } catch (err) {
+            console.error(err);
+            setError(
+                err.response?.data?.message ||
+                "Failed to approve request"
+            );
+        } finally {
+            setApproving(false);
+        }
     };
 
-    const dummyDocuments = [
-        {
-            Doc_ID: 1,
-            Doc_Type: "National ID",
-            DateUploaded: "2026-04-03",
-            FilePath: "/files/national_id.pdf",
-            IsValid: 1
-        },
-        {
-            Doc_ID: 2,
-            Doc_Type: "Proof of Residence",
-            DateUploaded: "2026-04-03",
-            FilePath: "/files/residence.pdf",
-            IsValid: 1
-        },
-        {
-            Doc_ID: 3,
-            Doc_Type: "Property Deed",
-            DateUploaded: "2026-04-02",
-            FilePath: "/files/deed.pdf",
-            IsValid: 0
-        }
-    ];
+    if (error) {
+        return <h1 className={styles.error}>{error}</h1>;
+    }
 
-    const [request] = useState(dummyRequest);
-    const [documents] = useState(dummyDocuments);
+    if (loading || !request) {
+        return <h1 className={styles.loading}>Loading...</h1>;
+    }
 
     return (
         <div className={styles.container}>
@@ -58,36 +107,50 @@ function RequestDetails() {
 
             <RequestDetailsCard request={request} />
 
+            {request.status === "Submitted" || request.status === "Under Review" ? (
+                <button
+                    className={styles.approveBtn}
+                    onClick={handleApprove}
+                    disabled={approving}
+                >
+                    {approving ? "Approving..." : "Approve Request"}
+                </button>
+            ) : null}
+
             <div className={styles.docsBox}>
                 <h2 className={styles.sectionTitle}>Citizen Documents</h2>
 
-                {documents.map(doc => (
-                    <div key={doc.Doc_ID} className={styles.docCard}>
+                {documents.length === 0 ? (
+                    <p>No documents found</p>
+                ) : (
+                    documents.map(doc => (
+                        <div key={doc.id} className={styles.docCard}>
 
-                        <div className={styles.docInfo}>
-                            <p className={styles.docTitle}>
-                                {doc.Doc_Type}
-                            </p>
+                            <div className={styles.docInfo}>
+                                <p className={styles.docTitle}>
+                                    {doc.type}
+                                </p>
 
-                            <p className={styles.meta}>
-                                Uploaded: {doc.DateUploaded}
-                            </p>
+                                <p className={styles.meta}>
+                                    Uploaded: {doc.uploadedAt}
+                                </p>
 
-                            <p className={`${styles.status} ${doc.IsValid ? styles.valid : styles.invalid}`}>
-                                {doc.IsValid ? "Valid" : "Invalid"}
-                            </p>
+                                <p className={`${styles.status} ${doc.isValid ? styles.valid : styles.invalid}`}>
+                                    {doc.isValid ? "Valid" : "Invalid"}
+                                </p>
+                            </div>
+
+                            <a
+                                href={`${API_URL}${doc.file}`}
+                                target="_blank"
+                                rel="noreferrer"
+                                className={styles.viewBtn}
+                            >
+                                View
+                            </a>
                         </div>
-
-                        <a
-                            href={doc.FilePath}
-                            target="_blank"
-                            rel="noreferrer"
-                            className={styles.viewBtn}
-                        >
-                            View
-                        </a>
-                    </div>
-                ))}
+                    ))
+                )}
             </div>
 
         </div>

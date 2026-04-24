@@ -99,3 +99,36 @@
 .viewBtn:hover {
     background: var(--primary-dark);
 }
+
+.approveBtn {
+    margin-top: 10px;
+    align-self: flex-start;
+
+    padding: 10px 16px;
+    border-radius: 10px;
+    border: none;
+
+    background: #22c55e;
+    color: white;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.approveBtn:hover {
+    background: #16a34a;
+    transform: translateY(-1px);
+}
+
+.approveBtn:active {
+    transform: translateY(0);
+}
+
+.approveBtn:disabled {
+    background: #94a3b8;
+    cursor: not-allowed;
+    transform: none;
+}
