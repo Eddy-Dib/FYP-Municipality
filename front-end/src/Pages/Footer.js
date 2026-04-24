@@ -1,8 +1,32 @@
 import styles from "./Footer.module.css";
 import { FaPhone, FaEnvelope, FaMapMarkerAlt, FaLandmark } from "react-icons/fa";
 import logo from "../Assets/Logo.jpg";
+import axios from "axios";
+import { useState } from "react";
 
 function Footer() {
+
+    const [message, setMessage] = useState("");
+
+    const sendMessage = async () => {
+        try {
+            const res = await axios.post("http://localhost:5000/api/complaints/message", {
+                message: message,
+                C_ID: 1 
+            });
+
+            if (res.data.success) {
+                alert("Message sent successfully");
+                setMessage("");
+            } else {
+                alert(res.data.message);
+            }
+        } catch (err) {
+            console.log(err);
+            alert("Server error");
+        }
+    };
+
     return (
         <footer className={styles.footer}>
 
@@ -18,8 +42,13 @@ function Footer() {
 
                 <div className={styles.left}>
                     <h4>Send Message</h4>
-                    <textarea placeholder="Your Message"></textarea>
-                    <button>Send</button>
+                    <textarea
+                        placeholder="Your Message"
+                        value={message}
+                        onChange={(e) => setMessage(e.target.value)}
+                    ></textarea>
+
+                    <button onClick={sendMessage}>Send</button>
                 </div>
 
                 <div className={styles.center}>
@@ -47,7 +76,7 @@ function Footer() {
                 </div>
 
             </div>
-            
+
             <div className={styles.bottom}>
                 © 2026 Municipality. All rights reserved.
             </div>

@@ -8,7 +8,6 @@ function ReportCard({
     requestId,
     taskId,
     date,
-    onView,
     onDownload
 }) {
     return (
@@ -24,10 +23,6 @@ function ReportCard({
             </div>
 
             <div className={styles.right}>
-                <button className={styles.iconBtn} onClick={onView} title="View Report">
-                    <FaEye />
-                </button>
-
                 <button className={styles.iconBtn} onClick={onDownload} title="Download Report">
                     <FaDownload />
                 </button>

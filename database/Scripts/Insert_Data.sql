@@ -46,6 +46,15 @@ INSERT INTO REP_TYPE (RepType_ID, RepType_Name) VALUES
 (6, 'Audit'),
 (7, 'General');
 
+-- Issued document statuses
+INSERT INTO ISSDOC_STATUSES (IssStat_Code, IssStat_Name, IssStat_Desc) VALUES
+(1, 'Draft', 'Document is being prepared'),
+(2, 'Under Review', 'Document is under review by authority'),
+(3, 'Approved', 'Document has been approved'),
+(4, 'Rejected', 'Document has been rejected'),
+(5, 'Signed', 'Document has been signed by the authority'),
+(6, 'Issued', 'Document has been officially issued to the citizen');
+
 -- Request types
 INSERT INTO REQUEST_TYPES (RType_ID, RType_Name, RType_Desc, RType_Duration) VALUES
 (1, 'Building Permit', 'Request for permission to construct or modify a building', 14),
@@ -176,6 +185,23 @@ INSERT INTO REPORT (Title, Description, RepType_ID, Task_ID)
 VALUES
 ('User Registration Audit', 'Checked new user registrations for correctness and completeness.', 2, 1),
 ('Building Site Inspection Report', 'Inspected the site and noted compliance issues.', 1, 2);
+
+-- Dummy issued documents
+INSERT INTO ISSUED_DOCUMENT 
+(Title, Content, DateIssued, IssStat_Code, Req_ID, Created_By, Approved_By)
+VALUES
+(
+    'Building Permit Approval',
+    'This document certifies that the construction request has been reviewed and approved by the municipality.',
+    '2026-04-15 10:00:00',
+    6, 1, 5, 2
+),
+(
+    'Business License Approval',
+    'The business license request has been approved and is now valid for operation.',
+    '2026-04-16 11:30:00',
+    6, 2, 3, 2
+);
 
 -- Dummy fees
 INSERT INTO FEE (Fee_Type, Amount, DateExpected, Location_ID)

@@ -1,62 +1,81 @@
+import { useEffect, useState } from "react";
+import axios from "axios";
+
 import ReportCard from "../Components/Card/ReportCard";
 import styles from "./Reports.module.css";
 
 function Reports() {
+    const API_URL = process.env.REACT_APP_API_URL;
+    const token = localStorage.getItem("token");
 
-    const reports = [
-        {
-            title: "Water Pipeline Inspection Report",
-            type: "Inspection",
-            requestId: "REQ-5532",
-            taskId: "TASK-101",
-            date: "2026-04-15"
-        },
-        {
-            title: "Building Permit Approval Report",
-            type: "Approval",
-            requestId: "REQ-5511",
-            taskId: "TASK-102",
-            date: "2026-04-18"
-        },
-        {
-            title: "Road Damage Analysis",
-            type: "Analysis",
-            requestId: "REQ-5499",
-            taskId: "TASK-103",
-            date: "2026-04-10"
-        }
-    ];
+    const [reports, setReports] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
+
+    const user = JSON.parse(localStorage.getItem("user"));
+
+    useEffect(() => {
+        const fetchHistory = async () => {
+            try {
+                setLoading(true);
+                setError("");
+
+                const res = await axios.get(
+                    `${API_URL}/employee/reports/history`,
+                    {
+                        headers: { Authorization: `Bearer ${token}` }
+                    }
+                );
+
+                setReports(res?.data?.data || []);
+            } catch (err) {
+                console.error(err);
+                setError(
+                    err?.response?.data?.message ||
+                    "Failed to load report history"
+                );
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchHistory();
+    }, [API_URL, token]);
+
+    const openReport = (report) => {
+        window.open(
+            `/employee/report/print/${report.reportId}`, "_blank"
+        );
+    };
+
+    if (loading) return <p style={{ padding: 20 }}>Loading history...</p>;
+    if (error) return <p style={{ padding: 20 }}>{error}</p>;
 
     return (
         <>
-            <h1 className={styles.title}>Reports</h1>
-
-            {/* FOR LATER: might need to filter reports by type or something
-            <div className={styles.ribbon}>
-                {["All", "Inspection", "Approval", "Analysis"].map(tab => (
-                    <button
-                        key={tab}
-                        className={`${styles.tab} ${styles.active}`}
-                    >
-                        {tab}
-                    </button>
-                ))}
-            </div>
-            */}
+            <h1 className={styles.title}>History</h1>
 
             <div className={styles.list}>
-                {reports.map((report, index) => (
-                    <ReportCard
-                        key={index}
-                        title={report.title}
-                        type={report.type}
-                        requestId={report.requestId}
-                        taskId={report.taskId}
-                        date={report.date}
-                        onView={() => console.log("View report", report.title)}
-                        onDownload={() => console.log("Download report", report.title)}
-                    />
-                ))}
+                {reports.length === 0 ? (
+                    <p>No completed reports yet.</p>
+                ) : (
+                    reports.map((report) => (
+                        <ReportCard
+                            key={report.reportId}
+
+                            title={report.title}
+                            type={report.type}
+
+                            requestId={report.requestNumber}
+                            taskId={report.taskNumber}
+
+                            date={report.completedDate}
+
+                            onView={() => openReport(report)}
+                            onDownload={() => openReport(report)}
+                        />
+                    ))
+                )}
             </div>
         </>
     );

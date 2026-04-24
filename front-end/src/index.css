@@ -27,6 +27,8 @@
 
   --text-light: #ffffff;
   --text-muted: #cacaca;
+  --text-dark: #222;
+  --text-dark-muted: #434343;
 
   --shadow: 0 6px 12px #00000058;
   --shadoww: 0 6px 12px #000000e0;

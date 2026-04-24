@@ -58,7 +58,7 @@ function Complain() {
             {/* FORM CARD */}
             <div className={styles.formCard}>
 
-                <h3>Submit Complaint</h3>
+                <h3 className={styles.sectionTitle}>Submit Complaint</h3>
 
                 <div className={styles.formGroup}>
                     <label>Full Name *</label>

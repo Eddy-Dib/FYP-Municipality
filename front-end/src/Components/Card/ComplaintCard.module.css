@@ -1,0 +1,56 @@
+.complaint {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.middle {
+  flex: 1;
+}
+
+.title {
+  margin-bottom: 10px;
+}
+
+.description {
+  margin-top: 6px;
+  color: #555;
+}
+
+.right {
+  font-size: 28px;
+  color: #ef4444;
+  margin-left: 15px;
+}
+
+/* actions */
+.actions {
+  margin-top: 12px;
+}
+
+.resolve {
+  background: #22c55e;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: none;
+  margin-right: 8px;
+  cursor: pointer;
+}
+
+.resolve:hover {
+  background: #16a34a;
+}
+
+.delete {
+  background: #ef4444;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}
+
+.delete:hover {
+  background: #dc2626;
+}
