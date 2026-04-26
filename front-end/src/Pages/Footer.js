@@ -5,14 +5,17 @@ import axios from "axios";
 import { useState } from "react";
 
 function Footer() {
+    const token = localStorage.getItem("token");
+    const API_URL = process.env.REACT_APP_API_URL;
+    const user = JSON.parse(localStorage.getItem("user"));
 
     const [message, setMessage] = useState("");
 
     const sendMessage = async () => {
         try {
-            const res = await axios.post("http://localhost:5000/api/complaints/message", {
+            const res = await axios.post(`${API_URL}/api/complaints/message`, {
                 message: message,
-                C_ID: 1 
+                C_ID: user?.id
             });
 
             if (res.data.success) {

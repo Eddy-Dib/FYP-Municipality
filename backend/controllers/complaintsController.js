@@ -1,7 +1,6 @@
 import db from "../config/db.js";
 import { sendSuccess, sendError } from "../utils/responses.js";
 
-// ================= CREATE =================
 export const createComplaint = async (req, res) => {
   try {
     const { subject, details, c_id } = req.body;
@@ -24,7 +23,6 @@ export const createComplaint = async (req, res) => {
   }
 };
 
-// ================= GET ALL =================
 export const getComplaints = async (req, res) => {
   try {
     const [complaints] = await db.promise().query(
@@ -38,7 +36,6 @@ export const getComplaints = async (req, res) => {
   }
 };
 
-// ================= RESOLVE =================
 export const approveComplaint = async (req, res) => {
   try {
     const { id } = req.params;
