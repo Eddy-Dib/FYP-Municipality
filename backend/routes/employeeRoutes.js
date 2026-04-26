@@ -2,7 +2,7 @@ import express from "express";
 import { getDashboard } from "../controllers/employeeController.js";
 import { authMiddleware } from "../middleware/authMiddleware.js";
 import { getTaskDetails, updateTaskStatus, getTaskHistory } from "../controllers/taskController.js";
-import {createComplaint, getComplaints, approveComplaint, rejectComplaint} from "../controllers/complaintsController.js";
+import {getComplaints, approveComplaint, rejectComplaint} from "../controllers/complaintsController.js";
 import { getReportByTask, updateReport, getReportHistory, getReportById } from "../controllers/reportController.js";
 
 const router = express.Router();
@@ -12,10 +12,9 @@ router.get("/tasks/history", authMiddleware, getTaskHistory);
 router.get("/tasks/:id", authMiddleware, getTaskDetails);
 router.patch("/tasks/:id/status", authMiddleware, updateTaskStatus);
 
-router.post("/complaints", authMiddleware, createComplaint);
 router.get("/complaints", authMiddleware, getComplaints);
 router.patch("/complaints/:id/approve", authMiddleware, approveComplaint);
-router.delete("/complaints/:id", authMiddleware, rejectComplaint);
+router.patch("/complaints/:id/reject", authMiddleware, rejectComplaint);
 
 router.get("/report/:id", authMiddleware, getReportByTask);
 router.post("/report/:taskId", authMiddleware, updateReport);

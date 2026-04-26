@@ -3,6 +3,16 @@ import styles from "./ComplaintCard.module.css";
 import { FaExclamationTriangle } from "react-icons/fa";
 
 function ComplaintCard({ complaint, onResolve, onDelete }) {
+    const isResolved = complaint.DateResolved !== null;
+    const isRejected = complaint.DateRejected !== null;
+    const isPending = !isResolved && !isRejected;
+
+    const getStatus = () => {
+        if (isResolved) return "resolved";
+        if (isRejected) return "rejected";
+        return "pending";
+    };
+
     return (
         <Card className={styles.complaint}>
 
@@ -17,11 +27,10 @@ function ComplaintCard({ complaint, onResolve, onDelete }) {
                 </p>
 
                 <p>
-                    <strong>Status:</strong>{" "}
-                    {complaint.DateResolved ? "resolved" : "pending"}
+                    <strong>Status:</strong> {getStatus()}
                 </p>
 
-                {!complaint.DateResolved && (
+                {isPending && (
                     <div className={styles.actions}>
                         <button
                             className={styles.resolve}
