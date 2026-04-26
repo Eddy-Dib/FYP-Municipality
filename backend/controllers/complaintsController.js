@@ -1,32 +1,10 @@
 import db from "../config/db.js";
 import { sendSuccess, sendError } from "../utils/responses.js";
 
-export const createComplaint = async (req, res) => {
-  try {
-    const { subject, details, c_id } = req.body;
-
-    const [result] = await db.promise().query(
-      `INSERT INTO COMPLAINT (Subject, Details, DateMade, C_ID)
-       VALUES (?, ?, NOW(), ?)`,
-      [subject, details, c_id]
-    );
-
-    return sendSuccess(res, "Complaint created", {
-      Cmpt_ID: result.insertId,
-      subject,
-      details,
-      c_id
-    });
-
-  } catch (err) {
-    return sendError(res, 500, "Error creating complaint", err.message);
-  }
-};
-
 export const getComplaints = async (req, res) => {
   try {
     const [complaints] = await db.promise().query(
-      `SELECT * FROM COMPLAINT`
+      `SELECT * FROM COMPLAINT ORDER BY DateMade desc`
     );
 
     return sendSuccess(res, "All complaints", complaints);
@@ -42,31 +20,38 @@ export const approveComplaint = async (req, res) => {
 
     const [result] = await db.promise().query(
       `UPDATE COMPLAINT 
-       SET DateResolved = NOW()
+       SET DateResolved = NOW(),
+           DateRejected = NULL
        WHERE Cmpt_ID = ?`,
       [id]
     );
 
-    return sendSuccess(res, "Complaint resolved", result);
+    return sendSuccess(res, "Complaint resolved", {
+      affectedRows: result.affectedRows
+    });
 
   } catch (err) {
     return sendError(res, 500, "Error resolving complaint", err.message);
   }
 };
 
-// ================= DELETE =================
 export const rejectComplaint = async (req, res) => {
   try {
     const { id } = req.params;
 
     const [result] = await db.promise().query(
-      `DELETE FROM COMPLAINT WHERE Cmpt_ID = ?`,
+      `UPDATE COMPLAINT 
+       SET DateRejected = NOW(),
+           DateResolved = NULL
+       WHERE Cmpt_ID = ?`,
       [id]
     );
 
-    return sendSuccess(res, "Complaint deleted", result);
+    return sendSuccess(res, "Complaint rejected", {
+      affectedRows: result.affectedRows
+    });
 
   } catch (err) {
-    return sendError(res, 500, "Error deleting complaint", err.message);
+    return sendError(res, 500, "Error rejecting complaint", err.message);
   }
 };
