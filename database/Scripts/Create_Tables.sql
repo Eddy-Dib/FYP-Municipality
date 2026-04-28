@@ -140,7 +140,6 @@ CREATE TABLE SETTING_FEES(
 -- stores amount needed per location for each fee type. TBD: automation (backend or database?)
 CREATE TABLE FEE (
     Fee_ID INT NOT NULL AUTO_INCREMENT,
-    Fee_Type VARCHAR(100) NOT NULL,
     Amount DECIMAL(10,2) NOT NULL,
     DateExpected DATE NOT NULL,
     CreatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,

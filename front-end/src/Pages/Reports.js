@@ -11,16 +11,19 @@ function Reports() {
 
     const [reports, setReports] = useState([]);
     const [tasks, setTasks] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
 
-    const user = JSON.parse(localStorage.getItem("user"));
+    const [loading, setLoading] = useState(true);
+
+    const [reportError, setReportError] = useState("");
+    const [taskError, setTaskError] = useState("");
+
+    const user = JSON.parse(localStorage.getItem("user") || "null");
 
     useEffect(() => {
         const fetchHistory = async () => {
             try {
                 setLoading(true);
-                setError("");
+                setReportError("");
 
                 const res = await axios.get(
                     `${API_URL}/employee/reports/history`,
@@ -32,7 +35,7 @@ function Reports() {
                 setReports(res?.data?.data || []);
             } catch (err) {
                 console.error(err);
-                setError(
+                setReportError(
                     err?.response?.data?.message ||
                     "Failed to load report history"
                 );
@@ -40,8 +43,11 @@ function Reports() {
                 setLoading(false);
             }
         };
+
         const fetchTasks = async () => {
             try {
+                setTaskError("");
+
                 const res = await axios.get(
                     `${API_URL}/employee/tasks/history`,
                     {
@@ -52,7 +58,7 @@ function Reports() {
                 setTasks(res?.data?.data || []);
             } catch (err) {
                 console.error(err);
-                setError(
+                setTaskError(
                     err?.response?.data?.message ||
                     "Failed to load task history"
                 );
@@ -61,16 +67,27 @@ function Reports() {
 
         fetchHistory();
         fetchTasks();
-    }, []);
+    }, [API_URL, token]);
 
     const openReport = (report) => {
         window.open(
-            `/employee/report/print/${report.reportId}`, "_blank"
+            `/employee/report/print/${report.reportId}`,
+            "_blank"
         );
     };
 
-    if (loading) return <p style={{ padding: 20 }}>Loading history...</p>;
-    if (error) return <p style={{ padding: 20 }}>{error}</p>;
+    if (loading) {
+        return <p style={{ padding: 20 }}>Loading history...</p>;
+    }
+
+    if (reportError && taskError) {
+        return (
+            <div style={{ padding: 20 }}>
+                <p>{reportError}</p>
+                <p>{taskError}</p>
+            </div>
+        );
+    }
 
     return (
         <>
@@ -111,13 +128,19 @@ function Reports() {
                 ) : (
                     tasks.map((task) => (
                         <TaskCard
-                            key={task.taskId}
+                            key={task.taskId || task.Task_ID}
+
                             number={task.taskNumber}
                             title={task.taskName}
+
                             requestId={task.requestNumber}
+
                             priority={task.priority}
-                            dueDate={task.completedDate}
+
+                            dueDate={task.completedDate || task.DateCompleted}
+
                             status={task.status}
+
                             onClick={() => console.log(task)}
                         />
                     ))

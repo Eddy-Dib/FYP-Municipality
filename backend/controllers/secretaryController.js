@@ -1,6 +1,7 @@
 import db from "../config/db.js";
 import { sendSuccess, sendError } from "../utils/responses.js";
 import { formatDate, safeParseJSON } from "../utils/formats.js";
+import { getPriority, getRoleForRequestType } from "../utils/labels.js";
 
 const requireSecretary = (req, res) => {
     if (!req.user) {
@@ -53,10 +54,7 @@ export const getSubmittedRequests = async (req, res) => {
             requestNumber: r.RequestNumber,
             type: r.RType_Name,
             status: r.RStat_Name,
-            priority:
-                r.Priority >= 2 ? "High"
-                    : r.Priority === 1 ? "Medium"
-                        : "Low",
+            priority: getPriority(r.Priority),
             createdAt: formatDate(r.DateMade),
             description: safeParseJSON(r.Description)
         }));
@@ -206,18 +204,7 @@ export const approveRequest = async (req, res) => {
 
         const request = reqRows[0];
 
-        const roleMap = {
-            1: 5, // Engineer
-            2: 4, // Lawyer
-            3: 5, // Engineer
-            4: 7, // Staff
-            5: 4, // Lawyer
-            6: 2, // Mayor
-            7: 7, // Staff
-            8: 3  // Secretary
-        };
-
-        const roleId = roleMap[request.RType_ID];
+        const roleId = getRoleForRequestType(request.RType_ID);
 
         const [empRows] = await connection.query(
             `SELECT Emp_ID FROM EMPLOYEE WHERE Role_ID = ? LIMIT 1`,
@@ -241,7 +228,7 @@ export const approveRequest = async (req, res) => {
             (Name, DateAssigned, Priority, TStat_Code, Emp_ID, Req_ID)
             VALUES (?, NOW(), ?, 1, ?, ?)`,
             [
-                `${request.RType_Name} Processing`, // 🔥 clean task name
+                `${request.RType_Name} Processing`,
                 request.Priority,
                 empId,
                 id

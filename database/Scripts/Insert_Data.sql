@@ -28,63 +28,43 @@ INSERT INTO REQ_STATUSES VALUES
 -- REQUEST_TYPES
 -- (RType_ID, RType_Name, RType_Desc, RType_Duration)
 INSERT INTO REQUEST_TYPES VALUES
--- Admin
-(1, 'User Account Access', 'Requests related to user or account access management', 2),
 -- Mayor
-(2, 'Project Approval', 'High-level approval for infrastructure or public works projects', 15),
-(3, 'Policy Exception', 'Requests for exceptions to municipal policies', 10),
-(4, 'Public Service Approval', 'Approval for high-impact public service actions', 12),
+(1, 'Project Approval', 'High-level approval for infrastructure or public works projects', 15),
+(2, 'Policy Exception', 'Requests for exceptions to municipal policies', 10),
+(3, 'Public Service Approval', 'Approval for high-impact public service actions', 12),
 -- Secretary
-(5, 'Civil Status Document', 'Requests for civil documents such as registry extracts and certificates', 2),
-(6, 'Certificate Issuance', 'Requests for official certificates like residence or registry extracts', 3),
-(7, 'Archive Retrieval', 'Requests to retrieve archived municipal documents', 4),
-(8, 'Administrative Inquiry Request', 'General administrative questions or guidance requests', 2),
+(4, 'Civil Status Document', 'Requests for civil documents such as registry extracts and certificates', 2),
+(5, 'Certificate Issuance', 'Requests for official certificates like residence or registry extracts', 3),
+(6, 'Archive Retrieval', 'Requests to retrieve archived municipal documents', 4),
+(7, 'Administrative Inquiry Request', 'General administrative questions or guidance requests', 2),
 -- Lawyer
-(9, 'Legal Verification', 'Requests for legal validation of documents or records', 5),
-(10, 'Dispute Legal Review', 'Legal review of disputes or complaints', 7),
-(11, 'Property Legal Validation', 'Validation of ownership or property legal status', 6),
-(12, 'Regulation Compliance Review', 'Checks for compliance with laws and regulations', 6),
+(8, 'Legal Verification', 'Requests for legal validation of documents or records', 5),
+(9, 'Dispute Legal Review', 'Legal review of disputes or complaints', 7),
+(10, 'Property Legal Validation', 'Validation of ownership or property legal status', 6),
+(11, 'Regulation Compliance Review', 'Checks for compliance with laws and regulations', 6),
 -- Engineer
-(13, 'Building Permit', 'Approval for new construction projects', 14),
-(14, 'Renovation Permit', 'Approval for structural modifications or renovations', 10),
-(15, 'Infrastructure Repair', 'Requests for road, water, or sewage repairs', 7),
-(16, 'Site Inspection', 'Requests for technical inspection of sites', 5),
-(17, 'Occupancy Certificate', 'Certification that a building is safe for use', 12),
+(12, 'Building Permit', 'Approval for new construction projects', 14),
+(13, 'Renovation Permit', 'Approval for structural modifications or renovations', 10),
+(14, 'Infrastructure Repair', 'Requests for road, water, or sewage repairs', 7),
+(15, 'Site Inspection', 'Requests for technical inspection of sites', 5),
+(16, 'Occupancy Certificate', 'Certification that a building is safe for use', 12),
 -- Finance
-(18, 'Payment Validation', 'Verification of payments or financial records', 2),
-(19, 'Financial Clearance', 'Confirmation that all financial obligations are cleared', 4),
+(17, 'Payment Validation', 'Verification of payments or financial records', 2),
+(18, 'Financial Clearance', 'Confirmation that all financial obligations are cleared', 4),
 -- Staff
-(20, 'Miscellaneous Service Request', 'General service-related requests not classified elsewhere', 3);
+(19, 'Miscellaneous Service Request', 'General service-related requests not classified elsewhere', 3);
 
 
 -- REP_TYPE
 -- (RepType_ID, RepType_Name)
 INSERT INTO REP_TYPE VALUES
--- Admin
-(1, 'User Access'),
--- Mayor (high-level decisions)
-(2, 'Municipal Approval'),
-(3, 'Policy Exception'),
-(4, 'Public Service Approval'),
--- Secretary (documents & administrative work)
-(5, 'Civil Documentation'),
-(6, 'Certificate Report'),
-(7, 'Inquiry'),
--- Lawyer (legal & compliance cluster)
-(8, 'Legal Review'),
-(9, 'Property & Rights Validation'),
-(10, 'Regulatory Compliance'),
--- Engineer (technical & infrastructure)
-(11, 'Construction Permit Report'),
-(12, 'Renovation'),
-(13, 'Repair'),
-(14, 'Technical Inspection'),
-(15, 'Occupancy Certification Report'),
--- Finance
-(16, 'Financial Transaction'),
-(17, 'Tax & Clearance'),
--- Staff (general catch-all)
-(18, 'General Service Report');
+(1, 'Administrative Report'),
+(2, 'Mayoral Report'),
+(3, 'Secretary Summary'),
+(4, 'Legal Review'),
+(5, 'Technical Report'),
+(6, 'Financial Report'),
+(7, 'General Service Report');
 
 
 -- TASK_STATUSES
