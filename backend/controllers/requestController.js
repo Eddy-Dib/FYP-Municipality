@@ -1,59 +1,38 @@
 import db from "../config/db.js";
 import { sendSuccess, sendError } from "../utils/responses.js";
 
-/* =========================
-   GET REQUESTS (Mayor view)
-   only 3 (Validated) + 7 (In Progress)
-export const getRequests = (req, res) => {
-    const query = `
-        SELECT * FROM REQUEST
-        WHERE RStat_Code IN (3,7)
-        ORDER BY DateMade DESC
-    `;
-
-    db.query(query, (err, results) => {
-        if (err) {
-            return sendError(res, 500, "Database error", err.message);
-        }
-
-        return sendSuccess(res, "Requests fetched successfully", results || []);
-    });
-};
-
-/* =========================
-   CREATE REQUEST (Citizen)
-export const createRequest = (req, res) => {
 export const createRequest = async (req, res) => {
     try {
-        const { description, type } = req.body;
         const citizenId = req.user?.id;
 
         if (!citizenId) {
             return sendError(res, 401, "Unauthorized", "NO_USER");
         }
 
-        const query = `
-            INSERT INTO REQUEST
-            (DateMade, Description, Priority, RType_ID, RStat_Code, C_ID)
-            VALUES (NOW(), ?, 1, ?, 3, ?)
-        `;
+        const {
+            title,
+            type,
+            fullName,
+            phones,
+            email,
+            address,
+            description,
+            urgency
+        } = req.body;
 
-        db.query(query, [JSON.stringify(description), type, citizenId], (err, result) => {
-            if (err) {
-                return sendError(res, 500, "Database error", err.message);
-            }
+        if (!title || !type || !fullName || !phones?.[0] || !email || !address) {
+            return sendError(res, 400, "Missing required fields", "MISSING_FIELDS");
+        }
 
-            return sendSuccess(res, "Request created", {
-                insertId: result.insertId
-            });
-        });
-        if (!type) {
-            return sendError(res, 400, "Request type is required", "NO_TYPE");
+        const rTypeId = Number(type);
+
+        if (isNaN(rTypeId)) {
+            return sendError(res, 400, "Invalid request type format", "INVALID_TYPE_FORMAT");
         }
 
         const [typeRows] = await db.promise().query(
             `SELECT RType_ID FROM REQUEST_TYPES WHERE RType_ID = ?`,
-            [type]
+            [rTypeId]
         );
 
         if (!typeRows.length) {
@@ -72,12 +51,11 @@ export const createRequest = async (req, res) => {
         const [result] = await db.promise().query(
             `INSERT INTO REQUEST 
             (DateMade, Description, Priority, RType_ID, RStat_Code, C_ID)
-            VALUES (NOW(), ?, ?, ?, ?, ?)`,
+            VALUES (NOW(), ?, ?, ?, 1, ?)`,
             [
                 jsonData,
-                urgency ?? 0,
-                type,
-                1,
+                urgency || 1,
+                rTypeId,
                 citizenId
             ]
         );
@@ -87,24 +65,8 @@ export const createRequest = async (req, res) => {
         });
 
     } catch (err) {
-        return sendError(res, 500, "Server error", err.message);
-    }
-};
-
-/* =========================
-   GET TYPES
-export const getRequestTypes = (req, res) => {
-    const query = "SELECT * FROM REQUEST_TYPES";
-
-    db.query(query, (err, results) => {
-        if (err) {
-            return sendError(res, 500, "Error", err.message);
-        }
-
-        return sendSuccess(res, "Types fetched", results || []);
-    });
         console.error("CREATE REQUEST ERROR:", err);
-        return sendError(res, 500, "Database error", err.message);
+        return sendError(res, 500, "Server error", err.message);
     }
 };
 
@@ -140,10 +102,6 @@ export const getRequests = async (req, res) => {
     }
 };
 
-/* =========================
-   APPROVE / REJECT REQUEST
-   THIS WAS MISSING (MAIN FIX)
-========================= */
 export const updateRequestStatus = (req, res) => {
     const { id } = req.params;
     const { action } = req.body;
@@ -171,6 +129,8 @@ export const updateRequestStatus = (req, res) => {
 
         return sendSuccess(res, "Status updated", result);
     });
+};
+
 export const getRequestTypes = async (req, res) => {
     try {
         const [results] = await db.promise().query(

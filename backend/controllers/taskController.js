@@ -4,7 +4,7 @@ import { formatDate } from "../utils/formats.js";
 
 // returns task details
 export const getTaskDetails = async (req, res) => {
-    const empId = req.user?.id;
+    const empId = req.user?.empId;
     const taskId = req.params.id;
 
     if (!req.user) {
@@ -177,7 +177,7 @@ export const getTaskDetails = async (req, res) => {
 
 // updates task status in database
 export const updateTaskStatus = async (req, res) => {
-    const empId = req.user?.id;
+    const empId = req.user?.empId;
     const taskId = req.params.id;
     const { status } = req.body;
 
@@ -254,7 +254,7 @@ export const updateTaskStatus = async (req, res) => {
 };
 
 export const getTaskHistory = async (req, res) => {
-    const empId = req.user?.id;
+    const empId = req.user?.empId;
 
     if (!req.user) {
         return sendError(res, 401, "Unauthorized access", "NO_USER_CONTEXT");

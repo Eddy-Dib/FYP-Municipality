@@ -29,7 +29,7 @@ function EmployeeDashboard() {
                 });
 
                 const data = res.data.data;
-
+                console.log(data);
                 setSummaryData([
                     {
                         title: "Assigned Tasks",
