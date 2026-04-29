@@ -1,11 +1,7 @@
 import db from "../config/db.js";
 import { sendSuccess, sendError } from "../utils/responses.js";
 import { formatDate, safeParseJSON } from "../utils/formats.js";
-<<<<<<< HEAD
-import { getPriority, getRoleForRequestType } from "../utils/labels.js";
-=======
 import { getPriority } from "../utils/labels.js";
->>>>>>> 7302d69 (fixed secretary task assignment)
 
 const requireSecretary = (req, res) => {
     if (!req.user) {
