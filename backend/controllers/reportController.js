@@ -3,7 +3,7 @@ import { sendSuccess, sendError } from "../utils/responses.js";
 import { formatDate } from "../utils/formats.js";
 
 export const getReportByTask = async (req, res) => {
-    const empId = req.user?.id;
+    const empId = req.user?.empId;
     const taskId = req.params.id;
 
     if (!req.user?.isEmployee) {
@@ -51,7 +51,7 @@ export const getReportByTask = async (req, res) => {
 
 
 export const updateReport = async (req, res) => {
-    const empId = req.user?.id;
+    const empId = req.user?.empId;
     const taskId = req.params.taskId;
     const { title, description, type } = req.body;
 
@@ -124,7 +124,7 @@ export const updateReport = async (req, res) => {
 
 
 export const getReportHistory = async (req, res) => {
-    const empId = req.user?.id;
+    const empId = req.user?.empId;
 
     if (!req.user || !req.user.isEmployee) {
         return sendError(res, 403, "Employees only");
@@ -202,7 +202,7 @@ export const getReportHistory = async (req, res) => {
 
 
 export const getReportById = async (req, res) => {
-    const empId = req.user?.id;
+    const empId = req.user?.empId;
     const reportId = req.params.id;
 
     if (!req.user || !req.user.isEmployee) {

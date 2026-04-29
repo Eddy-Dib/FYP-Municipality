@@ -48,6 +48,7 @@ export const login = async (req, res) => {
         const payload = {
             id: user.U_ID,
             username: user.Username,
+            empId: user.Emp_ID || null,
             role,
             name,
             isEmployee
@@ -56,7 +57,7 @@ export const login = async (req, res) => {
         const token = generateToken(payload, "2h");
 
         return sendSuccess(res, "Login successful", {
-            user: { id: user.U_ID, username: user.Username, name, role, isEmployee },
+            user: { id: user.U_ID, empId: user.Emp_ID || null, username: user.Username, name, role, isEmployee },
             token
         });
 

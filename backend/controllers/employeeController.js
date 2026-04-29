@@ -3,7 +3,8 @@ import { sendSuccess, sendError } from "../utils/responses.js";
 import { getPriority } from "../utils/labels.js";
 
 export const getDashboard = async (req, res) => {
-    const empId = req.user?.id;
+
+    const empId = req.user?.empId;
 
     if (!req.user) {
         return sendError(res, 401, "Unauthorized access", "NO_USER_CONTEXT");
