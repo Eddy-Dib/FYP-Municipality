@@ -42,20 +42,49 @@
     font-weight: 600;
 }
 
-.description {
-    margin-top: 4px;
-    padding: 8px 10px;
-
-    background: #f5f8ff;
-    border-left: 3px solid var(--primary);
-    border-radius: 6px;
-
-    font-size: 13px;
-    color: var(--text-dark-muted);
-}
 
 .middle p:last-child {
     margin-top: 6px;
     font-weight: 500;
     color: var(--primary-dark);
+}
+
+.jsonBox {
+    margin-top: 8px;
+
+    display: inline-flex;
+    flex-direction: column;
+    gap: 6px;
+
+    padding: 10px 12px;
+    background: #f5f8ff;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+
+    width: fit-content;
+    max-width: 100%;
+}
+
+.row {
+    display: flex;
+    justify-content: flex-start;
+    align-items: baseline;
+    gap: 6px;
+    padding: 2px 0;
+    background: transparent;
+}
+
+.key {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-dark);
+    text-transform: capitalize;
+}
+
+.value {
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--text-dark-muted);
+    text-align: left;
+    word-break: break-word;
 }

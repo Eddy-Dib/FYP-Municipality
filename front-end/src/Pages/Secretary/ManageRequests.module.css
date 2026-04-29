@@ -1,15 +1,15 @@
-
 .title {
     font-size: 22px;
     font-weight: 600;
     margin-bottom: 12px;
-    margin-top: 15px;
+    color: var(--text-main);
 }
 
 .ribbon {
     display: flex;
     gap: 10px;
     margin-bottom: 20px;
+    flex-wrap: wrap;
 }
 
 .tab {
@@ -19,7 +19,7 @@
     background: #e9eef6;
     cursor: pointer;
     font-size: 14px;
-    transition: 0.2s;
+    transition: 0.2s ease;
 }
 
 .tab:hover {

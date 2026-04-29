@@ -6,7 +6,10 @@ function ReportCard({
     title,
     type,
     requestId,
+    requestName,
     taskId,
+    taskName,
+    citizenName,
     date,
     onDownload
 }) {
@@ -16,10 +19,10 @@ function ReportCard({
             <div className={styles.middle}>
                 <h4 className={styles.title}>{title}</h4>
                 <p className={styles.type}>{type}</p>
-
-                <p>Request ID: {requestId}</p>
-                <p>Task ID: {taskId}</p>
-                <p>Date: {date}</p>
+                <p><strong>Citizen:</strong> {citizenName}</p>
+                <p><strong>Request:</strong> {requestName} ({requestId}) </p>
+                <p><strong>Task:</strong> {taskName} ({taskId})</p>
+                <p><strong>Date:</strong> {date}</p>
             </div>
 
             <div className={styles.right}>

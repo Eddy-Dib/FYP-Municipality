@@ -1,7 +1,14 @@
 import styles from "./Complain.module.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 
 function Complain() {
+
+    const API_URL = process.env.REACT_APP_API_URL;
+    const token = localStorage.getItem("token");
+
+    const [profile, setProfile] = useState(null);
+    const [error, setError] = useState("");
     const [data, setData] = useState({
         fullName: "",
         phone: "",
@@ -14,6 +21,8 @@ function Complain() {
 
     const [previews, setPreviews] = useState([]);
     const [reference] = useState(Math.floor(100000 + Math.random() * 900000));
+
+    const [loading, setLoading] = useState(false);
 
     const handleChange = (e) => {
         const { name, value, files } = e.target;
@@ -45,29 +54,103 @@ function Complain() {
 
         setPreviews(prev => prev.filter((_, i) => i !== index));
     };
+    useEffect(() => {
+        const fetchProfile = async () => {
+            try {
+                const res = await axios.get(`${API_URL}/api/citizen/me`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
 
+                if (res.data.success) {
+                    const p = res.data.data;
+                    setProfile(p);
+
+                    setData(prev => ({
+                        ...prev,
+                        fullName: p.FullName ?? "",
+                        phone: p.Phone_Num ?? ""
+                    }));
+                }
+            } catch (err) {
+                console.log("Profile error:", err);
+            }
+        };
+
+        fetchProfile();
+    }, [API_URL, token]);
+    const validate = () => {
+        if (!data.category) return "Category is required";
+        if (!data.description) return "Description is required";
+        return "";
+    };
+
+    const handleSubmit = async () => {
+        try {
+            setLoading(true);
+
+            if (!data.category) {
+                setError("Category is required");
+                return;
+            }
+
+            if (!data.description) {
+                setError("Description is required");
+                return;
+            }
+
+            const payload = {
+                subject: data.category,
+                details: `
+Name: ${data.fullName}
+Phone: ${data.phone}
+Location: ${data.location || "N/A"}
+
+Description:
+${data.description}
+            `
+            };
+
+            await axios.post(
+                `${API_URL}/api/complaints/createcomplaint`,
+                payload,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            );
+
+            alert("Complaint sent!");
+            setError(""); // clear error
+
+        } catch (err) {
+            console.log(err);
+            alert(err.response?.data?.error || "Error sending complaint");
+
+        } finally {
+            setLoading(false); // 🔥 stop loading
+        }
+    };
     return (
         <div className={styles.complainPage}>
 
-            {/* HEADER */}
             <div className={styles.topSection}>
                 <h1>Report an Issue</h1>
                 <p>Help us improve your municipality by reporting problems in your area</p>
             </div>
 
-            {/* FORM CARD */}
             <div className={styles.formCard}>
 
                 <h3 className={styles.sectionTitle}>Submit Complaint</h3>
 
                 <div className={styles.formGroup}>
                     <label>Full Name *</label>
-                    <input name="fullName" placeholder="Enter your full name" onChange={handleChange} />
+                    <input value={data.fullName} readOnly className={styles.readOnlyInput} />
                 </div>
 
                 <div className={styles.formGroup}>
                     <label>Phone *</label>
-                    <input name="phone" placeholder="Enter your phone number" onChange={handleChange} />
+                    <input value={data.phone} readOnly />
                 </div>
 
                 <div className={styles.formGroup}>
@@ -92,7 +175,6 @@ function Complain() {
                     <textarea name="description" placeholder="Describe the issue..." onChange={handleChange} />
                 </div>
 
-                {/* PRIORITY */}
                 <div className={styles.formGroup}>
                     <label>Priority</label>
 
@@ -111,7 +193,6 @@ function Complain() {
                     </div>
                 </div>
 
-                {/* FILES */}
                 <div className={styles.formGroup}>
                     <label>Upload Photos (max 3)</label>
                     <input type="file" multiple accept="image/*" onChange={handleChange} />
@@ -126,18 +207,33 @@ function Complain() {
                     ))}
                 </div>
 
-                {/* REFERENCE */}
                 <div className={styles.reference}>
                     Reference ID: #{reference}
                 </div>
 
-                {/* BUTTON */}
-                <button className={styles.submitBtn}>
-                    Submit Complaint
+                {error && (
+                    <p style={{ color: "red", marginTop: "10px" }}>
+                        {error}
+                    </p>
+                )}
+
+                <button
+                    className={styles.submitBtn}
+                    disabled={loading}
+                    onClick={() => {
+                        const err = validate();
+                        if (err) {
+                            setError(err);
+                            return;
+                        }
+                        handleSubmit();
+                    }}
+                >
+                    {loading ? "Sending..." : "Submit Complaint"}
                 </button>
 
             </div>
-        </div>
+        </div >
     );
 }
 

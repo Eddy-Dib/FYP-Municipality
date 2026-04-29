@@ -113,10 +113,12 @@ export const getTaskDetails = async (req, res) => {
 
         let requestDescription = data.RequestDescription;
 
-        if (typeof requestDescription === "object" && requestDescription !== null) {
-            requestDescription = Object.entries(requestDescription)
-                .map(([k, v]) => `${k}: ${v}`)
-                .join(", ");
+        if (typeof requestDescription === "string") {
+            try {
+                requestDescription = JSON.parse(requestDescription);
+            } catch (e) {
+                requestDescription = requestDescription;
+            }
         }
 
         return sendSuccess(res, "Task details loaded", {
@@ -248,5 +250,85 @@ export const updateTaskStatus = async (req, res) => {
     } catch (err) {
         console.error("UPDATE TASK STATUS ERROR:", err);
         return sendError(res, 500, "Failed to update task status", "TASK_UPDATE_ERROR");
+    }
+};
+
+export const getTaskHistory = async (req, res) => {
+    const empId = req.user?.id;
+
+    if (!req.user) {
+        return sendError(res, 401, "Unauthorized access", "NO_USER_CONTEXT");
+    }
+
+    if (!req.user.isEmployee) {
+        return sendError(res, 403, "Access denied: employees only", "NOT_EMPLOYEE");
+    }
+
+    if (!empId) {
+        return sendError(res, 401, "Invalid user session", "INVALID_USER_ID");
+    }
+
+    try {
+        const [rows] = await db.promise().query(
+            `SELECT 
+                t.Task_ID,
+                t.Name AS TaskName,
+                t.DateAssigned,
+                t.DateCompleted,
+                t.Priority,
+                ts.TStat_Name AS Status,
+
+                r.Req_ID,
+                rt.RType_Name AS RequestType,
+
+                CONCAT(
+                    'TASK-',
+                    DATE_FORMAT(t.DateAssigned, '%y'),
+                    LPAD(t.Task_ID, 3, '0')
+                ) AS TaskNumber,
+
+                CONCAT(
+                    'REQ-',
+                    DATE_FORMAT(t.DateAssigned, '%y'),
+                    LPAD(r.Req_ID, 3, '0')
+                ) AS RequestNumber,
+
+                CONCAT(c.First_Name, ' ', c.Last_Name) AS CitizenName
+
+            FROM TASK t
+            JOIN TASK_STATUSES ts ON t.TStat_Code = ts.TStat_Code
+            JOIN REQUEST r ON t.Req_ID = r.Req_ID
+            JOIN REQUEST_TYPES rt ON r.RType_ID = rt.RType_ID
+            JOIN CITIZEN c ON r.C_ID = c.C_ID
+
+            WHERE t.Emp_ID = ?
+              AND ts.TStat_Name = 'Completed'
+
+            ORDER BY t.DateCompleted DESC`,
+            [empId]
+        );
+
+        const formatted = rows.map(row => ({
+            taskId: row.Task_ID,
+            taskName: row.TaskName,
+            taskNumber: row.TaskNumber,
+            priority: row.Priority,
+
+            requestId: row.Req_ID,
+            requestNumber: row.RequestNumber,
+            requestType: row.RequestType,
+
+            citizenName: row.CitizenName,
+
+            status: row.Status,
+            assignedDate: formatDate(row.DateAssigned),
+            completedDate: formatDate(row.DateCompleted)
+        }));
+
+        return sendSuccess(res, "Task history loaded", formatted);
+
+    } catch (err) {
+        console.error("GET TASK HISTORY ERROR:", err);
+        return sendError(res, 500, "Failed to load task history", "TASK_HISTORY_ERROR");
     }
 };

@@ -33,6 +33,9 @@ import AdminUsers from "./Pages/AdminUsers";
 import AssignRoles from "./Pages/AssignRoles";
 import ServicesConfig from "./Pages/ServicesConfig";
 import SystemLogs from "./Pages/SystemLogs";
+// Secretary
+import ManageRequests from "./Pages/Secretary/ManageRequests";
+import RequestDetailsPage from "./Pages/Secretary/RequestDetailsPage";
 
 // Print
 import ReportPrint from "./Pages/ReportPrint";
@@ -141,6 +144,16 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route path="mayor/dashboard" element={<ProtectedRoute allowedRoles={["Mayor"]}><MayorDashboard /></ProtectedRoute>} />
+          <Route path="mayor/requests" element={<ProtectedRoute allowedRoles={["Mayor"]}><MayorRequests /></ProtectedRoute>} />
+          <Route path="mayor/complaints" element={<ProtectedRoute allowedRoles={["Mayor"]}><MayorComplaints /></ProtectedRoute>} />
+          <Route path="mayor/alerts" element={<ProtectedRoute allowedRoles={["Mayor"]}><MayorAlerts /></ProtectedRoute>} />
+          <Route path="mayor/reports" element={<ProtectedRoute allowedRoles={["Mayor"]}><MayorReports /></ProtectedRoute>} />
+          <Route path="reports" element={<Reports />} />
+
+          {/* SECRETARY ROUTES*/}
+          <Route path="secretary/managereq" element={<ProtectedRoute allowedRoles={["Secretary"]}><ManageRequests /></ProtectedRoute>}/>
+          <Route path="secretary/managereq/:id" element={<ProtectedRoute allowedRoles={["Secretary"]}><RequestDetailsPage /></ProtectedRoute>} />
         </Route>
 
         {/* CITIZEN */}
