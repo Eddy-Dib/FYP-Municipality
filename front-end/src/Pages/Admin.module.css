@@ -1,0 +1,165 @@
+.page {
+    padding: 30px;
+    width: 100%;
+    box-sizing: border-box;
+    min-height: 100vh;
+    background: #f4f7fb;
+}
+
+.header {
+    margin-bottom: 28px;
+}
+
+.header h1 {
+    margin: 0;
+    color: #1e293b;
+    font-size: 32px;
+    font-weight: 700;
+}
+
+.header p {
+    margin-top: 8px;
+    color: #64748b;
+    font-size: 15px;
+}
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 22px;
+    margin-bottom: 30px;
+}
+
+.card {
+    background: white;
+    border-radius: 18px;
+    padding: 24px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+    transition: 0.25s ease;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+}
+
+.cardTitle {
+    color: #64748b;
+    font-size: 15px;
+    margin-bottom: 12px;
+}
+
+.cardValue {
+    font-size: 34px;
+    font-weight: bold;
+    color: #0f172a;
+}
+
+.cardSub {
+    margin-top: 8px;
+    font-size: 13px;
+    color: #94a3b8;
+}
+
+.section {
+    background: white;
+    border-radius: 18px;
+    padding: 24px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+}
+
+.sectionTitle {
+    margin: 0 0 20px 0;
+    font-size: 22px;
+    color: #0f172a;
+    font-weight: 700;
+}
+
+.tableWrapper {
+    overflow-x: auto;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table th {
+    text-align: left;
+    padding: 16px;
+    background: #f8fafc;
+    color: #334155;
+    font-size: 14px;
+}
+
+.table td {
+    padding: 16px;
+    border-bottom: 1px solid #e2e8f0;
+    color: #475569;
+}
+
+.table tr:hover {
+    background: #f8fbff;
+}
+
+.greenBtn {
+    border: none;
+    background: #16a34a;
+    color: white;
+    padding: 9px 16px;
+    border-radius: 10px;
+    cursor: pointer;
+    margin-right: 10px;
+    font-weight: 600;
+}
+
+.redBtn {
+    border: none;
+    background: #dc2626;
+    color: white;
+    padding: 9px 16px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.blueBtn {
+    border: none;
+    background: #2563eb;
+    color: white;
+    padding: 9px 16px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.select {
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid #cbd5e1;
+    min-width: 140px;
+    outline: none;
+}
+
+.logBox {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.logItem {
+    padding: 18px;
+    border-left: 5px solid #2563eb;
+    background: #f8fafc;
+    border-radius: 12px;
+}
+
+.logTitle {
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 6px;
+}
+
+.logMeta {
+    color: #64748b;
+    font-size: 14px;
+}
