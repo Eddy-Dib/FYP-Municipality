@@ -23,19 +23,26 @@ function ReportEditor() {
     const getDefaultType = () => {
         switch (user?.role) {
             case "Admin":
-                return "User Access";
+                return "Administrative Report";
+
             case "Mayor":
-                return "Municipal Approval";
+                return "Mayoral Report";
+
             case "Secretary":
-                return "Civil Documentation";
+                return "Secretary Summary";
+
             case "Lawyer":
                 return "Legal Review";
+
             case "Engineer":
-                return "Technical Inspection";
+                return "Technical Report";
+
             case "Financial Staff":
-                return "Tax & Clearance";
+                return "Financial Report";
+
             case "Staff":
                 return "General Service Report";
+
             default:
                 return "General Service Report";
         }
