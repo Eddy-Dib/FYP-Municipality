@@ -1,8 +1,7 @@
 import db from "../config/db.js";
 import { sendSuccess, sendError } from "../utils/responses.js";
 
-
-export const createRequest = (req, res) => {
+export const createRequest = async (req, res) => {
     try {
         const {
             title,
@@ -25,11 +24,14 @@ export const createRequest = (req, res) => {
             return sendError(res, 400, "Request type is required", "NO_TYPE");
         }
 
-        const query = `
-            INSERT INTO REQUEST 
-            (DateMade, Description, Priority, RType_ID, RStat_Code, C_ID)
-            VALUES (NOW(), ?, ?, ?, ?, ?)
-        `;
+        const [typeRows] = await db.promise().query(
+            `SELECT RType_ID FROM REQUEST_TYPES WHERE RType_ID = ?`,
+            [type]
+        );
+
+        if (!typeRows.length) {
+            return sendError(res, 400, "Invalid request type", "INVALID_TYPE");
+        }
 
         const jsonData = JSON.stringify({
             title,
@@ -40,52 +42,74 @@ export const createRequest = (req, res) => {
             description
         });
 
-        db.query(
-            query,
+        const [result] = await db.promise().query(
+            `INSERT INTO REQUEST 
+            (DateMade, Description, Priority, RType_ID, RStat_Code, C_ID)
+            VALUES (NOW(), ?, ?, ?, ?, ?)`,
             [
                 jsonData,
-                urgency || 0,
+                urgency ?? 0,
                 type,
                 1,
                 citizenId
-            ],
-            (err, result) => {
-                if (err) {
-                    return sendError(res, 500, "Database error", err.message);
-                }
-
-                return sendSuccess(res, "Request created successfully", {
-                    insertId: result.insertId
-                });
-            }
+            ]
         );
 
+        return sendSuccess(res, "Request created successfully", {
+            insertId: result.insertId
+        });
+
     } catch (err) {
+        console.error("CREATE REQUEST ERROR:", err);
         return sendError(res, 500, "Database error", err.message);
     }
 };
 
-export const getRequests = (req, res) => {
-    const query = "SELECT * FROM REQUEST ORDER BY DateMade DESC";
+export const getRequests = async (req, res) => {
+    try {
+        const [rows] = await db.promise().query(
+            `SELECT 
+                r.Req_ID,
+                r.DateMade,
+                r.Description,
+                r.Priority,
+                rs.RStat_Name,
+                rt.RType_Name,
 
-    db.query(query, (err, results) => {
-        if (err) {
-            return sendError(res, 500, "Database error", err.message);
-        }
+                CONCAT(
+                    'REQ-',
+                    DATE_FORMAT(r.DateMade, '%y'),
+                    LPAD(rt.RType_ID, 2, '0'),
+                    LPAD(r.Req_ID, 3, '0')
+                ) AS RequestNumber
 
-        return sendSuccess(res, "Requests fetched successfully", results || []);
-    });
+            FROM REQUEST r
+            JOIN REQ_STATUSES rs ON r.RStat_Code = rs.RStat_Code
+            JOIN REQUEST_TYPES rt ON r.RType_ID = rt.RType_ID
+            ORDER BY r.DateMade DESC`
+        );
+
+        return sendSuccess(res, "Requests fetched successfully", rows);
+
+    } catch (err) {
+        console.error("GET REQUESTS ERROR:", err);
+        return sendError(res, 500, "Database error", err.message);
+    }
 };
 
 
-export const getRequestTypes = (req, res) => {
-    const query = "SELECT RType_ID, RType_Name FROM REQUEST_TYPES";
+export const getRequestTypes = async (req, res) => {
+    try {
+        const [results] = await db.promise().query(
+            `SELECT RType_ID, RType_Name 
+             FROM REQUEST_TYPES
+             ORDER BY RType_ID`
+        );
 
-    db.query(query, (err, results) => {
-        if (err) {
-            return sendError(res, 500, "Failed to fetch request types", err.message);
-        }
+        return sendSuccess(res, "Request types fetched successfully", results);
 
-        return sendSuccess(res, "Request types fetched successfully", results || []);
-    });
+    } catch (err) {
+        console.error("GET TYPES ERROR:", err);
+        return sendError(res, 500, "Failed to fetch request types", err.message);
+    }
 };

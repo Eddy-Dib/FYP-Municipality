@@ -86,7 +86,7 @@ function Complain() {
 
     const handleSubmit = async () => {
         try {
-            setLoading(true); // 🔥 start loading
+            setLoading(true);
 
             if (!data.category) {
                 setError("Category is required");
