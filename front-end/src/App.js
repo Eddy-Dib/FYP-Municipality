@@ -1,5 +1,4 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-
 import ProtectedRoute from "./Components/Routing/ProtectedRoute";
 
 // Login
@@ -29,6 +28,12 @@ import MayorComplaints from "./Pages/MayorComplaints";
 import MayorAlerts from "./Pages/MayorAlerts";
 import MayorReports from "./Pages/MayorReports";
 
+// Admin
+import AdminUsers from "./Pages/AdminUsers";
+import AssignRoles from "./Pages/AssignRoles";
+import ServicesConfig from "./Pages/ServicesConfig";
+import SystemLogs from "./Pages/SystemLogs";
+
 // Print
 import ReportPrint from "./Pages/ReportPrint";
 
@@ -36,42 +41,129 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-
         <Route path="/" element={<Login />} />
 
-        <Route path="/employee" element={<ProtectedRoute><EmployeeLayout /></ProtectedRoute>}>
+        {/* EMPLOYEE LAYOUT */}
+        <Route
+          path="/employee"
+          element={
+            <ProtectedRoute>
+              <EmployeeLayout />
+            </ProtectedRoute>
+          }
+        >
           <Route index element={<EmployeeDashboard />} />
           <Route path="tasks" element={<Tasks />} />
           <Route path="tasks/:id" element={<TaskDetails />} />
           <Route path="tasks/:id/report" element={<ReportEditor />} />
           <Route path="history" element={<Reports />} />
+          <Route path="reports" element={<Reports />} />
+
+          {/* ADMIN ROUTES */}
+          <Route
+            path="admin/users"
+            element={
+              <ProtectedRoute allowedRoles={["Admin"]}>
+                <AdminUsers />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="admin/roles"
+            element={
+              <ProtectedRoute allowedRoles={["Admin"]}>
+                <AssignRoles />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="admin/services"
+            element={
+              <ProtectedRoute allowedRoles={["Admin"]}>
+                <ServicesConfig />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="admin/logs"
+            element={
+              <ProtectedRoute allowedRoles={["Admin"]}>
+                <SystemLogs />
+              </ProtectedRoute>
+            }
+          />
 
           {/* MAYOR ROUTES */}
-          <Route path="mayor/dashboard" element={<ProtectedRoute allowedRoles={["Mayor"]}><MayorDashboard /></ProtectedRoute>} />
-          <Route path="mayor/requests" element={<ProtectedRoute allowedRoles={["Mayor"]}><MayorRequests /></ProtectedRoute>} />
-          <Route path="mayor/complaints" element={<ProtectedRoute allowedRoles={["Mayor"]}><MayorComplaints /></ProtectedRoute>} />
-          <Route path="mayor/alerts" element={<ProtectedRoute allowedRoles={["Mayor"]}><MayorAlerts /></ProtectedRoute>} />
-          <Route path="mayor/reports" element={<ProtectedRoute allowedRoles={["Mayor"]}><MayorReports /></ProtectedRoute>} />
-          <Route path="reports" element={<Reports />} />
+          <Route
+            path="mayor/dashboard"
+            element={
+              <ProtectedRoute allowedRoles={["Mayor"]}>
+                <MayorDashboard />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="mayor/requests"
+            element={
+              <ProtectedRoute allowedRoles={["Mayor"]}>
+                <MayorRequests />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="mayor/complaints"
+            element={
+              <ProtectedRoute allowedRoles={["Mayor"]}>
+                <MayorComplaints />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="mayor/alerts"
+            element={
+              <ProtectedRoute allowedRoles={["Mayor"]}>
+                <MayorAlerts />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="mayor/reports"
+            element={
+              <ProtectedRoute allowedRoles={["Mayor"]}>
+                <MayorReports />
+              </ProtectedRoute>
+            }
+          />
         </Route>
 
-
+        {/* CITIZEN */}
         <Route
           path="/citizen"
-          element={<ProtectedRoute><CitizenLayout /></ProtectedRoute>}>
+          element={
+            <ProtectedRoute>
+              <CitizenLayout />
+            </ProtectedRoute>
+          }
+        >
           <Route index element={<CitizenDashboard />} />
           <Route path="request" element={<Request />} />
           <Route path="complain" element={<Complain />} />
           <Route path="payfees" element={<PayFees />} />
-          <Route path="profile" element={<Profile/>} />
-
+          <Route path="profile" element={<Profile />} />
         </Route>
 
+        {/* PRINT */}
         <Route path="/employee/report/print/:id" element={<ReportPrint />} />
 
-
+        {/* 404 */}
         <Route path="*" element={<NotFound />} />
-
       </Routes>
     </BrowserRouter>
   );
