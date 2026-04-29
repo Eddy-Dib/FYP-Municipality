@@ -22,18 +22,20 @@ function ReportEditor() {
 
     const getDefaultType = () => {
         switch (user?.role) {
-            case "Engineer":
-                return "Technical Report";
+            case "Admin":
+                return "User Access";
+            case "Mayor":
+                return "Municipal Approval";
+            case "Secretary":
+                return "Civil Documentation";
             case "Lawyer":
                 return "Legal Review";
+            case "Engineer":
+                return "Technical Inspection";
             case "Financial Staff":
-                return "Financial Report";
-            case "Secretary":
-                return "Secretary Summary";
-            case "Admin":
-                return "Administrative Report";
-            case "Mayor":
-                return "Mayoral Report";
+                return "Tax & Clearance";
+            case "Staff":
+                return "General Service Report";
             default:
                 return "General Service Report";
         }
@@ -75,7 +77,6 @@ function ReportEditor() {
                 {
                     title,
                     description: content,
-
                     type: getDefaultType()
                 },
                 {
@@ -85,15 +86,16 @@ function ReportEditor() {
 
             setShowToast(true);
 
+
         } catch (err) {
             console.error(err?.response?.data);
             setError("Failed to save report");
         }
     };
 
-    if (loading) return <h1>Loading...</h1>;
+    if (loading) return <h1>Loading...</h1>
 
-    if (error) return <h1>{error}</h1>;
+    if (error) return <h1>{error}</h1>
 
     return (
         <div className={styles.container}>
@@ -127,7 +129,6 @@ function ReportEditor() {
                     Submit Report
                 </button>
             </div>
-
             {showToast && (
                 <SuccessToast
                     message="Success"
