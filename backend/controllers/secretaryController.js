@@ -269,3 +269,35 @@ export const approveRequest = async (req, res) => {
         connection.release();
     }
 };
+
+export const rejectRequest = async (req, res) => {
+    if (!requireSecretary(req, res)) return;
+
+    const { id } = req.params;
+
+    if (!id || isNaN(id)) {
+        return sendError(res, 400, "Invalid request ID", "BAD_REQUEST_ID");
+    }
+
+    try {
+        const [result] = await db.promise().query(
+            `
+            UPDATE REQUEST 
+            SET FlagRejected = 1,
+                RStat_Code = 3 -- adjust this to your "Rejected" status code
+            WHERE Req_ID = ?
+            `,
+            [id]
+        );
+
+        if (result.affectedRows === 0) {
+            return sendError(res, 404, "Request not found", "REQ_NOT_FOUND");
+        }
+
+        return sendSuccess(res, "Request rejected successfully");
+
+    } catch (err) {
+        console.error("REJECT ERROR:", err);
+        return sendError(res, 500, "Failed to reject request", "REJECT_ERROR");
+    }
+};

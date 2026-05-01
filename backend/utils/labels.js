@@ -4,38 +4,6 @@ export const getPriority = (priorityCode) => {
     return "Low";
 };
 
-<<<<<<< HEAD
-const REQUEST_ROLE_MAP = {
-    // Mayor
-    1: 2,
-    2: 2,
-    3: 2,
-    // Secretary
-    4: 3,
-    5: 3,
-    6: 3,
-    7: 3,
-    // Lawyer
-    8: 4,
-    9: 4,
-    10: 4,
-    11: 4,
-    // Engineer
-    12: 5,
-    13: 5,
-    14: 5,
-    15: 5,
-    16: 5,
-    // Finance
-    17: 6,
-    18: 6,
-    // Staff
-    19: 7
-};
-
-export const getRoleForRequestType = (requestTypeId) => {
-    return REQUEST_ROLE_MAP[requestTypeId] || 7;
-=======
 const ROLE_REQUEST_MAP = {
     Mayor: [1, 2, 3],
     Secretary: [4, 5, 6, 7],
@@ -62,5 +30,4 @@ export const getRoleForRequestType = (requestTypeId) => {
     }
 
     return ROLE_TO_ID.Staff;
->>>>>>> 7302d69 (fixed secretary task assignment)
 };

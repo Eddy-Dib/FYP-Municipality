@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
-
+import RejectionReason from "../../Components/Form/RejectionReason";
 import RequestDetailsCard from "../../Components/Card/RequestDetailsCard";
 import styles from "./RequestDetailsPage.module.css";
 
@@ -18,6 +18,9 @@ function RequestDetails() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [approving, setApproving] = useState(false);
+    const [rejecting, setRejecting] = useState(false);
+    const [showRejectModal, setShowRejectModal] = useState(false);
+
 
     useEffect(() => {
         const fetchData = async () => {
@@ -90,6 +93,40 @@ function RequestDetails() {
         }
     };
 
+    const handleReject = async () => {
+        try {
+            setRejecting(true);
+
+            const res = await axios.post(
+                `${API_URL}/secretary/requests/${id}/reject`,
+                {},
+                {
+                    headers: { Authorization: `Bearer ${token}` }
+                }
+            );
+
+            if (res.data.success) {
+                setRequest(prev => ({
+                    ...prev,
+                    status: "Rejected"
+                }));
+                return true;
+            } else {
+                setError(res.data.message);
+                return false;
+            }
+
+        } catch (err) {
+            console.error(err);
+            setError(
+                err.response?.data?.message ||
+                "Failed to reject request"
+            );
+        } finally {
+            setRejecting(false);
+        }
+    };
+
     if (error) {
         return <h1 className={styles.error}>{error}</h1>;
     }
@@ -108,14 +145,36 @@ function RequestDetails() {
             <RequestDetailsCard request={request} />
 
             {request.status === "Submitted" || request.status === "Under Review" ? (
-                <button
-                    className={styles.approveBtn}
-                    onClick={handleApprove}
-                    disabled={approving}
-                >
-                    {approving ? "Approving..." : "Approve Request"}
-                </button>
+                <div className={styles.btnContainer}>
+                    <button
+                        className={styles.approveBtn}
+                        onClick={handleApprove}
+                        disabled={approving}
+                    >
+                        {approving ? "Approving..." : "Approve Request"}
+                    </button>
+
+                    <button
+                        className={styles.rejectBtn}
+                        onClick={() => setShowRejectModal(true)}
+                    >
+                        {rejecting ? "Rejecting..." : "Reject Request"}
+                    </button>
+                </div>
             ) : null}
+
+            {showRejectModal && (
+                <RejectionReason
+                    loading={rejecting}
+                    onCancel={() => setShowRejectModal(false)}
+                    onSubmit={async ({ title, text }) => {
+                        const success = await handleReject(title, text);
+                        if (success) {
+                            setShowRejectModal(false); // ✅ only close on success
+                        }
+                    }}
+                />
+            )}
 
             <div className={styles.docsBox}>
                 <h2 className={styles.sectionTitle}>Citizen Documents</h2>
