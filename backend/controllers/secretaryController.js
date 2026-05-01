@@ -2,6 +2,8 @@ import db from "../config/db.js";
 import { sendSuccess, sendError } from "../utils/responses.js";
 import { formatDate, safeParseJSON } from "../utils/formats.js";
 import { getPriority } from "../utils/labels.js";
+import { sendRequestStatusEmail } from "../utils/notificationService.js";
+import { text } from "express";
 
 const requireSecretary = (req, res) => {
     if (!req.user) {
@@ -185,9 +187,17 @@ export const approveRequest = async (req, res) => {
                 r.Req_ID,
                 r.RType_ID,
                 r.Priority,
-                rt.RType_Name
+                rt.RType_Name,
+                c.Email,
+                CONCAT(
+                    'REQ-',
+                    DATE_FORMAT(r.DateMade, '%y'),
+                    LPAD(rt.RType_ID, 2, '0'),
+                    LPAD(r.Req_ID, 3, '0')
+                ) AS RequestNumber
             FROM REQUEST r
             JOIN REQUEST_TYPES rt ON r.RType_ID = rt.RType_ID
+            JOIN CITIZEN c ON r.C_ID = c.C_ID
             WHERE r.Req_ID = ?
             `,
             [id]
@@ -201,7 +211,7 @@ export const approveRequest = async (req, res) => {
         const request = reqRows[0];
 
         const roleName = getRoleNameFromRequestType(request.RType_ID);
-        
+
         const [roleRows] = await connection.query(
             `SELECT Role_ID FROM ROLES WHERE Role_Type = ?`,
             [roleName]
@@ -259,6 +269,19 @@ export const approveRequest = async (req, res) => {
 
         await connection.commit();
 
+        try {
+            await sendRequestStatusEmail({
+                email: request.Email,
+                status: "approved",
+                requestNumber: request.RequestNumber,
+                reqId: request.Req_ID,
+                title: request.RType_Name,
+                reason: null
+            });
+        } catch (e) {
+            console.error("Email failed", e);
+        }
+
         return sendSuccess(res, "Request approved and task created");
 
     } catch (err) {
@@ -274,17 +297,49 @@ export const rejectRequest = async (req, res) => {
     if (!requireSecretary(req, res)) return;
 
     const { id } = req.params;
+    const {rejTitle, rejText } = req.body;
 
     if (!id || isNaN(id)) {
         return sendError(res, 400, "Invalid request ID", "BAD_REQUEST_ID");
     }
 
+    if (!rejTitle?.trim() || !rejText?.trim()) {
+        return sendError(res, 400, "Rejection title and message required", "MISSING_REJECTION_DATA");
+    }
+
     try {
+        const [rows] = await db.promise().query(
+            `
+            SELECT 
+                r.Req_ID,
+                r.RType_ID,
+                rt.RType_Name,
+                c.Email,
+                CONCAT(
+                    'REQ-',
+                    DATE_FORMAT(r.DateMade, '%y'),
+                    LPAD(rt.RType_ID, 2, '0'),
+                    LPAD(r.Req_ID, 3, '0')
+                ) AS RequestNumber
+            FROM REQUEST r
+            JOIN REQUEST_TYPES rt ON r.RType_ID = rt.RType_ID
+            JOIN CITIZEN c ON r.C_ID = c.C_ID
+            WHERE r.Req_ID = ?
+            `,
+            [id]
+        );
+
+        if (!rows.length) {
+            return sendError(res, 404, "Request not found", "REQ_NOT_FOUND");
+        }
+
+        const request = rows[0];
+
         const [result] = await db.promise().query(
             `
             UPDATE REQUEST 
             SET FlagRejected = 1,
-                RStat_Code = 3 -- adjust this to your "Rejected" status code
+                RStat_Code = 3
             WHERE Req_ID = ?
             `,
             [id]
@@ -292,6 +347,19 @@ export const rejectRequest = async (req, res) => {
 
         if (result.affectedRows === 0) {
             return sendError(res, 404, "Request not found", "REQ_NOT_FOUND");
+        }
+
+        try {
+            await sendRequestStatusEmail({
+                email: request.Email,
+                status: "rejected",
+                requestNumber: request.RequestNumber,
+                reqId: request.Req_ID,
+                title: request.RType_Name,
+                reason: `${rejTitle}: ${rejText}`
+            });
+        } catch (e) {
+            console.error("EMAIL FAILED", e);
         }
 
         return sendSuccess(res, "Request rejected successfully");

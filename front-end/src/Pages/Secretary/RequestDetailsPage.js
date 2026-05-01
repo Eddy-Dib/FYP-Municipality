@@ -93,16 +93,15 @@ function RequestDetails() {
         }
     };
 
-    const handleReject = async () => {
+    const handleReject = async (title, text) => {
         try {
             setRejecting(true);
 
             const res = await axios.post(
                 `${API_URL}/secretary/requests/${id}/reject`,
-                {},
-                {
-                    headers: { Authorization: `Bearer ${token}` }
-                }
+                {rejTitle: title, rejText: text},
+                
+                {headers: { Authorization: `Bearer ${token}` }}
             );
 
             if (res.data.success) {
@@ -170,7 +169,7 @@ function RequestDetails() {
                     onSubmit={async ({ title, text }) => {
                         const success = await handleReject(title, text);
                         if (success) {
-                            setShowRejectModal(false); // ✅ only close on success
+                            setShowRejectModal(false);
                         }
                     }}
                 />
