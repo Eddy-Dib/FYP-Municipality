@@ -1,63 +1,84 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import axios from "axios";
 import styles from "./Admin.module.css";
 
 function AdminUsers() {
-    const [users, setUsers] = useState([
-        {
-            id: 1,
-            name: "Ali Hassan",
-            email: "ali@gmail.com",
-            role: "Citizen",
-            status: "Pending"
-        },
-        {
-            id: 2,
-            name: "Maya Elias",
-            email: "maya@gmail.com",
-            role: "Employee",
-            status: "Approved"
-        },
-        {
-            id: 3,
-            name: "Karim Raad",
-            email: "karim@gmail.com",
-            role: "Engineer",
-            status: "Pending"
-        },
-        {
-            id: 4,
-            name: "Sarah Nader",
-            email: "sarah@gmail.com",
-            role: "Secretary",
-            status: "Rejected"
-        }
-    ]);
+    const API_URL = process.env.REACT_APP_API_URL;
 
+    const [users, setUsers] = useState([]);
     const [selectedStatus, setSelectedStatus] = useState("Pending");
 
-    const approveUser = (id) => {
-        setUsers(users.map(user =>
-            user.id === id
-                ? { ...user, status: "Approved" }
-                : user
-        ));
+    const token = localStorage.getItem("token");
+
+    const statusMap = {
+        Pending: 0,
+        Approved: 1,
+        Rejected: 2
     };
 
-    const rejectUser = (id) => {
-        setUsers(users.map(user =>
-            user.id === id
-                ? { ...user, status: "Rejected" }
-                : user
-        ));
+    const loadUsers = async (statusName) => {
+        try {
+            const res = await axios.get(
+                `${API_URL}/api/admin/users/${statusMap[statusName]}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            );
+
+            setUsers(res.data.data);
+        } catch (err) {
+            console.error(err);
+        }
     };
 
-    const pendingUsers = users.filter(user => user.status === "Pending").length;
-    const approvedUsers = users.filter(user => user.status === "Approved").length;
-    const rejectedUsers = users.filter(user => user.status === "Rejected").length;
+    useEffect(() => {
+        loadUsers(selectedStatus);
+    }, [selectedStatus]);
 
-    const filteredUsers = users.filter(
-        user => user.status === selectedStatus
-    );
+    const approveUser = async (id) => {
+        try {
+            await axios.put(
+                `${API_URL}/api/admin/users/${id}/approve`,
+                {},
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            );
+
+            loadUsers(selectedStatus);
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const rejectUser = async (id) => {
+        try {
+            await axios.put(
+                `${API_URL}/api/admin/users/${id}/reject`,
+                {},
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            );
+
+            loadUsers(selectedStatus);
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const pendingUsers =
+        selectedStatus === "Pending" ? users.length : "...";
+    const approvedUsers =
+        selectedStatus === "Approved" ? users.length : "...";
+    const rejectedUsers =
+        selectedStatus === "Rejected" ? users.length : "...";
 
     return (
         <div className={styles.page}>
@@ -128,15 +149,15 @@ function AdminUsers() {
                                 <th>ID</th>
                                 <th>Name</th>
                                 <th>Email</th>
-                                <th>Role Request</th>
+                                <th>Role</th>
                                 <th>Status</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
 
                         <tbody>
-                            {filteredUsers.length > 0 ? (
-                                filteredUsers.map(user => (
+                            {users.length > 0 ? (
+                                users.map((user) => (
                                     <tr key={user.id}>
                                         <td>#{user.id}</td>
                                         <td>{user.name}</td>
@@ -148,7 +169,9 @@ function AdminUsers() {
                                             {selectedStatus !== "Approved" && (
                                                 <button
                                                     className={styles.greenBtn}
-                                                    onClick={() => approveUser(user.id)}
+                                                    onClick={() =>
+                                                        approveUser(user.id)
+                                                    }
                                                 >
                                                     Approve
                                                 </button>
@@ -157,7 +180,9 @@ function AdminUsers() {
                                             {selectedStatus !== "Rejected" && (
                                                 <button
                                                     className={styles.redBtn}
-                                                    onClick={() => rejectUser(user.id)}
+                                                    onClick={() =>
+                                                        rejectUser(user.id)
+                                                    }
                                                 >
                                                     Reject
                                                 </button>
@@ -174,7 +199,7 @@ function AdminUsers() {
                                             padding: "40px"
                                         }}
                                     >
-                                        No {selectedStatus.toLowerCase()} users
+                                        No users found
                                     </td>
                                 </tr>
                             )}

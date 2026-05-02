@@ -1,21 +1,73 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import axios from "axios";
 import styles from "./Admin.module.css";
 
 function AssignRoles() {
-    const [users, setUsers] = useState([
-        { id: 1, name: "Ali Hassan", role: "Citizen" },
-        { id: 2, name: "Maya Elias", role: "Employee" },
-        { id: 3, name: "Karim Raad", role: "Engineer" },
-        { id: 4, name: "Sarah Nader", role: "Secretary" },
-        { id: 5, name: "Omar Khalil", role: "Staff" }
-    ]);
+    const API_URL = process.env.REACT_APP_API_URL;
+    const token = localStorage.getItem("token");
 
-    const changeRole = (id, newRole) => {
-        setUsers(users.map(user =>
-            user.id === id
-                ? { ...user, role: newRole }
-                : user
-        ));
+    const [employees, setEmployees] = useState([]);
+    const [roles, setRoles] = useState([]);
+
+    const loadData = async () => {
+        try {
+            const [employeesRes, rolesRes] = await Promise.all([
+                axios.get(`${API_URL}/api/admin/employees`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }),
+                axios.get(`${API_URL}/api/admin/roles`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                })
+            ]);
+
+            setEmployees(employeesRes.data.data);
+            setRoles(rolesRes.data.data);
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    useEffect(() => {
+        loadData();
+    }, []);
+
+    const changeRole = (empId, roleId) => {
+        setEmployees(
+            employees.map(emp =>
+                emp.Emp_ID === empId
+                    ? { ...emp, Role_ID: Number(roleId) }
+                    : emp
+            )
+        );
+    };
+
+    const saveRole = async (empId, roleId) => {
+        try {
+            await axios.put(
+                `${API_URL}/api/admin/assign-role`,
+                {
+                    empId,
+                    roleId
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            );
+
+            alert("Role updated successfully");
+            loadData();
+
+        } catch (err) {
+            console.error(err);
+            alert("Failed to update role");
+        }
     };
 
     return (
@@ -41,40 +93,51 @@ function AssignRoles() {
                         </thead>
 
                         <tbody>
-                            {users.map(user => (
-                                <tr key={user.id}>
-                                    <td>#{user.id}</td>
-                                    <td>{user.name}</td>
-                                    <td>{user.role}</td>
+                            {employees.map(emp => (
+                                <tr key={emp.Emp_ID}>
+                                    <td>#{emp.Emp_ID}</td>
+                                    <td>{emp.name}</td>
+                                    <td>{emp.Role_Type}</td>
 
                                     <td>
                                         <select
                                             className={styles.select}
-                                            value={user.role}
+                                            value={emp.Role_ID}
                                             onChange={(e) =>
-                                                changeRole(user.id, e.target.value)
+                                                changeRole(
+                                                    emp.Emp_ID,
+                                                    e.target.value
+                                                )
                                             }
                                         >
-                                            <option>Citizen</option>
-                                            <option>Employee</option>
-                                            <option>Admin</option>
-                                            <option>Mayor</option>
-                                            <option>Secretary</option>
-                                            <option>Engineer</option>
-                                            <option>Lawyer</option>
-                                            <option>Financial Staff</option>
-                                            <option>Staff</option>
+                                            {roles.map(role => (
+                                                <option
+                                                    key={role.Role_ID}
+                                                    value={role.Role_ID}
+                                                >
+                                                    {role.Role_Type}
+                                                </option>
+                                            ))}
                                         </select>
                                     </td>
 
                                     <td>
-                                        <button className={styles.blueBtn}>
+                                        <button
+                                            className={styles.blueBtn}
+                                            onClick={() =>
+                                                saveRole(
+                                                    emp.Emp_ID,
+                                                    emp.Role_ID
+                                                )
+                                            }
+                                        >
                                             Save Role
                                         </button>
                                     </td>
                                 </tr>
                             ))}
                         </tbody>
+
                     </table>
                 </div>
             </div>
