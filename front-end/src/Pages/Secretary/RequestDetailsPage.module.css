@@ -5,6 +5,7 @@
     gap: 16px;
 }
 
+/* Back button */
 .backBtn {
     display: inline-flex;
     align-items: center;
@@ -21,6 +22,7 @@
     padding: 4px 0;
 }
 
+/* Sections */
 .sectionTitle {
     font-size: 16px;
     font-weight: 600;
@@ -35,6 +37,7 @@
     gap: 10px;
 }
 
+/* Document card */
 .docCard {
     display: flex;
     justify-content: space-between;
@@ -83,6 +86,7 @@
     color: #ef4444;
 }
 
+/* View button */
 .viewBtn {
     padding: 6px 10px;
     border-radius: 8px;
@@ -100,6 +104,14 @@
     background: var(--primary-dark);
 }
 
+/* Buttons container */
+.btnContainer {
+    display: flex;
+    flex-direction: row;
+    gap: 15px;
+}
+
+/* Approve button */
 .approveBtn {
     margin-top: 10px;
     align-self: flex-start;
@@ -128,6 +140,40 @@
 }
 
 .approveBtn:disabled {
+    background: #94a3b8;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Reject button (fixed to match approve) */
+.rejectBtn {
+    margin-top: 10px;
+    align-self: flex-start;
+
+    padding: 10px 16px;
+    border-radius: 10px;
+    border: none;
+
+    background: #ef4444;
+    color: white;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.rejectBtn:hover {
+    background: #dc2626;
+    transform: translateY(-1px);
+}
+
+.rejectBtn:active {
+    transform: translateY(0);
+}
+
+.rejectBtn:disabled {
     background: #94a3b8;
     cursor: not-allowed;
     transform: none;
