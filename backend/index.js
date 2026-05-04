@@ -1,40 +1,35 @@
 import express, { json } from "express";
 import cors from "cors";
+
 import authRoutes from "./routes/authRoutes.js";
 import requestRoutes from "./routes/requestRoutes.js";
-import complaintRoutes from "./routes/ComplaintRoutes.js";
-import employeeRoutes from "./routes/employeeRoutes.js"
+import complaintRoutes from "./routes/complaintRoutes.js";
+import employeeRoutes from "./routes/employeeRoutes.js";
 import citizenRoutes from "./routes/citizenRoutes.js";
 import secretaryRoutes from "./routes/secretaryRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js";
 
 const app = express();
 
 app.use(cors());
-
 app.use(json());
 
-// Sends all requests starting with /auth to authRoutes
+// Routes
 app.use("/auth", authRoutes);
-
-// Requests system (citizen submissions)
 app.use("/api/requests", requestRoutes);
-
+app.use("/api/complaints", complaintRoutes);
+app.use("/employee", employeeRoutes);
+app.use("/api/citizen", citizenRoutes);
+app.use("/secretary", secretaryRoutes);
+app.use("/api/admin", adminRoutes);
 
 app.get("/test", (req, res) => {
     res.send("API WORKS");
 });
-// Routes for handling complaints and citizen messages (stored in COMPLAINT table)
-app.use("/api/complaints", complaintRoutes);
 
-// Sends all requests starting with /employee to employeeRoutes
-app.use("/employee", employeeRoutes);
-
-app.use("/api/citizen", citizenRoutes);
-
-// Sends all requests starting with /secretary to secretaryRoutes
-app.use("/secretary", secretaryRoutes);
-
-// Start server. Backup port: 5000
+// Start server (ONLY ONCE)
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});
