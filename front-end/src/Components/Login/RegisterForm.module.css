@@ -1,0 +1,101 @@
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 6px;
+    width: 100%;
+}
+
+.row {
+    display: flex;
+    gap: 10px;
+}
+
+.group {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+}
+
+.group label {
+    font-size: 14px;
+    color: #f6f6f6;
+    line-height: 1.2;
+    margin-bottom: 0;
+}
+
+.group input,
+.group select {
+    height: 40px;
+    padding: 10px 12px;
+    box-sizing: border-box;
+
+    border-radius: 12px;
+    border: 1px solid rgba(210, 210, 210, 0.3);
+    background: rgba(204, 204, 204, 0.25);
+
+    color: white;
+    font-size: 14px;
+    outline: none;
+
+    transition: 0.2s ease;
+
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+
+    line-height: 1.2;
+}
+
+.group input::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.group input:focus,
+.group select:focus {
+    border: 1.5px solid #38649d;
+    background: rgba(255, 255, 255, 0.25);
+    box-shadow: 0 0 0 2px rgba(56, 100, 157, 0.2);
+}
+
+.group select {
+    cursor: pointer;
+}
+
+.group select option {
+    background: #1e2a3a;
+    color: white;
+}
+
+.button {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #1e3a5f, #38649d);
+    color: white;
+    font-size: 15px;
+    cursor: pointer;
+    transition: 0.2s ease;
+    margin-top: 6px;
+}
+
+.button:hover {
+    transform: translateY(-1px);
+}
+
+.error {
+    margin-top: 12px;
+    text-align: center;
+    color: #ff2525 !important;
+    font-size: 18px !important;
+    font-weight: 500;
+}
+
+@media (max-width: 900px) {
+    .row {
+        flex-direction: column;
+        gap: 8px;
+    }
+}
