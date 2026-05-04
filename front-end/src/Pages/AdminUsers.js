@@ -6,20 +6,14 @@ function AdminUsers() {
     const API_URL = process.env.REACT_APP_API_URL;
 
     const [users, setUsers] = useState([]);
-    const [selectedStatus, setSelectedStatus] = useState("Pending");
+    const [selectedStatus, setSelectedStatus] = useState("All");
 
     const token = localStorage.getItem("token");
 
-    const statusMap = {
-        Pending: 0,
-        Approved: 1,
-        Rejected: 2
-    };
-
-    const loadUsers = async (statusName) => {
+    const loadUsers = async () => {
         try {
             const res = await axios.get(
-                `${API_URL}/api/admin/users/${statusMap[statusName]}`,
+                `${API_URL}/api/admin/citizens`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`
@@ -34,13 +28,13 @@ function AdminUsers() {
     };
 
     useEffect(() => {
-        loadUsers(selectedStatus);
-    }, [selectedStatus]);
+        loadUsers();
+    }, []);
 
-    const approveUser = async (id) => {
+    const enableUser = async (id) => {
         try {
             await axios.put(
-                `${API_URL}/api/admin/users/${id}/approve`,
+                `${API_URL}/api/admin/users/${id}/enable`,
                 {},
                 {
                     headers: {
@@ -49,16 +43,16 @@ function AdminUsers() {
                 }
             );
 
-            loadUsers(selectedStatus);
+            loadUsers();
         } catch (err) {
             console.error(err);
         }
     };
 
-    const rejectUser = async (id) => {
+    const disableUser = async (id) => {
         try {
             await axios.put(
-                `${API_URL}/api/admin/users/${id}/reject`,
+                `${API_URL}/api/admin/users/${id}/disable`,
                 {},
                 {
                     headers: {
@@ -67,79 +61,86 @@ function AdminUsers() {
                 }
             );
 
-            loadUsers(selectedStatus);
+            loadUsers();
         } catch (err) {
             console.error(err);
         }
     };
 
-    const pendingUsers =
-        selectedStatus === "Pending" ? users.length : "...";
-    const approvedUsers =
-        selectedStatus === "Approved" ? users.length : "...";
-    const rejectedUsers =
-        selectedStatus === "Rejected" ? users.length : "...";
+    const filteredUsers =
+        selectedStatus === "All"
+            ? users
+            : users.filter((u) => u.status === selectedStatus);
+
+    const count = (status) =>
+        users.filter((u) => u.status === status).length;
 
     return (
         <div className={styles.page}>
             <div className={styles.header}>
                 <h1>User Management</h1>
-                <p>Approve or reject municipality members</p>
+                <p>Manage citizen accounts</p>
             </div>
 
+            {/* STATUS CARDS */}
             <div className={styles.cards}>
                 <div
                     className={styles.card}
-                    onClick={() => setSelectedStatus("Pending")}
+                    onClick={() => setSelectedStatus("All")}
                     style={{
                         cursor: "pointer",
                         border:
-                            selectedStatus === "Pending"
+                            selectedStatus === "All"
                                 ? "3px solid #2563eb"
                                 : "3px solid transparent"
                     }}
                 >
-                    <div className={styles.cardTitle}>Pending</div>
-                    <div className={styles.cardValue}>{pendingUsers}</div>
-                    <div className={styles.cardSub}>Awaiting approval</div>
+                    <div className={styles.cardTitle}>All</div>
+                    <div className={styles.cardValue}>{users.length}</div>
+                    <div className={styles.cardSub}>All citizens</div>
                 </div>
 
                 <div
                     className={styles.card}
-                    onClick={() => setSelectedStatus("Approved")}
+                    onClick={() => setSelectedStatus("Active")}
                     style={{
                         cursor: "pointer",
                         border:
-                            selectedStatus === "Approved"
+                            selectedStatus === "Active"
                                 ? "3px solid #16a34a"
                                 : "3px solid transparent"
                     }}
                 >
-                    <div className={styles.cardTitle}>Approved</div>
-                    <div className={styles.cardValue}>{approvedUsers}</div>
-                    <div className={styles.cardSub}>Accepted members</div>
+                    <div className={styles.cardTitle}>Active</div>
+                    <div className={styles.cardValue}>
+                        {count("Active")}
+                    </div>
+                    <div className={styles.cardSub}>Enabled accounts</div>
                 </div>
 
                 <div
                     className={styles.card}
-                    onClick={() => setSelectedStatus("Rejected")}
+                    onClick={() => setSelectedStatus("Disabled")}
                     style={{
                         cursor: "pointer",
                         border:
-                            selectedStatus === "Rejected"
+                            selectedStatus === "Disabled"
                                 ? "3px solid #dc2626"
                                 : "3px solid transparent"
                     }}
                 >
-                    <div className={styles.cardTitle}>Rejected</div>
-                    <div className={styles.cardValue}>{rejectedUsers}</div>
-                    <div className={styles.cardSub}>Declined registrations</div>
+                    <div className={styles.cardTitle}>Disabled</div>
+                    <div className={styles.cardValue}>
+                        {count("Disabled")}
+                    </div>
+                    <div className={styles.cardSub}>Blocked accounts</div>
                 </div>
             </div>
 
+            {/* TABLE */}
             <div className={styles.section}>
                 <h2 className={styles.sectionTitle}>
-                    {selectedStatus} Applications
+                    {selectedStatus} Citizens
                 </h2>
 
                 <div className={styles.tableWrapper}>
@@ -149,42 +150,42 @@ function AdminUsers() {
                                 <th>ID</th>
                                 <th>Name</th>
                                 <th>Email</th>
-                                <th>Role</th>
+                                <th>Username</th>
                                 <th>Status</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
 
                         <tbody>
-                            {users.length > 0 ? (
-                                users.map((user) => (
+                            {filteredUsers.length > 0 ? (
+                                filteredUsers.map((user) => (
                                     <tr key={user.id}>
                                         <td>#{user.id}</td>
                                         <td>{user.name}</td>
                                         <td>{user.email}</td>
-                                        <td>{user.role}</td>
+                                        <td>{user.username || "-"}</td>
                                         <td>{user.status}</td>
 
                                         <td>
-                                            {selectedStatus !== "Approved" && (
+                                            {user.status !== "Active" && (
                                                 <button
                                                     className={styles.greenBtn}
                                                     onClick={() =>
-                                                        approveUser(user.id)
+                                                        enableUser(user.id)
                                                     }
                                                 >
-                                                    Approve
+                                                    Enable
                                                 </button>
                                             )}
 
-                                            {selectedStatus !== "Rejected" && (
+                                            {user.status !== "Disabled" && (
                                                 <button
                                                     className={styles.redBtn}
                                                     onClick={() =>
-                                                        rejectUser(user.id)
+                                                        disableUser(user.id)
                                                     }
                                                 >
-                                                    Reject
+                                                    Disable
                                                 </button>
                                             )}
                                         </td>
@@ -199,7 +200,7 @@ function AdminUsers() {
                                             padding: "40px"
                                         }}
                                     >
-                                        No users found
+                                        No citizens found
                                     </td>
                                 </tr>
                             )}
