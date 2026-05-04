@@ -4,140 +4,156 @@ import styles from "./Admin.module.css";
 
 function AdminUsers() {
     const API_URL = process.env.REACT_APP_API_URL;
-
-    const [users, setUsers] = useState([]);
-    const [selectedStatus, setSelectedStatus] = useState("All");
-
     const token = localStorage.getItem("token");
 
-    const loadUsers = async () => {
-        try {
-            const res = await axios.get(
-                `${API_URL}/api/admin/citizens`,
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
-                }
-            );
+    const [citizens, setCitizens] = useState([]);
+    const [selectedStatus, setSelectedStatus] = useState("All");
 
-            setUsers(res.data.data);
+    const [loadingId, setLoadingId] = useState(null);
+
+    const loadCitizens = async () => {
+        try {
+            const res = await axios.get(`${API_URL}/api/admin/citizens`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+
+            setCitizens(res.data.data);
         } catch (err) {
             console.error(err);
         }
     };
 
     useEffect(() => {
-        loadUsers();
+        loadCitizens();
     }, []);
 
-    const enableUser = async (id) => {
+    const approveCitizen = async (id) => {
         try {
-            await axios.put(
-                `${API_URL}/api/admin/users/${id}/enable`,
+            setLoadingId(`approve-${id}`);
+
+            await axios.post(
+                `${API_URL}/api/admin/citizens/${id}/approve`,
                 {},
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
-                }
+                { headers: { Authorization: `Bearer ${token}` } }
             );
 
-            loadUsers();
+            await loadCitizens();
         } catch (err) {
             console.error(err);
+        } finally {
+            setLoadingId(null);
         }
     };
 
-    const disableUser = async (id) => {
+    const rejectCitizen = async (id) => {
         try {
-            await axios.put(
-                `${API_URL}/api/admin/users/${id}/disable`,
+            setLoadingId(`reject-${id}`);
+
+            await axios.post(
+                `${API_URL}/api/admin/citizens/${id}/reject`,
                 {},
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
-                }
+                { headers: { Authorization: `Bearer ${token}` } }
             );
 
-            loadUsers();
+            await loadCitizens();
         } catch (err) {
             console.error(err);
+        } finally {
+            setLoadingId(null);
         }
     };
 
-    const filteredUsers =
+    const enableUser = async (userId) => {
+        try {
+            setLoadingId(`enable-${userId}`);
+
+            await axios.put(
+                `${API_URL}/api/admin/users/${userId}/enable`,
+                {},
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+
+            await loadCitizens();
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setLoadingId(null);
+        }
+    };
+
+    const disableUser = async (userId) => {
+        try {
+            setLoadingId(`disable-${userId}`);
+
+            await axios.put(
+                `${API_URL}/api/admin/users/${userId}/disable`,
+                {},
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+
+            await loadCitizens();
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setLoadingId(null);
+        }
+    };
+
+    const filteredCitizens =
         selectedStatus === "All"
-            ? users
-            : users.filter((u) => u.status === selectedStatus);
+            ? citizens
+            : citizens.filter((c) => c.status === selectedStatus);
 
     const count = (status) =>
-        users.filter((u) => u.status === status).length;
+        citizens.filter((c) => c.status === status).length;
 
     return (
         <div className={styles.page}>
             <div className={styles.header}>
-                <h1>User Management</h1>
-                <p>Manage citizen accounts</p>
+                <h1>Citizen Management</h1>
+                <p>Approve or manage citizen accounts</p>
             </div>
 
-            {/* STATUS CARDS */}
             <div className={styles.cards}>
                 <div
-                    className={styles.card}
+                    className={`${styles.card} ${selectedStatus === "All" ? styles.activeCard : ""}`}
                     onClick={() => setSelectedStatus("All")}
-                    style={{
-                        cursor: "pointer",
-                        border:
-                            selectedStatus === "All"
-                                ? "3px solid #2563eb"
-                                : "3px solid transparent"
-                    }}
                 >
                     <div className={styles.cardTitle}>All</div>
-                    <div className={styles.cardValue}>{users.length}</div>
+                    <div className={styles.cardValue}>{citizens.length}</div>
                     <div className={styles.cardSub}>All citizens</div>
                 </div>
 
                 <div
-                    className={styles.card}
-                    onClick={() => setSelectedStatus("Active")}
-                    style={{
-                        cursor: "pointer",
-                        border:
-                            selectedStatus === "Active"
-                                ? "3px solid #16a34a"
-                                : "3px solid transparent"
-                    }}
+                    className={`${styles.card} ${selectedStatus === "Pending" ? styles.activeCard : ""}`}
+                    onClick={() => setSelectedStatus("Pending")}
                 >
-                    <div className={styles.cardTitle}>Active</div>
-                    <div className={styles.cardValue}>
-                        {count("Active")}
-                    </div>
-                    <div className={styles.cardSub}>Enabled accounts</div>
+                    <div className={styles.cardTitle}>Pending</div>
+                    <div className={styles.cardValue}>{count("Pending")}</div>
+                    <div className={styles.cardSub}>Awaiting approval</div>
                 </div>
 
                 <div
-                    className={styles.card}
+                    className={`${styles.card} ${selectedStatus === "Active" ? styles.activeCard : ""}`}
+                    onClick={() => setSelectedStatus("Active")}
+                >
+                    <div className={styles.cardTitle}>Active</div>
+                    <div className={styles.cardValue}>{count("Active")}</div>
+                    <div className={styles.cardSub}>Enabled users</div>
+                </div>
+
+                <div
+                    className={`${styles.card} ${selectedStatus === "Disabled" ? styles.activeCard : ""}`}
                     onClick={() => setSelectedStatus("Disabled")}
-                    style={{
-                        cursor: "pointer",
-                        border:
-                            selectedStatus === "Disabled"
-                                ? "3px solid #dc2626"
-                                : "3px solid transparent"
-                    }}
                 >
                     <div className={styles.cardTitle}>Disabled</div>
-                    <div className={styles.cardValue}>
-                        {count("Disabled")}
-                    </div>
-                    <div className={styles.cardSub}>Blocked accounts</div>
+                    <div className={styles.cardValue}>{count("Disabled")}</div>
+                    <div className={styles.cardSub}>Blocked users</div>
                 </div>
             </div>
 
-            {/* TABLE */}
             <div className={styles.section}>
                 <h2 className={styles.sectionTitle}>
                     {selectedStatus} Citizens
@@ -157,49 +173,69 @@ function AdminUsers() {
                         </thead>
 
                         <tbody>
-                            {filteredUsers.length > 0 ? (
-                                filteredUsers.map((user) => (
-                                    <tr key={user.id}>
-                                        <td>#{user.id}</td>
-                                        <td>{user.name}</td>
-                                        <td>{user.email}</td>
-                                        <td>{user.username || "-"}</td>
-                                        <td>{user.status}</td>
+                            {filteredCitizens.length > 0 ? (
+                                filteredCitizens.map((c) => (
+                                    <tr key={c.id}>
+                                        <td>#{c.id}</td>
+                                        <td>{c.name}</td>
+                                        <td>{c.email}</td>
+                                        <td>{c.username || "-"}</td>
+                                        <td>{c.status}</td>
 
-                                        <td>
-                                            {user.status !== "Active" && (
-                                                <button
-                                                    className={styles.greenBtn}
-                                                    onClick={() =>
-                                                        enableUser(user.id)
-                                                    }
-                                                >
-                                                    Enable
-                                                </button>
+                                        <td className={styles.actionCell}>
+                                            {!c.isRegistered && (
+                                                <div className={styles.actionGroup}>
+                                                    <button
+                                                        className={styles.greenBtn}
+                                                        onClick={() => approveCitizen(c.id)}
+                                                        disabled={loadingId === `approve-${c.id}`}
+                                                    >
+                                                        {loadingId === `approve-${c.id}`
+                                                            ? "Approving..."
+                                                            : "Approve"}
+                                                    </button>
+
+                                                    <button
+                                                        className={styles.redBtn}
+                                                        onClick={() => rejectCitizen(c.id)}
+                                                        disabled={loadingId === `reject-${c.id}`}
+                                                    >
+                                                        {loadingId === `reject-${c.id}`
+                                                            ? "Rejecting..."
+                                                            : "Reject"}
+                                                    </button>
+                                                </div>
                                             )}
 
-                                            {user.status !== "Disabled" && (
-                                                <button
-                                                    className={styles.redBtn}
-                                                    onClick={() =>
-                                                        disableUser(user.id)
-                                                    }
-                                                >
-                                                    Disable
-                                                </button>
+                                            {c.isRegistered && (
+                                                c.isActive ? (
+                                                    <button
+                                                        className={styles.redBtn}
+                                                        onClick={() => disableUser(c.userId)}
+                                                        disabled={loadingId === `disable-${c.userId}`}
+                                                    >
+                                                        {loadingId === `disable-${c.userId}`
+                                                            ? "Disabling..."
+                                                            : "Disable"}
+                                                    </button>
+                                                ) : (
+                                                    <button
+                                                        className={styles.greenBtn}
+                                                        onClick={() => enableUser(c.userId)}
+                                                        disabled={loadingId === `enable-${c.userId}`}
+                                                    >
+                                                        {loadingId === `enable-${c.userId}`
+                                                            ? "Enabling..."
+                                                            : "Enable"}
+                                                    </button>
+                                                )
                                             )}
                                         </td>
                                     </tr>
                                 ))
                             ) : (
                                 <tr>
-                                    <td
-                                        colSpan="6"
-                                        style={{
-                                            textAlign: "center",
-                                            padding: "40px"
-                                        }}
-                                    >
+                                    <td colSpan="6" className={styles.emptyState}>
                                         No citizens found
                                     </td>
                                 </tr>

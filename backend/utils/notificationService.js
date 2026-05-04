@@ -58,3 +58,48 @@ export const saveNotification = async ({
         [title, text, reqId, feeId]
     );
 };
+
+export const sendCitizenStatusEmail = async ({
+    email,
+    status,
+    username,
+    password,
+    citizenName
+}) => {
+    let subject = "";
+    let text = "";
+
+    if (status === "approved") {
+        subject = "Account Approved";
+        text = `Hello ${citizenName}, your account has been approved.\n\nUsername: ${username}\nPassword: ${password}`;
+    }
+
+    if (status === "rejected") {
+        subject = "Account Rejected";
+        text = `Hello ${citizenName}, your registration has been rejected.`;
+    }
+
+    if (status === "enabled") {
+        subject = "Account Enabled";
+        text = `Hello ${citizenName}, your account has been reactivated.`;
+    }
+
+    if (status === "disabled") {
+        subject = "Account Disabled";
+        text = `Hello ${citizenName}, your account has been disabled.`;
+    }
+
+    await transporter.sendMail({
+        from: `"Municipality System" <${process.env.EMAIL_USER}>`,
+        to: email,
+        subject,
+        text
+    });
+
+    await saveNotification({
+        title: subject,
+        text,
+        reqId: null,
+        feeId: null
+    });
+};

@@ -1,7 +1,13 @@
 import db from "../config/db.js";
 import { sendSuccess, sendError } from "../utils/responses.js";
+import { hashPassword } from "../utils/hash.js";
+import { saveNotification, sendCitizenStatusEmail } from "../utils/notificationService.js";
 
-// GET CITIZENS BY STATUS ONLY
+const generateUsername = (first, last, id) => {
+    const base = `${first.toLowerCase()}.${last.toLowerCase()}`;
+    return `${base}${id}`;
+};
+
 export const getCitizens = async (req, res) => {
     try {
         const [rows] = await db.promise().query(`
@@ -17,18 +23,27 @@ export const getCitizens = async (req, res) => {
             LEFT JOIN USERS u ON c.U_ID = u.U_ID
         `);
 
-        const citizens = rows.map(c => ({
-            id: c.C_ID,
-            name: `${c.First_Name} ${c.Last_Name}`,
-            email: c.Email,
-            username: c.Username || null,
-            status:
-                c.U_ID === null
-                    ? "Not Registered"
+        const citizens = rows.map(c => {
+            const isRegistered = c.U_ID !== null;
+
+            return {
+                id: c.C_ID,
+                name: `${c.First_Name} ${c.Last_Name}`,
+                email: c.Email,
+
+                userId: c.U_ID || null,
+                username: c.Username || null,
+
+                isRegistered,
+                isActive: c.Active_Flg === 1,
+
+                status: !isRegistered
+                    ? "Pending"
                     : c.Active_Flg === 1
                         ? "Active"
                         : "Disabled"
-        }));
+            };
+        });
 
         return sendSuccess(res, "Citizens fetched", citizens);
 
@@ -38,7 +53,115 @@ export const getCitizens = async (req, res) => {
     }
 };
 
-// APPROVE USER
+export const approveCitizen = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const [citizenRows] = await db.promise().query(
+            `SELECT * FROM CITIZEN WHERE C_ID = ?`,
+            [id]
+        );
+
+        if (citizenRows.length === 0) {
+            return sendError(res, 404, "Citizen not found");
+        }
+
+        const citizen = citizenRows[0];
+
+        if (citizen.U_ID) {
+            return sendError(res, 400, "Already registered");
+        }
+
+        const username = generateUsername(
+            citizen.First_Name,
+            citizen.Last_Name,
+            citizen.C_ID
+        );
+
+        const rawPassword = "1234";
+        const hashedPassword = await hashPassword(rawPassword);
+
+        const [userResult] = await db.promise().query(
+            `INSERT INTO USERS (Username, Password, RegDate, Active_Flg)
+             VALUES (?, ?, NOW(), 1)`,
+            [username, hashedPassword]
+        );
+
+        const userId = userResult.insertId;
+
+        await db.promise().query(
+            `UPDATE CITIZEN SET U_ID = ? WHERE C_ID = ?`,
+            [userId, id]
+        );
+
+        const email = citizen.Email;
+
+        await sendCitizenStatusEmail({
+            email,
+            status: "approved",
+            username,
+            password: rawPassword,
+            citizenName: citizen.First_Name
+        });
+
+        await saveNotification({
+            title: "Account Approved",
+            text: `Your account has been approved. Username: ${username}`,
+            reqId: null,
+            feeId: null
+        });
+
+        return sendSuccess(res, "Citizen approved and user created", {
+            username,
+            password: rawPassword
+        });
+
+    } catch (err) {
+        console.error(err);
+        return sendError(res, 500, "Server error");
+    }
+};
+
+export const rejectCitizen = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const [citizenRows] = await db.promise().query(
+            `SELECT * FROM CITIZEN WHERE C_ID = ?`,
+            [id]
+        );
+
+        if (citizenRows.length === 0) {
+            return sendError(res, 404, "Citizen not found");
+        }
+
+        const citizen = citizenRows[0];
+
+        if (citizen.U_ID) {
+            return sendError(res, 400, "Already processed");
+        }
+
+        await sendCitizenStatusEmail({
+            email: citizen.Email,
+            status: "rejected",
+            citizenName: citizen.First_Name
+        });
+
+        await saveNotification({
+            title: "Account Rejected",
+            text: `Dear ${citizen.First_Name}, your registration was rejected.`,
+            reqId: null,
+            feeId: null
+        });
+
+        return sendSuccess(res, "Citizen rejected and notified");
+
+    } catch (err) {
+        console.error(err);
+        return sendError(res, 500, "Server error");
+    }
+};
+
 export const enableUser = async (req, res) => {
     const { id } = req.params;
 
@@ -48,6 +171,22 @@ export const enableUser = async (req, res) => {
             [id]
         );
 
+        const [rows] = await db.promise().query(
+            `SELECT c.Email, c.First_Name
+             FROM CITIZEN c
+             WHERE c.U_ID = ?`,
+            [id]
+        );
+
+        const email = rows[0]?.Email;
+        const name = rows[0]?.First_Name;
+
+        await sendCitizenStatusEmail({
+            email,
+            status: "enabled",
+            citizenName: name
+        });
+
         return sendSuccess(res, "User enabled");
 
     } catch (err) {
@@ -56,7 +195,6 @@ export const enableUser = async (req, res) => {
     }
 };
 
-// REJECT USER
 export const disableUser = async (req, res) => {
     const { id } = req.params;
 
@@ -66,6 +204,22 @@ export const disableUser = async (req, res) => {
             [id]
         );
 
+        const [rows] = await db.promise().query(
+            `SELECT c.Email, c.First_Name
+             FROM CITIZEN c
+             WHERE c.U_ID = ?`,
+            [id]
+        );
+
+        const email = rows[0]?.Email;
+        const name = rows[0]?.First_Name;
+
+        await sendCitizenStatusEmail({
+            email,
+            status: "disabled",
+            citizenName: name
+        });
+
         return sendSuccess(res, "User disabled");
 
     } catch (err) {
@@ -74,16 +228,13 @@ export const disableUser = async (req, res) => {
     }
 };
 
-// GET ALL ROLES
 export const getRoles = async (req, res) => {
     try {
-        const [rows] = await db.promise().query(
-            `
+        const [rows] = await db.promise().query(`
             SELECT Role_ID, Role_Type
             FROM ROLES
             ORDER BY Role_ID
-            `
-        );
+        `);
 
         return sendSuccess(res, "Roles fetched", rows);
 
@@ -93,7 +244,6 @@ export const getRoles = async (req, res) => {
     }
 };
 
-// GET EMPLOYEES
 export const getEmployees = async (req, res) => {
     try {
         const [rows] = await db.promise().query(`
@@ -115,7 +265,6 @@ export const getEmployees = async (req, res) => {
     }
 };
 
-// ASSIGN ROLE
 export const assignRole = async (req, res) => {
     const { empId, roleId } = req.body;
 
