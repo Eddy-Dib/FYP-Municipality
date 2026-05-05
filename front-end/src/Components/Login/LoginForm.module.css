@@ -1,0 +1,102 @@
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 18px;
+    animation: fadeIn 0.5s ease;
+}
+
+.inputGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.inputGroup label {
+    font-size: 16px;
+    color: #f6f6f6;
+    text-shadow: 0 0 6px rgba(0, 0, 0, 0.4);
+}
+
+.input {
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(210, 210, 210, 0.3);
+    background: rgba(204, 204, 204, 0.25);
+    color: white;
+    font-size: 14px;
+    outline: none;
+    transition: 0.25s ease;
+}
+
+.input::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.input:focus {
+    border: 1.5px solid #38649d;
+    background: rgba(255, 255, 255, 0.25);
+}
+
+.inputWrapper {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around;
+}
+
+.inputWrapper input {
+    width: 100%;
+    padding-right: 42px;
+}
+
+.eye {
+    position: absolute;
+    right: 12px;
+    top: 55%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #cfcfcf;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+}
+
+.button {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #1e3a5f, #38649d);
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 25px;
+    transition: 0.25s ease;
+}
+
+.button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+}
+
+.error {
+    margin-top: 12px;
+    text-align: center;
+    color: #ff2525 !important;
+    font-size: 18px !important;
+    font-weight: 500;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}

@@ -5,6 +5,7 @@
     height: 100vh;
     position: relative;
     overflow: hidden;
+    font-family: 'Poppins', sans-serif;
 }
 
 .background {
@@ -18,240 +19,64 @@
 
 .rightBox {
     position: absolute;
-    display: flex;
-    flex-direction: column;
     top: 50%;
     right: 10%;
     transform: translateY(-50%);
-    width: 33%;
-    padding: 50px;
+
+    width: 35%;
+    padding: 40px;
+    max-height: 90%;
+
     background: rgba(102, 102, 102, 0.33);
     backdrop-filter: blur(10px);
     border-radius: 20px;
-    color: var(--text-light);
-    transition: all 0.6s ease-in-out;
-}
 
+    color: white;
+
+    display: flex;
+    flex-direction: column;
+}
 .rightBox h2 {
     text-align: center;
-    font-size: 40px;
-    font-weight: 600;
-    color: var(--text-light);
-    letter-spacing: 0.5px;
-    margin-bottom: 5px;
-    text-shadow: 0 0 6px rgba(0, 0, 0, 0.4);
-}
-
-.rightBox h3 {
-    text-align: left;
-    font-size: 28px;
-    color: var(--text-light);
-    letter-spacing: 0.5px;
-    margin-bottom: 5px;
-    text-shadow: 0 0 6px rgba(0, 0, 0, 0.4);
+    font-size: 36px;
+    margin-bottom: 6px;
 }
 
 .rightBox p {
-    text-align: left;
-    font-size: 17px;
-    color: #f3f5f9;
-    margin-bottom: 25px;
-    text-shadow: 0 0 6px rgba(0, 0, 0, 0.4);
-}
-
-.loginForm .inputGroup {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 20px;
-}
-
-.loginForm label {
-    margin-bottom: 6px;
-    font-size: 19px;
-    color: #f6f6f6;
-    text-shadow: 0 0 6px rgba(0, 0, 0, 0.4);
-}
-
-.loginForm input {
-    padding: 12px 14px;
-    border-radius: 12px;
-    border: 1px solid rgba(210, 210, 210, 0.3);
-    background: rgba(204, 204, 204, 0.25);
-    color: white;
-    font-size: 14px;
-    outline: none;
-    letter-spacing: 0.5px;
-    transition: all 0.3s ease;
-}
-
-.loginForm input:focus {
-    border: 1.5px solid var(--primary);
-    background: rgba(255, 255, 255, 0.25);
-}
-
-.loginForm input::placeholder {
-    color: rgba(255, 255, 255, 0.6);
-}
-
-.inputWrapper {
-    position: relative;
-}
-
-.inputWrapper input {
-    width: 100%;
-    padding-right: 2.5rem;
-    box-sizing: border-box;
-    letter-spacing: 0.5px;
-}
-
-.eye {
-    position: absolute;
-    right: 0.75rem;
-    top: 50%;
-    transform: translateY(-50%);
-    cursor: pointer;
-    font-size: 1.2rem;
-    color: #bebebe;
-    display: flex;
-    align-items: center;
-}
-
-.loginButton {
-    width: 100%;
-    padding: 12px;
-    border: none;
-    border-radius: 12px;
-    background: linear-gradient(135deg, #1e3a5f, #38649d);
-    color: white;
-    font-size: 17px;
-    cursor: pointer;
-    transition: 0.3s;
-    display: block;
-    margin: 40px auto 0;
-}
-
-.loginButton:hover {
-    transform: translateY(-1.5px);
-    box-shadow: 0 10px 20px rgba(2, 2, 2, 0.3);
-    background-color: #15314a;
-}
-
-.registerText {
-    margin-top: 40px;
-    font-size: 14px;
     text-align: center;
-    display: inline-block;
+    font-size: 15px;
+    margin-bottom: 20px;
+    color: #f3f5f9;
 }
 
-.rightBox .registerLink {
+
+.formContainer {
+    width: 100%;
+    overflow-y: scroll;
+}
+
+.switchText {
+    margin-top: 25px;
+    text-align: center;
+    font-size: 14px;
+}
+
+
+.link {
     color: #79b0f9;
     cursor: pointer;
     font-weight: 500;
     transition: 0.3s;
 }
 
-.registerLink:hover {
-    color: #ffffff;
-    text-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
+.link:hover {
+    color: white;
 }
 
-.loginForm {
-    margin-top: 18px;
-    animation: fadeIn 0.6s ease;
-}
-
-.rightBox .error {
-    color: #ff2d2d;
-    margin-top: 10px;
-    text-align: center;
-    font-weight: 500;
-    letter-spacing: -0.2px;
-    text-shadow: 0 0 6px #00000030;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateX(30px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-@media (max-width: 767px) {
-
-    html,
-    body {
-        overflow: hidden;
-    }
-
-    * {
-        max-width: 100%;
-    }
-
-    .background {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-size: cover;
-        background-position: center;
-        z-index: -1;
-    }
-
-    .container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100dvh;
-        width: auto;
-        padding: 0;
-    }
-
+@media (max-width: 900px) {
     .rightBox {
-        position: static;
-        transform: none;
-        width: 80%;
-        margin: 0 auto;
-        padding: 30px 20px;
-    }
-
-    .rightBox.register {
-        width: 95%;
-    }
-
-    .rightBox h2 {
-        font-size: 28px;
-    }
-
-    .rightBox h3 {
-        font-size: 22px;
-    }
-
-    .rightBox p {
-        font-size: 15px;
-    }
-
-    .loginForm label {
-        font-size: 16px;
-    }
-
-    .loginForm input {
-        font-size: 13px;
-        padding: 10px 12px;
-    }
-
-    .loginButton {
-        font-size: 15px;
-        padding: 10px;
-        margin-top: 30px;
-    }
-
-    .eye {
-        font-size: 1rem;
+        width: 85%;
+        right: 50%;
+        transform: translate(50%, -50%);
     }
 }

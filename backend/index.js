@@ -8,6 +8,7 @@ import employeeRoutes from "./routes/employeeRoutes.js";
 import citizenRoutes from "./routes/citizenRoutes.js";
 import secretaryRoutes from "./routes/secretaryRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
+import locationRoutes from "./routes/locationRoutes.js"
 
 const app = express();
 
@@ -22,6 +23,8 @@ app.use("/employee", employeeRoutes);
 app.use("/api/citizen", citizenRoutes);
 app.use("/secretary", secretaryRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/locations", locationRoutes);
+
 
 app.get("/test", (req, res) => {
     res.send("API WORKS");
