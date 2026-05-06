@@ -2,6 +2,7 @@ import db from "../config/db.js";
 import { sendSuccess, sendError } from "../utils/responses.js";
 import { getPriority } from "../utils/labels.js";
 import { hashPassword, verifyPassword } from "../utils/hash.js";
+import { formatRequestNumber } from "../utils/formats.js";
 
 export const getDashboard = async (req, res) => {
 
@@ -76,14 +77,7 @@ export const getDashboard = async (req, res) => {
                 CONCAT(
                     DATE_FORMAT(t.DateAssigned, '%y'),
                     LPAD(t.Task_ID, 3, '0')
-                ) AS TaskNumber,
-
-                CONCAT(
-                    'REQ-',
-                    DATE_FORMAT(t.DateAssigned, '%y'),
-                    LPAD(rt.RType_ID, 2, '0'),
-                    LPAD(r.Req_ID, 3, '0')
-                ) AS RequestNumber
+                ) AS TaskNumber
 
             FROM TASK t
             JOIN TASK_STATUSES s ON t.TStat_Code = s.TStat_Code
@@ -108,7 +102,12 @@ export const getDashboard = async (req, res) => {
                 status: task.Status,
                 priority: getPriority(task.Priority),
 
-                requestId: task.RequestNumber,
+                requestId: task.Req_id,
+                requestNum: formatRequestNumber({
+                    date: task.DateAssigned,
+                    requestTypeId: task.RType_ID,
+                    requestId: task.Req_ID
+                }),
 
                 dueDate: dueDate.toISOString().split("T")[0]
             };

@@ -7,13 +7,11 @@ function RequestCard({ request, onSelect }) {
     const formatDescription = (desc) => {
         if (!desc) return "";
 
-        if (typeof desc === "string") {
-            return desc;
-        }
+        if (typeof desc === "string") return desc;
 
         if (typeof desc === "object") {
             return Object.entries(desc)
-                .map(([key, value]) => `${key.replaceAll("_", " ")}: ${value}`)
+                .map(([k, v]) => `${k.replaceAll("_", " ")}: ${v}`)
                 .join(" | ");
         }
 
@@ -21,6 +19,10 @@ function RequestCard({ request, onSelect }) {
     };
 
     const descriptionText = formatDescription(request.description);
+
+    const statusKey = request.status
+        ? request.status.toLowerCase().replaceAll(" ", "")
+        : "";
 
     return (
         <Card
@@ -36,13 +38,13 @@ function RequestCard({ request, onSelect }) {
 
                 <p>
                     <strong>Status:</strong>{" "}
-                    <span
-                        className={`${styles.status} ${styles[
-                            request.status?.toLowerCase().replace(" ", "")
-                        ]}`}
-                    >
+                    <span className={`${styles.status} ${styles[statusKey] || ""}`}>
                         {request.status}
                     </span>
+                </p>
+
+                <p>
+                    <strong>Priority:</strong> {request.priority}
                 </p>
 
                 <p>

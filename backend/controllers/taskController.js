@@ -1,6 +1,6 @@
 import db from "../config/db.js";
 import { sendSuccess, sendError } from "../utils/responses.js";
-import { formatDate } from "../utils/formats.js";
+import { formatDate, formatRequestNumber } from "../utils/formats.js";
 
 // returns task details
 export const getTaskDetails = async (req, res) => {
@@ -40,19 +40,13 @@ export const getTaskDetails = async (req, res) => {
                 rs.RStat_Name AS RequestStatus,
                 rt.RType_Name,
                 rt.RType_Duration,
+                rt.RType_ID,
                 rpt.RepType_Name AS ReportTypeName,
 
                 CONCAT(
                     DATE_FORMAT(t.DateAssigned, '%y'),
                     LPAD(t.Task_ID, 3, '0')
                 ) AS TaskNumber,
-
-                CONCAT(
-                    'REQ-',
-                    DATE_FORMAT(t.DateAssigned, '%y'),
-                    LPAD(rt.RType_ID, 2, '0'),
-                    LPAD(r.Req_ID, 3, '0')
-                ) AS RequestNumber,
 
                 CONCAT(c.First_Name, ' ', c.Last_Name) AS CitizenName,
                 c.Email,
@@ -140,7 +134,11 @@ export const getTaskDetails = async (req, res) => {
 
             request: {
                 id: data.Req_ID,
-                requestNumber: data.RequestNumber,
+                requestNumber: formatRequestNumber({
+                    date: data.RequestDate,
+                    requestTypeId: data.RType_ID,
+                    requestId: data.Req_ID
+                }),
                 type: data.RType_Name,
                 description: requestDescription,
                 status: data.RequestStatus,
@@ -279,6 +277,8 @@ export const getTaskHistory = async (req, res) => {
                 ts.TStat_Name AS Status,
 
                 r.Req_ID,
+                r.DateMade,
+                rt.RType_ID,
                 rt.RType_Name AS RequestType,
 
                 CONCAT(
@@ -286,12 +286,6 @@ export const getTaskHistory = async (req, res) => {
                     DATE_FORMAT(t.DateAssigned, '%y'),
                     LPAD(t.Task_ID, 3, '0')
                 ) AS TaskNumber,
-
-                CONCAT(
-                    'REQ-',
-                    DATE_FORMAT(t.DateAssigned, '%y'),
-                    LPAD(r.Req_ID, 3, '0')
-                ) AS RequestNumber,
 
                 CONCAT(c.First_Name, ' ', c.Last_Name) AS CitizenName
 
@@ -315,7 +309,11 @@ export const getTaskHistory = async (req, res) => {
             priority: row.Priority,
 
             requestId: row.Req_ID,
-            requestNumber: row.RequestNumber,
+            requestNumber: formatRequestNumber({
+                date: row.DateMade,
+                requestTypeId: row.RType_ID,
+                requestId: row.Req_ID
+            }),
             requestType: row.RequestType,
 
             citizenName: row.CitizenName,

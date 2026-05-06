@@ -1,35 +1,19 @@
 .container {
   background: #f5f7fb;
   min-height: 100vh;
+  padding: 20px;
 }
 
-.section {
+.title {
   max-width: 1000px;
-  margin: 30px auto;
-  background: white;
-  padding: 25px;
-  border-radius: 20px;
-  box-shadow: var(--shadow);
-}
-
-.card {
-  background: #f9fafb;
-  padding: 18px;
-  border-radius: 16px;
-  margin-bottom: 15px;
-  transition: 0.3s;
-}
-
-.card:hover {
-  transform: translateY(-4px);
-}
-
-.card h3 {
-  font-size: 15px;
+  margin: 30px auto 15px auto;
   color: var(--text-dark);
 }
 
-.card p {
-  margin-top: 6px;
-  color: var(--text-dark-muted);
+.grid {
+  max-width: 1000px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
 }

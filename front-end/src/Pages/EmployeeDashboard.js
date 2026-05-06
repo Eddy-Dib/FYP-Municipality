@@ -119,7 +119,7 @@ function EmployeeDashboard() {
                                 <td>{task.name}</td>
                                 <td><StatusBadge value={task.status} /></td>
                                 <td><PriorityBadge value={task.priority} /></td>
-                                <td>{task.requestId}</td>
+                                <td>{task.requestNum}</td>
                                 <td>{task.dueDate}</td>
                                 <td>
                                     <button
