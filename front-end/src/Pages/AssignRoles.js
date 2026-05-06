@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import styles from "./Admin.module.css";
+import EmployeeRegisterForm from "../Components/Login/EmployeeRegisterForm";
 
 function AssignRoles() {
     const API_URL = process.env.REACT_APP_API_URL;
@@ -10,20 +11,18 @@ function AssignRoles() {
     const [roles, setRoles] = useState([]);
     const [loading, setLoading] = useState(true);
 
+    const [showModal, setShowModal] = useState(false);
+
     const loadData = async () => {
         try {
             setLoading(true);
 
             const [employeesRes, rolesRes] = await Promise.all([
                 axios.get(`${API_URL}/api/admin/employees`, {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
+                    headers: { Authorization: `Bearer ${token}` }
                 }),
                 axios.get(`${API_URL}/api/admin/roles`, {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
+                    headers: { Authorization: `Bearer ${token}` }
                 })
             ]);
 
@@ -55,14 +54,9 @@ function AssignRoles() {
         try {
             await axios.put(
                 `${API_URL}/api/admin/employees/assign-role`,
+                { empId, roleId },
                 {
-                    empId,
-                    roleId
-                },
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
+                    headers: { Authorization: `Bearer ${token}` }
                 }
             );
 
@@ -76,9 +70,21 @@ function AssignRoles() {
 
     return (
         <div className={styles.page}>
+
             <div className={styles.header}>
-                <h1>Assign Roles</h1>
-                <p>Manage employee access and permissions</p>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div>
+                        <h1>Assign Roles</h1>
+                        <p>Manage employee access and permissions</p>
+                    </div>
+
+                    <button
+                        className={styles.blueBtn}
+                        onClick={() => setShowModal(true)}
+                    >
+                        + Add Employee
+                    </button>
+                </div>
             </div>
 
             <div className={styles.section}>
@@ -115,10 +121,7 @@ function AssignRoles() {
                                                 className={styles.select}
                                                 value={emp.Role_ID || ""}
                                                 onChange={(e) =>
-                                                    changeRole(
-                                                        emp.Emp_ID,
-                                                        e.target.value
-                                                    )
+                                                    changeRole(emp.Emp_ID, e.target.value)
                                                 }
                                             >
                                                 {roles.map(role => (
@@ -152,10 +155,16 @@ function AssignRoles() {
                                 </tr>
                             )}
                         </tbody>
-
                     </table>
                 </div>
             </div>
+
+            {showModal && (
+                <EmployeeRegisterForm
+                    onClose={() => setShowModal(false)}
+                    onSuccess={loadData}
+                />
+            )}
         </div>
     );
 }

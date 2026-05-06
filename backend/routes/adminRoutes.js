@@ -8,7 +8,8 @@ import {
     disableUser,
     getRoles,
     getEmployees,
-    assignRole
+    assignRole,
+    createEmployee
 } from "../controllers/adminController.js";
 
 const router = express.Router();
@@ -25,5 +26,6 @@ router.get("/roles", authMiddleware, getRoles);
 
 router.get("/employees", authMiddleware, getEmployees);
 router.put("/employees/assign-role", authMiddleware, assignRole);
+router.post("/employees/create",authMiddleware, createEmployee)
 
 export default router;

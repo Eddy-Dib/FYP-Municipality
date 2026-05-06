@@ -2,11 +2,7 @@ import db from "../config/db.js";
 import { sendSuccess, sendError } from "../utils/responses.js";
 import { hashPassword } from "../utils/hash.js";
 import { saveNotification, sendCitizenStatusEmail } from "../utils/notificationService.js";
-
-const generateUsername = (first, last, id) => {
-    const base = `${first.toLowerCase()}.${last.toLowerCase()}`;
-    return `${base}${id}`;
-};
+import { generateUsername } from "../utils/generateUsername.js";
 
 export const getCitizens = async (req, res) => {
     try {
@@ -91,11 +87,7 @@ export const approveCitizen = async (req, res) => {
             return sendError(res, 400, "Already registered");
         }
 
-        const username = generateUsername(
-            citizen.First_Name,
-            citizen.Last_Name,
-            citizen.C_ID
-        );
+        const username = await generateUsername( citizen.First_Name, citizen.Last_Name);
 
         const rawPassword = "1234";
         const hashedPassword = await hashPassword(rawPassword);
@@ -316,6 +308,47 @@ export const assignRole = async (req, res) => {
         );
 
         return sendSuccess(res, "Role assigned");
+
+    } catch (err) {
+        console.error(err);
+        return sendError(res, 500, "Server error");
+    }
+};
+
+export const createEmployee = async (req, res) => {
+    const { firstName, lastName, birthDate, roleId } = req.body;
+
+    try {
+        if (!firstName || !lastName || !birthDate || !roleId) {
+            return sendError(res, 400, "Missing required fields");
+        }
+
+        const rawPassword = "1234";
+        const hashedPassword = await hashPassword(rawPassword);
+
+        const username = await generateUsername(firstName, lastName);
+
+        const [userResult] = await db.promise().query(
+            `INSERT INTO USERS (Username, Password, RegDate, Active_Flg)
+             VALUES (?, ?, NOW(), 1)`,
+            [username, hashedPassword]
+        );
+
+        const userId = userResult.insertId;
+
+        const [empResult] = await db.promise().query(
+            `INSERT INTO EMPLOYEE (First_Name, Last_Name, BirthDate, Role_ID, U_ID)
+             VALUES (?, ?, ?, ?, ?)`,
+            [firstName, lastName, birthDate, roleId, userId]
+        );
+
+        const empId = empResult.insertId;
+
+        return sendSuccess(res, "Employee created successfully", {
+            empId,
+            username,
+            password: rawPassword
+        });
 
     } catch (err) {
         console.error(err);
