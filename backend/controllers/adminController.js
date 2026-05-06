@@ -16,6 +16,7 @@ export const getCitizens = async (req, res) => {
                 c.First_Name,
                 c.Last_Name,
                 c.Email,
+                c.Rejected,
                 u.U_ID,
                 u.Username,
                 u.Active_Flg
@@ -36,12 +37,15 @@ export const getCitizens = async (req, res) => {
 
                 isRegistered,
                 isActive: c.Active_Flg === 1,
+                rejected: c.Rejected === 1,
 
-                status: !isRegistered
-                    ? "Pending"
-                    : c.Active_Flg === 1
-                        ? "Active"
-                        : "Disabled"
+                status: c.Rejected === 1
+                    ? "Rejected"
+                    : !isRegistered
+                        ? "Pending"
+                        : c.Active_Flg === 1
+                            ? "Active"
+                            : "Disabled"
             };
         });
 
@@ -67,6 +71,21 @@ export const approveCitizen = async (req, res) => {
         }
 
         const citizen = citizenRows[0];
+
+        if (citizen.Rejected === 1) {
+            await db.promise().query(
+                `UPDATE CITIZEN SET Rejected = 0 WHERE C_ID = ?`,
+                [id]
+            );
+
+            await sendCitizenStatusEmail({
+                email: citizen.Email,
+                status: "reactivated",
+                citizenName: citizen.First_Name
+            });
+
+            return sendSuccess(res, "Citizen reactivated");
+        }
 
         if (citizen.U_ID) {
             return sendError(res, 400, "Already registered");
@@ -140,6 +159,15 @@ export const rejectCitizen = async (req, res) => {
         if (citizen.U_ID) {
             return sendError(res, 400, "Already processed");
         }
+
+        if (citizen.Rejected === 1) {
+            return sendError(res, 400, "Already rejected");
+        }
+
+        await db.promise().query(
+            `UPDATE CITIZEN SET Rejected = 1 WHERE C_ID = ?`,
+            [id]
+        );
 
         await sendCitizenStatusEmail({
             email: citizen.Email,

@@ -209,6 +209,7 @@ CREATE TABLE CITIZEN (
     CreatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     U_ID INT UNIQUE,				-- can be a user or not (NULL => not registered)
     Location_ID INT,
+    Rejected TINYINT NOT NULL DEFAULT 0,
     PRIMARY KEY (C_ID),
     FOREIGN KEY (U_ID) REFERENCES USERS(U_ID),
     FOREIGN KEY (Location_ID) REFERENCES LOCATION(Location_ID)

@@ -19,7 +19,17 @@ function AdminUsers() {
                 }
             });
 
-            setCitizens(res.data.data);
+            setCitizens(
+                res.data.data.map((c) => ({
+                    ...c,
+                    status: c.rejected
+                        ? "Rejected"
+                        : c.isRegistered
+                            ? (c.isActive ? "Active" : "Disabled")
+                            : "Pending"
+                }))
+            );
+
         } catch (err) {
             console.error(err);
         }
@@ -180,10 +190,12 @@ function AdminUsers() {
                                         <td>{c.name}</td>
                                         <td>{c.email}</td>
                                         <td>{c.username || "-"}</td>
+
                                         <td>{c.status}</td>
 
                                         <td className={styles.actionCell}>
-                                            {!c.isRegistered && (
+
+                                            {!c.isRegistered && c.status === "Pending" && (
                                                 <div className={styles.actionGroup}>
                                                     <button
                                                         className={styles.greenBtn}
@@ -203,6 +215,20 @@ function AdminUsers() {
                                                         {loadingId === `reject-${c.id}`
                                                             ? "Rejecting..."
                                                             : "Reject"}
+                                                    </button>
+                                                </div>
+                                            )}
+
+                                            {!c.isRegistered && c.status === "Rejected" && (
+                                                <div className={styles.actionGroup}>
+                                                    <button
+                                                        className={styles.warningBtn}
+                                                        onClick={() => approveCitizen(c.id)}
+                                                        disabled={loadingId === `approve-${c.id}`}
+                                                    >
+                                                        {loadingId === `approve-${c.id}`
+                                                            ? "Reactivating..."
+                                                            : "Reactivate"}
                                                     </button>
                                                 </div>
                                             )}
