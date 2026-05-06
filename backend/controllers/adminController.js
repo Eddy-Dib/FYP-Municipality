@@ -272,9 +272,11 @@ export const getEmployees = async (req, res) => {
                 e.U_ID,
                 CONCAT(e.First_Name, ' ', e.Last_Name) AS name,
                 r.Role_ID,
-                r.Role_Type
+                r.Role_Type,
+                u.Active_Flg
             FROM EMPLOYEE e
             LEFT JOIN ROLES r ON e.Role_ID = r.Role_ID
+            LEFT JOIN USERS u ON e.U_ID = u.U_ID
         `);
 
         return sendSuccess(res, "Employees fetched", rows);
@@ -293,6 +295,30 @@ export const assignRole = async (req, res) => {
     }
 
     try {
+        const [empRows] = await db.promise().query(
+            `SELECT U_ID FROM EMPLOYEE WHERE Emp_ID = ?`,
+            [empId]
+        );
+
+        if (empRows.length === 0) {
+            return sendError(res, 404, "Employee not found");
+        }
+
+        const userId = empRows[0].U_ID;
+
+        
+        if(Number(roleId) === -1){
+            await db.promise().query(
+                `UPDATE USERS u
+                 JOIN EMPLOYEE e ON e.U_ID = u.U_ID
+                 SET u.Active_Flg = 0
+                 WHERE e.Emp_ID = ?`,
+                [empId]
+            );
+
+            return sendSuccess(res, "Employee disabled");
+        }
+
         const [role] = await db.promise().query(
             `SELECT Role_ID FROM ROLES WHERE Role_ID = ?`,
             [roleId]
@@ -305,6 +331,11 @@ export const assignRole = async (req, res) => {
         await db.promise().query(
             `UPDATE EMPLOYEE SET Role_ID = ? WHERE Emp_ID = ?`,
             [roleId, empId]
+        );
+
+        await db.promise().query(
+            `UPDATE USERS SET Active_Flg = 1 WHERE U_ID = ?`,
+            [userId]
         );
 
         return sendSuccess(res, "Role assigned");

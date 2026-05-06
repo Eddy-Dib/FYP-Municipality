@@ -26,8 +26,15 @@ function AssignRoles() {
                 })
             ]);
 
+            const realRoles = rolesRes.data.data;
+
+            const disabledRole = {
+                Role_ID: -1,
+                Role_Type: "Disabled"
+            }
+
             setEmployees(employeesRes.data.data);
-            setRoles(rolesRes.data.data);
+            setRoles([...realRoles, disabledRole]);
 
         } catch (err) {
             console.error(err);
@@ -114,12 +121,12 @@ function AssignRoles() {
                                     <tr key={emp.Emp_ID}>
                                         <td>#{emp.Emp_ID}</td>
                                         <td>{emp.name}</td>
-                                        <td>{emp.Role_Type}</td>
+                                        <td>{emp.Active_Flg === 0 ? "Disabled" : emp.Role_Type}</td>
 
                                         <td>
                                             <select
                                                 className={styles.select}
-                                                value={emp.Role_ID || ""}
+                                                value={emp.Active_Flg === 0 ? -1 : emp.Role_ID}
                                                 onChange={(e) =>
                                                     changeRole(emp.Emp_ID, e.target.value)
                                                 }
