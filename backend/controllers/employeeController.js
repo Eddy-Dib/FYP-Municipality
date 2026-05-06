@@ -1,6 +1,7 @@
 import db from "../config/db.js";
 import { sendSuccess, sendError } from "../utils/responses.js";
 import { getPriority } from "../utils/labels.js";
+import { hashPassword, verifyPassword } from "../utils/hash.js";
 
 export const getDashboard = async (req, res) => {
 
@@ -132,5 +133,108 @@ export const getDashboard = async (req, res) => {
             "Failed to load dashboard",
             "DASHBOARD_SERVER_ERROR"
         );
+    }
+};
+
+export const changeEmpPassword = async (req, res) => {
+    const empId = req.user?.empId;
+
+    const { currentPassword, newPassword } = req.body;
+
+    if (!req.user || !req.user.isEmployee) {
+        return sendError(res, 403, "Employees only", "NOT_EMPLOYEE");
+    }
+
+    if (!empId) {
+        return sendError(res, 401, "Invalid session", "INVALID_USER_ID");
+    }
+
+    if (!currentPassword || !newPassword) {
+        return sendError(res, 400, "Missing password fields");
+    }
+
+    try {
+        const [rows] = await db.promise().query(
+            `SELECT u.U_ID, u.Password
+             FROM EMPLOYEE e
+             JOIN USERS u ON e.U_ID = u.U_ID
+             WHERE e.Emp_ID = ?`,
+            [empId]
+        );
+
+        if (rows.length === 0) {
+            return sendError(res, 404, "User not found");
+        }
+
+        const user = rows[0];
+
+        const isValid = await verifyPassword(
+            currentPassword,
+            user.Password
+        );
+
+        if (!isValid) {
+            return sendError(res, 400, "Current password is incorrect");
+        }
+
+        const hashedPassword = await hashPassword(newPassword);
+
+        await db.promise().query(
+            `UPDATE USERS SET Password = ? WHERE U_ID = ?`,
+            [hashedPassword, user.U_ID]
+        );
+
+        return sendSuccess(res, "Password updated successfully");
+
+    } catch(err){
+        console.error("CHANGE PASSWORD ERROR:", err);
+        return sendError(res, 500, "Server error", "CHANGE_PASSWORD_FAILED");
+    }
+};
+
+export const getEmpProfile = async (req, res) => {
+    const empId = req.user?.empId;
+
+    if (!req.user || !req.user.isEmployee) {
+        return sendError(res, 403, "Employees only", "NOT_EMPLOYEE");
+    }
+
+    if (!empId) {
+        return sendError(res, 401, "Invalid session", "INVALID_USER_ID");
+    }
+
+    try {
+        const [rows] = await db.promise().query(
+            `SELECT 
+                e.Emp_ID,
+                e.First_Name,
+                e.Last_Name,
+                r.Role_Type,
+                u.Username,
+                u.Active_Flg
+             FROM EMPLOYEE e
+             JOIN USERS u ON e.U_ID = u.U_ID
+             LEFT JOIN ROLES r ON e.Role_ID = r.Role_ID
+             WHERE e.Emp_ID = ?`,
+            [empId]
+        );
+
+        if (rows.length === 0) {
+            return sendError(res, 404, "Employee not found");
+        }
+
+        const emp = rows[0];
+
+        return sendSuccess(res, "Profile fetched", {
+            Emp_ID: emp.Emp_ID,
+            name: `${emp.First_Name} ${emp.Last_Name}`,
+            Role_Type: emp.Role_Type,
+            Username: emp.Username,
+            isActive: emp.Active_Flg === 1
+        });
+
+    } catch (err) {
+        console.error("PROFILE ERROR:", err);
+        return sendError(res, 500, "Server error", "PROFILE_FAILED");
     }
 };

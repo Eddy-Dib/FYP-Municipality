@@ -1,6 +1,7 @@
 import db from "../config/db.js";
 import { generateToken } from "../utils/jwt.js";
 import { sendSuccess, sendError } from "../utils/responses.js";
+import { verifyPassword } from "../utils/hash.js";
 
 export const login = async (req, res) => {
     let { username, password } = req.body;
@@ -36,7 +37,8 @@ export const login = async (req, res) => {
         }
 
         // TODO: add hashing
-        if (user.Password !== password) {
+        const isPassValid = await verifyPassword(password, user.Password);
+        if (!isPassValid) {
             return sendError(res, 401, "Wrong username or password.", "INVALID_CREDENTIALS");
         }
 
