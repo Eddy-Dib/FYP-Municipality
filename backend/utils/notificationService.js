@@ -15,7 +15,8 @@ export const sendRequestStatusEmail = async ({
     requestNumber,
     reqId,
     title,
-    reason
+    reason,
+    attachments = []
 }) => {
     let subject = "";
     let text = "";
@@ -30,11 +31,17 @@ export const sendRequestStatusEmail = async ({
         text = `Your request (${requestNumber} - ${title}) was rejected.\n\nReason:\n${reason || "Not provided"}`;
     }
 
+    if (status === "completed"){
+        subject = "Official Document Issued";
+        text = `Your request (${requestNumber} - ${title}) has been completed. \n\nFind the official document attached to this email.`
+    }
+
     await transporter.sendMail({
         from: `"Municipality System" <${process.env.EMAIL_USER}>`,
         to: email,
         subject,
-        text
+        text,
+        attachments
     });
 
     await saveNotification({

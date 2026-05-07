@@ -1,5 +1,6 @@
 import express, { json } from "express";
 import cors from "cors";
+import path from "path";
 
 import authRoutes from "./routes/authRoutes.js";
 import requestRoutes from "./routes/requestRoutes.js";
@@ -27,6 +28,7 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/locations", locationRoutes);
 app.use("/api/mayor", mayorRoutes)
 
+app.use("/issued-docs", express.static(path.join(process.env.DOC_ROOT, "municipality")));
 
 app.get("/test", (req, res) => {
     res.send("API WORKS");

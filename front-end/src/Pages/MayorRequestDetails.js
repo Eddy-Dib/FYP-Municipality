@@ -18,6 +18,7 @@ function MayorRequestDetails() {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [approving, setApproving] = useState(false);
     const [rejecting, setRejecting] = useState(false);
     const [showRejectModal, setShowRejectModal] = useState(false);
 
@@ -39,6 +40,48 @@ function MayorRequestDetails() {
 
         fetchRequest();
     }, [API_URL, id]);
+
+    const handleApprove = async () => {
+        try {
+            setApproving(true);
+
+            const res = await axios.post(
+                `${API_URL}/api/mayor/requests/${id}/approve`,
+                {},
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            );
+
+            if (res.data.success) {
+                setData(prev => ({
+                    ...prev,
+                    request: {
+                        ...prev.request,
+                        status: "Completed"
+                    }
+                }));
+
+                //alert("Document issued successfully");
+                const fileURL = res.data.data.fileURL;
+                window.open(fileURL, "_blank")
+                return;
+            }
+
+            setError(res.data.message || "Approval failed");
+
+        } catch (err) {
+            console.error(err);
+            setError(
+                err.response?.data?.message ||
+                "Failed to approve request"
+            );
+        } finally {
+            setApproving(false);
+        }
+    };
 
     const handleReject = async (title, text) => {
         try {
@@ -109,9 +152,10 @@ function MayorRequestDetails() {
             <div className={styles.actions}>
                 <button
                     className={styles.approveBtn}
-                    onClick={() => console.log("approve", data)}
+                    onClick={handleApprove}
+                    disabled={approving}
                 >
-                    Approve & Issue Document
+                    {approving ? "Processing..." : "Approve & Issue Document"}
                 </button>
 
                 <button
