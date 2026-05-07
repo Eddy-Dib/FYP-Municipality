@@ -2,11 +2,7 @@ import db from "../config/db.js";
 import { sendSuccess, sendError } from "../utils/responses.js";
 import { hashPassword } from "../utils/hash.js";
 import { saveNotification, sendCitizenStatusEmail } from "../utils/notificationService.js";
-
-const generateUsername = (first, last, id) => {
-    const base = `${first.toLowerCase()}.${last.toLowerCase()}`;
-    return `${base}${id}`;
-};
+import { generateUsername } from "../utils/generateUsername.js";
 
 export const getCitizens = async (req, res) => {
     try {
@@ -16,6 +12,7 @@ export const getCitizens = async (req, res) => {
                 c.First_Name,
                 c.Last_Name,
                 c.Email,
+                c.Rejected,
                 u.U_ID,
                 u.Username,
                 u.Active_Flg
@@ -36,12 +33,15 @@ export const getCitizens = async (req, res) => {
 
                 isRegistered,
                 isActive: c.Active_Flg === 1,
+                rejected: c.Rejected === 1,
 
-                status: !isRegistered
-                    ? "Pending"
-                    : c.Active_Flg === 1
-                        ? "Active"
-                        : "Disabled"
+                status: c.Rejected === 1
+                    ? "Rejected"
+                    : !isRegistered
+                        ? "Pending"
+                        : c.Active_Flg === 1
+                            ? "Active"
+                            : "Disabled"
             };
         });
 
@@ -68,15 +68,26 @@ export const approveCitizen = async (req, res) => {
 
         const citizen = citizenRows[0];
 
+        if (citizen.Rejected === 1) {
+            await db.promise().query(
+                `UPDATE CITIZEN SET Rejected = 0 WHERE C_ID = ?`,
+                [id]
+            );
+
+            await sendCitizenStatusEmail({
+                email: citizen.Email,
+                status: "reactivated",
+                citizenName: citizen.First_Name
+            });
+
+            return sendSuccess(res, "Citizen reactivated");
+        }
+
         if (citizen.U_ID) {
             return sendError(res, 400, "Already registered");
         }
 
-        const username = generateUsername(
-            citizen.First_Name,
-            citizen.Last_Name,
-            citizen.C_ID
-        );
+        const username = await generateUsername( citizen.First_Name, citizen.Last_Name);
 
         const rawPassword = "1234";
         const hashedPassword = await hashPassword(rawPassword);
@@ -140,6 +151,15 @@ export const rejectCitizen = async (req, res) => {
         if (citizen.U_ID) {
             return sendError(res, 400, "Already processed");
         }
+
+        if (citizen.Rejected === 1) {
+            return sendError(res, 400, "Already rejected");
+        }
+
+        await db.promise().query(
+            `UPDATE CITIZEN SET Rejected = 1 WHERE C_ID = ?`,
+            [id]
+        );
 
         await sendCitizenStatusEmail({
             email: citizen.Email,
@@ -252,9 +272,11 @@ export const getEmployees = async (req, res) => {
                 e.U_ID,
                 CONCAT(e.First_Name, ' ', e.Last_Name) AS name,
                 r.Role_ID,
-                r.Role_Type
+                r.Role_Type,
+                u.Active_Flg
             FROM EMPLOYEE e
             LEFT JOIN ROLES r ON e.Role_ID = r.Role_ID
+            LEFT JOIN USERS u ON e.U_ID = u.U_ID
         `);
 
         return sendSuccess(res, "Employees fetched", rows);
@@ -273,6 +295,30 @@ export const assignRole = async (req, res) => {
     }
 
     try {
+        const [empRows] = await db.promise().query(
+            `SELECT U_ID FROM EMPLOYEE WHERE Emp_ID = ?`,
+            [empId]
+        );
+
+        if (empRows.length === 0) {
+            return sendError(res, 404, "Employee not found");
+        }
+
+        const userId = empRows[0].U_ID;
+
+        
+        if(Number(roleId) === -1){
+            await db.promise().query(
+                `UPDATE USERS u
+                 JOIN EMPLOYEE e ON e.U_ID = u.U_ID
+                 SET u.Active_Flg = 0
+                 WHERE e.Emp_ID = ?`,
+                [empId]
+            );
+
+            return sendSuccess(res, "Employee disabled");
+        }
+
         const [role] = await db.promise().query(
             `SELECT Role_ID FROM ROLES WHERE Role_ID = ?`,
             [roleId]
@@ -287,7 +333,53 @@ export const assignRole = async (req, res) => {
             [roleId, empId]
         );
 
+        await db.promise().query(
+            `UPDATE USERS SET Active_Flg = 1 WHERE U_ID = ?`,
+            [userId]
+        );
+
         return sendSuccess(res, "Role assigned");
+
+    } catch (err) {
+        console.error(err);
+        return sendError(res, 500, "Server error");
+    }
+};
+
+export const createEmployee = async (req, res) => {
+    const { firstName, lastName, birthDate, roleId } = req.body;
+
+    try {
+        if (!firstName || !lastName || !birthDate || !roleId) {
+            return sendError(res, 400, "Missing required fields");
+        }
+
+        const rawPassword = "1234";
+        const hashedPassword = await hashPassword(rawPassword);
+
+        const username = await generateUsername(firstName, lastName);
+
+        const [userResult] = await db.promise().query(
+            `INSERT INTO USERS (Username, Password, RegDate, Active_Flg)
+             VALUES (?, ?, NOW(), 1)`,
+            [username, hashedPassword]
+        );
+
+        const userId = userResult.insertId;
+
+        const [empResult] = await db.promise().query(
+            `INSERT INTO EMPLOYEE (First_Name, Last_Name, BirthDate, Role_ID, U_ID)
+             VALUES (?, ?, ?, ?, ?)`,
+            [firstName, lastName, birthDate, roleId, userId]
+        );
+
+        const empId = empResult.insertId;
+
+        return sendSuccess(res, "Employee created successfully", {
+            empId,
+            username,
+            password: rawPassword
+        });
 
     } catch (err) {
         console.error(err);

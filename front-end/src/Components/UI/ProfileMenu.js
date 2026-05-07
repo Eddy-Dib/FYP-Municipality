@@ -12,11 +12,15 @@ function ProfileMenu({ open }) {
         navigate("/");
     };
 
+    const goToProfile = () => {
+        navigate("/employee/profile");
+    };
+
     if (!open) return null;
 
     return (
         <div className={styles.dropdown} ref={menuRef}>
-            <button className={styles.item}>
+            <button className={styles.item} onClick={goToProfile}>
                 Profile
             </button>
 

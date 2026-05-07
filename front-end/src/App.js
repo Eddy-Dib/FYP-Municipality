@@ -12,6 +12,7 @@ import Tasks from "./Pages/Tasks";
 import TaskDetails from "./Components/Tasks/TaskDetails";
 import ReportEditor from "./Components/Tasks/ReportEditor";
 import Reports from "./Pages/Reports";
+import EmployeeProfile from "./Pages/EmployeeProfile"
 
 // Citizen
 import CitizenLayout from "./Pages/CitizenLayout";
@@ -61,6 +62,7 @@ function App() {
           <Route path="tasks/:id/report" element={<ReportEditor />} />
           <Route path="history" element={<Reports />} />
           <Route path="reports" element={<Reports />} />
+          <Route path="profile" element={<EmployeeProfile/>}/>
 
           {/* ADMIN ROUTES */}
           <Route
