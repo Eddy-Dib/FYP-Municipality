@@ -1,112 +1,73 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import styles from "./MayorDashboard.module.css";
 
-const API = process.env.REACT_APP_API_URL;
+import RequestCard from "../Components/Card/RequestCard";
+import styles from "./MayorRequests.module.css";
 
-export default function MayorRequests() {
+function MayorRequests() {
+    const API_URL = process.env.REACT_APP_API_URL;
+    const navigate = useNavigate();
+
     const [requests, setRequests] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-    /* =========================
-       FETCH REQUESTS (FIXED WITH TOKEN)
-    ========================= */
-   const fetchRequests = () => {
-    const user = JSON.parse(localStorage.getItem("user"));
+    useEffect(() => {
+        const fetchRequests = async () => {
+            try {
+                const token = localStorage.getItem("token");
 
-    console.log("USER FROM STORAGE:", user);
+                const res = await axios.get(
+                    `${API_URL}/api/mayor/requests`,
+                    { headers: { Authorization: `Bearer ${token}` } }
+                );
 
-    axios.get(`${API}/api/requests`, {
-        headers: {
-            Authorization: `Bearer ${user?.token}`
-        }
-    })
-    .then(res => {
-        console.log("REQUESTS RESPONSE:", res.data);
-        setRequests(res.data.data || []);
-    })
-    .catch(err => console.log("ERROR:", err.response?.data || err));
-};
+                setRequests(res.data.data || []);
+            } catch (err) {
+                setError(err?.response?.data?.message || "Failed to load requests");
+            } finally {
+                setLoading(false);
+            }
+        };
 
-    /* =========================
-       HANDLE ACTION
-    ========================= */
-    const handleAction = async (id, action) => {
-        try {
-            const user = JSON.parse(localStorage.getItem("user"));
+        fetchRequests();
+    }, [API_URL]);
 
-            await axios.patch(
-                `${API}/api/requests/${id}/status`,
-                { action },
-                {
-                    headers: {
-                        Authorization: `Bearer ${user?.token}`
-                    }
-                }
-            );
-
-            fetchRequests();
-
-        } catch (err) {
-            console.log(err);
-        }
+    const handleSelect = (request) => {
+        navigate(`/employee/mayor/requests/${request.Req_ID}`);
     };
 
-    /* =========================
-       UI
-    ========================= */
+    if (loading) return <h2>Loading...</h2>;
+    if (error) return <h2>{error}</h2>;
+
     return (
         <div className={styles.container}>
-            <div className={styles.section}>
-                <h2>Requests</h2>
+            <h2 className={styles.title}>Requests</h2>
 
+            <div className={styles.grid}>
                 {requests.length === 0 ? (
                     <p>No requests available</p>
                 ) : (
-                    requests.map((r) => (
-                        <div key={r.Req_ID} className={styles.card}>
-
-                            <h3>
-                                {typeof r.Description === "string"
-                                    ? r.Description
-                                    : JSON.stringify(r.Description)}
-                            </h3>
-
-                            <p><strong>Status:</strong> {r.RStat_Code}</p>
-
-                            <div style={{ marginTop: "10px" }}>
-
-                                <button
-                                    onClick={() => handleAction(r.Req_ID, "approve")}
-                                    style={{
-                                        marginRight: "10px",
-                                        padding: "6px 12px",
-                                        backgroundColor: "green",
-                                        color: "white",
-                                        border: "none",
-                                        cursor: "pointer"
-                                    }}
-                                >
-                                    Accept
-                                </button>
-
-                                <button
-                                    onClick={() => handleAction(r.Req_ID, "reject")}
-                                    style={{
-                                        padding: "6px 12px",
-                                        backgroundColor: "red",
-                                        color: "white",
-                                        border: "none",
-                                        cursor: "pointer"
-                                    }}
-                                >
-                                    Reject
-                                </button>
-
-                            </div>
-                        </div>
+                    requests.map(req => (
+                        <RequestCard
+                            key={req.Req_ID}
+                            request={{
+                                requestNumber: req.RequestNumber,
+                                type: req.RType_Name,
+                                status: req.RStat_Name,
+                                priority: req.Priority,
+                                dueDate: req.TaskCompletedAt || req.DateMade,
+                                description: req.Description,
+                                report: req.report
+                            }}
+                            onSelect={() => handleSelect(req)}
+                        />
                     ))
                 )}
             </div>
         </div>
     );
 }
+
+export default MayorRequests;

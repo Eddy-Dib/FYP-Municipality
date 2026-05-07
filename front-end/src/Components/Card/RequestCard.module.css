@@ -22,7 +22,7 @@
 
 .description {
     margin-top: 6px;
-    color: var(--text-muted);
+    color: var(--text-dark-muted);
     font-size: 13px;
 }
 
@@ -32,7 +32,6 @@
     margin-left: 15px;
 }
 
-/* STATUS STYLES */
 .status {
     padding: 2px 8px;
     border-radius: 8px;
@@ -40,7 +39,6 @@
     font-weight: 500;
 }
 
-/* different statuses */
 .submitted {
     background: #dbeafe;
     color: #1d4ed8;

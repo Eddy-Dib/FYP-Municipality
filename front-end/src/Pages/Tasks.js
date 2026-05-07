@@ -36,6 +36,7 @@ function Tasks() {
                     priority: task.priority,
                     title: task.name,
                     requestId: task.requestId,
+                    requestNum: task.requestNum,
                     dueDate: task.dueDate,
                     status: task.status
                 }));
@@ -103,7 +104,7 @@ function Tasks() {
                         number={task.number}
                         priority={task.priority}
                         title={task.title}
-                        requestId={task.requestId}
+                        requestId={task.requestNum}
                         dueDate={task.dueDate}
                         status={task.status}
                         onClick={() =>

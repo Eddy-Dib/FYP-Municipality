@@ -83,19 +83,9 @@ function TaskDetails() {
                     </>
                 );
 
-            case "Mayor":
-                return (
-                    <>
-                        <button>Approve</button>
-                        <button>Reject</button>
-                    </>
-                );
-
             case "Lawyer":
                 return (
                     <>
-                        <button>Flag Case</button>
-                        <button>Write Report</button>
                     </>
                 );
 

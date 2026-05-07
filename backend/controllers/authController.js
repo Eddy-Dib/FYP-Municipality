@@ -36,7 +36,6 @@ export const login = async (req, res) => {
             return sendError(res, 403, "Access denied. Please contact an administrator or use a different account.", "ACCESS_DENIED");
         }
 
-        // TODO: add hashing
         const isPassValid = await verifyPassword(password, user.Password);
         if (!isPassValid) {
             return sendError(res, 401, "Wrong username or password.", "INVALID_CREDENTIALS");
