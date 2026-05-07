@@ -16,8 +16,8 @@ const requireSecretary = (req, res) => {
         return false;
     }
 
-    if (req.user.role !== "Secretary") {
-        sendError(res, 403, "Access denied: secretary only", "NOT_SECRETARY");
+    if (req.user.role !== "Secretary" && req.user.role !== "Mayor") {
+        sendError(res, 403, "Access denied: secretary and mayor only", "NOT_SECRETARY");
         return false;
     }
 
@@ -339,7 +339,7 @@ export const rejectRequest = async (req, res) => {
             `
             UPDATE REQUEST 
             SET FlagRejected = 1,
-                RStat_Code = 3
+                RStat_Code = 6
             WHERE Req_ID = ?
             `,
             [id]

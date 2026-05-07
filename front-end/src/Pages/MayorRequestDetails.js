@@ -5,6 +5,7 @@ import { FaArrowLeft } from "react-icons/fa";
 
 import RequestDetailsCard from "../Components/Card/RequestDetailsCard";
 import ReportDetailsCard from "../Components/Card/ReportDetailsCard";
+import RejectionReason from "../Components/Form/RejectionReason";
 
 import styles from "./MayorRequestDetails.module.css";
 
@@ -17,6 +18,8 @@ function MayorRequestDetails() {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [rejecting, setRejecting] = useState(false);
+    const [showRejectModal, setShowRejectModal] = useState(false);
 
     useEffect(() => {
         const fetchRequest = async () => {
@@ -36,6 +39,52 @@ function MayorRequestDetails() {
 
         fetchRequest();
     }, [API_URL, id]);
+
+    const handleReject = async (title, text) => {
+        try {
+            setRejecting(true);
+
+            const res = await axios.post(`${API_URL}/secretary/requests/${id}/reject`,
+                {
+                    rejTitle: title,
+                    rejText: text
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            );
+
+            if (res.data.success) {
+                setData(prev => ({
+                    ...prev,
+                    request: {
+                        ...prev.request,
+                        status: "Rejected"
+                    }
+                }));
+
+                return true;
+            }
+
+            setError(res.data.message);
+            return false;
+
+        } catch (err) {
+            console.error(err);
+
+            setError(
+                err.response?.data?.message ||
+                "Failed to reject request"
+            );
+
+            return false;
+
+        } finally {
+            setRejecting(false);
+        }
+    };
 
     if (loading) return <h2>Loading...</h2>;
     if (error) return <h2>{error}</h2>;
@@ -67,11 +116,25 @@ function MayorRequestDetails() {
 
                 <button
                     className={styles.rejectBtn}
-                    onClick={() => console.log("reject", data)}
+                    onClick={() => setShowRejectModal(true)}
                 >
-                    Reject Request
+                    {rejecting ? "Rejecting..." : "Reject Request"}
                 </button>
             </div>
+
+            {showRejectModal && (
+                <RejectionReason
+                    loading={rejecting}
+                    onCancel={() => setShowRejectModal(false)}
+                    onSubmit={async ({ title, text }) => {
+                        const success = await handleReject(title, text);
+
+                        if (success) {
+                            setShowRejectModal(false);
+                        }
+                    }}
+                />
+            )}
         </div>
     );
 }
