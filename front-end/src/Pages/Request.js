@@ -507,7 +507,7 @@ function Request() {
                         </div>
 
                         <div className={styles.formGroup}>
-                            <label>Upload Documents (max 3)</label>
+                            <label>Upload Documents </label>
                             <input type="file" multiple accept="image/*" onChange={handleChange} />
                         </div>
 

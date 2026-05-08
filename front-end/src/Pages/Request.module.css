@@ -26,6 +26,20 @@
     padding: 48px;
     border-radius: 20px;
     box-shadow: var(--shadow);
+
+    animation: slideUpFade 0.5s ease-out;
+}
+
+@keyframes slideUpFade {
+    from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
 
 .sectionTitle {
@@ -98,7 +112,16 @@
     width: 100px;
     height: 100px;
     object-fit: cover;
+
     border-radius: 8px;
+    border: 1px solid var(--border-color);
+
+    transition: all 0.2s ease;
+}
+
+.imageWrapper:hover .preview {
+    transform: scale(1.05);
+    border-color: var(--primary);
 }
 
 .imageWrapper {
@@ -307,6 +330,7 @@
     display: flex;
     flex-direction: column;
 }
+
 .voucherBox ul,
 .voucher ul {
     list-style: none;

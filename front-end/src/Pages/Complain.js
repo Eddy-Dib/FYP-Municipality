@@ -69,7 +69,7 @@ function Complain() {
             return;
         }
 
-        
+
         if (name === "streetId") {
             setData(prev => ({
                 ...prev,
@@ -83,7 +83,7 @@ function Complain() {
             return;
         }
 
-        
+
         if (name === "buildingId") {
             setData(prev => ({
                 ...prev,
@@ -95,7 +95,7 @@ function Complain() {
             return;
         }
 
-        
+
         setData(prev => ({
             ...prev,
             [name]: value
@@ -345,17 +345,27 @@ ${data.description}
                 </div>
 
                 <div className={styles.formGroup}>
-                    <label>Upload Photos (max 3)</label>
+                    <label>Upload Photos </label>
                     <input type="file" multiple accept="image/*" onChange={handleChange} />
                 </div>
 
-                <div className={styles.previewContainer}>
-                    {previews.map((src, i) => (
-                        <div key={i} className={styles.imageWrapper}>
-                            <img src={src} alt="preview" />
-                            <button onClick={() => removeImage(i)}>×</button>
-                        </div>
-                    ))}
+                {/* NEW WRAPPER (IMPORTANT FIX) */}
+                <div className={styles.uploadPreviewWrapper}>
+                    <div className={styles.previewContainer}>
+                        {previews.map((src, i) => (
+                            <div key={i} className={styles.imageWrapper}>
+                                <img src={src} alt="preview" />
+
+                                <button
+                                    type="button"
+                                    className={styles.removeBtn}
+                                    onClick={() => removeImage(i)}
+                                >
+                                    ×
+                                </button>
+                            </div>
+                        ))}
+                    </div>
                 </div>
 
                 <div className={styles.reference}>
