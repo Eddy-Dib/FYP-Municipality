@@ -63,7 +63,7 @@ function Request() {
             try {
 
                 const res = await axios.get(
-                    `${API_URL}/api/address/cities`
+                    `${API_URL}/api/locations/cities`
                 );
 
                 if (res.data.success) {
@@ -80,78 +80,63 @@ function Request() {
     }, []);
 
     useEffect(() => {
-
         const fetchStreets = async () => {
-
             if (!data.cityId) return;
 
             try {
-
                 const res = await axios.get(
-                    `${API_URL}/api/address/streets/${data.cityId}`
+                    `${API_URL}/api/locations/streets?cityId=${data.cityId}`
                 );
 
                 if (res.data.success) {
                     setStreets(res.data.data);
                 }
-
             } catch (err) {
                 console.log(err);
             }
         };
 
         fetchStreets();
-
     }, [data.cityId]);
 
     useEffect(() => {
-
         const fetchBuildings = async () => {
-
             if (!data.streetId) return;
 
             try {
-
                 const res = await axios.get(
-                    `${API_URL}/api/address/buildings/${data.streetId}`
+                    `${API_URL}/api/locations/buildings?streetId=${data.streetId}`
                 );
 
                 if (res.data.success) {
                     setBuildings(res.data.data);
                 }
-
             } catch (err) {
                 console.log(err);
             }
         };
 
         fetchBuildings();
-
     }, [data.streetId]);
 
     useEffect(() => {
-
         const fetchLocations = async () => {
-
             if (!data.buildingId) return;
 
             try {
-
                 const res = await axios.get(
-                    `${API_URL}/api/address/locations/${data.buildingId}`
+                    `${API_URL}/api/locations/locations?buildingId=${data.buildingId}`
                 );
 
                 if (res.data.success) {
                     setLocations(res.data.data);
                 }
-
             } catch (err) {
                 console.log(err);
             }
         };
 
         fetchLocations();
-
     }, [data.buildingId]);
 
 
@@ -159,6 +144,9 @@ function Request() {
     const handleChange = (e, index = null) => {
         const { name, value, files } = e.target;
 
+        setError("");
+
+        // ================= FILES =================
         if (files) {
             const newFiles = Array.from(files);
 
@@ -171,16 +159,25 @@ function Request() {
                 const newPreviews = newFiles.map(file => URL.createObjectURL(file));
                 return [...prev, ...newPreviews].slice(0, 3);
             });
+
+            return;
         }
 
-        else if (name === "phones") {
+        // ================= PHONES =================
+        if (name === "phones") {
             const updated = [...data.phones];
             updated[index] = value;
-            setData(prev => ({ ...prev, phones: updated }));
+
+            setData(prev => ({
+                ...prev,
+                phones: updated
+            }));
+
+            return;
         }
 
+        // ================= CITY CHANGE =================
         if (name === "cityId") {
-
             setData(prev => ({
                 ...prev,
                 cityId: value,
@@ -192,10 +189,12 @@ function Request() {
             setStreets([]);
             setBuildings([]);
             setLocations([]);
+
+            return;
         }
 
-        else if (name === "streetId") {
-
+        // ================= STREET CHANGE =================
+        if (name === "streetId") {
             setData(prev => ({
                 ...prev,
                 streetId: value,
@@ -205,10 +204,12 @@ function Request() {
 
             setBuildings([]);
             setLocations([]);
+
+            return;
         }
 
-        else if (name === "buildingId") {
-
+        // ================= BUILDING CHANGE =================
+        if (name === "buildingId") {
             setData(prev => ({
                 ...prev,
                 buildingId: value,
@@ -216,16 +217,16 @@ function Request() {
             }));
 
             setLocations([]);
+
+            return;
         }
 
-        else {
-
-            setData(prev => ({ ...prev, [name]: value }));
-        }
-
-        setError("");
+        // ================= DEFAULT =================
+        setData(prev => ({
+            ...prev,
+            [name]: value
+        }));
     };
-
     const removeImage = (index) => {
         setData(prev => ({
             ...prev,
@@ -280,14 +281,9 @@ function Request() {
 
                     setData(prev => ({
                         ...prev,
-
-                        fullName: p.FullName ?? "",
-
-                        email: p.Email ?? "",
-
-                        phones: p.Phone_Num
-                            ? [p.Phone_Num, ""]
-                            : ["", ""]
+                        fullName: p.FullName || prev.fullName,
+                        email: p.Email || prev.email,
+                        phones: p.Phone_Num ? [p.Phone_Num, ""] : prev.phones
                     }));
                 }
             } catch (err) {
@@ -409,7 +405,7 @@ function Request() {
 
                             <select
                                 name="cityId"
-                                value={data.cityId}
+                                value={data.cityId || ""}
                                 onChange={handleChange}
                             >
                                 <option value="">Select city</option>
@@ -430,9 +426,8 @@ function Request() {
 
                             <select
                                 name="streetId"
-                                value={data.streetId}
+                                value={data.streetId || ""}
                                 onChange={handleChange}
-                                disabled={!data.cityId}
                             >
                                 <option value="">Select street</option>
 
@@ -452,9 +447,8 @@ function Request() {
 
                             <select
                                 name="buildingId"
-                                value={data.buildingId}
+                                 value={data.buildingId || ""}
                                 onChange={handleChange}
-                                disabled={!data.streetId}
                             >
                                 <option value="">Select building</option>
 
@@ -474,9 +468,8 @@ function Request() {
 
                             <select
                                 name="locationId"
-                                value={data.locationId}
+                                value={data.locationId || ""}
                                 onChange={handleChange}
-                                disabled={!data.buildingId}
                             >
                                 <option value="">Select location</option>
 

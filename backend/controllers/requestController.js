@@ -1,6 +1,10 @@
 import db from "../config/db.js";
 import { sendSuccess, sendError } from "../utils/responses.js";
 
+
+// ===============================
+// CREATE REQUEST
+// ===============================
 export const createRequest = async (req, res) => {
     try {
         const citizenId = req.user?.id;
@@ -15,27 +19,32 @@ export const createRequest = async (req, res) => {
             fullName,
             phones,
             email,
-            address,
+            cityId,
+            streetId,
+            buildingId,
+            locationId,
             description,
             urgency
         } = req.body;
 
-        if (!title || !type || !fullName || !phones?.[0] || !email || !address) {
+        // validation
+        if (
+            !title ||
+            !type ||
+            !fullName ||
+            !phones?.[0] ||
+            !email ||
+            !cityId ||
+            !streetId ||
+            !buildingId ||
+            !locationId
+        ) {
             return sendError(res, 400, "Missing required fields", "MISSING_FIELDS");
         }
 
         const rTypeId = Number(type);
 
         if (isNaN(rTypeId)) {
-            return sendError(res, 400, "Invalid request type format", "INVALID_TYPE_FORMAT");
-        }
-
-        const [typeRows] = await db.promise().query(
-            `SELECT RType_ID FROM REQUEST_TYPES WHERE RType_ID = ?`,
-            [rTypeId]
-        );
-
-        if (!typeRows.length) {
             return sendError(res, 400, "Invalid request type", "INVALID_TYPE");
         }
 
@@ -51,14 +60,17 @@ export const createRequest = async (req, res) => {
             fullName,
             phones,
             email,
-            address,
+            cityId,
+            streetId,
+            buildingId,
+            locationId,
             description
         });
 
         const [result] = await db.promise().query(
             `INSERT INTO REQUEST 
-            (DateMade, Description, Priority, RType_ID, RStat_Code, C_ID)
-            VALUES (NOW(), ?, ?, ?, 1, ?)`,
+    (DateMade, Description, Priority, RType_ID, RStat_Code, C_ID)
+    VALUES (NOW(), ?, ?, ?, 1, ?)`,
             [
                 jsonData,
                 priorityMap[urgency] || 1,
@@ -76,6 +88,7 @@ export const createRequest = async (req, res) => {
         return sendError(res, 500, "Server error", err.message);
     }
 };
+
 
 export const getRequests = async (req, res) => {
     try {
@@ -96,8 +109,11 @@ export const getRequests = async (req, res) => {
                 ) AS RequestNumber
 
             FROM REQUEST r
-            JOIN REQ_STATUSES rs ON r.RStat_Code = rs.RStat_Code
-            JOIN REQUEST_TYPES rt ON r.RType_ID = rt.RType_ID
+            JOIN REQ_STATUSES rs 
+                ON r.RStat_Code = rs.RStat_Code
+            JOIN REQUEST_TYPES rt 
+                ON r.RType_ID = rt.RType_ID
+
             ORDER BY r.DateMade DESC`
         );
 
@@ -109,6 +125,10 @@ export const getRequests = async (req, res) => {
     }
 };
 
+
+// ===============================
+// UPDATE REQUEST STATUS
+// ===============================
 export const updateRequestStatus = (req, res) => {
     const { id } = req.params;
     const { action } = req.body;
@@ -123,21 +143,25 @@ export const updateRequestStatus = (req, res) => {
         return sendError(res, 400, "Invalid action", "INVALID_ACTION");
     }
 
-    const query = `
-        UPDATE REQUEST
-        SET RStat_Code = ?, DateCompleted = NOW()
-        WHERE Req_ID = ?
-    `;
+    db.query(
+        `UPDATE REQUEST
+         SET RStat_Code = ?, DateCompleted = NOW()
+         WHERE Req_ID = ?`,
+        [newStatus, id],
+        (err, result) => {
+            if (err) {
+                return sendError(res, 500, "Database error", err.message);
+            }
 
-    db.query(query, [newStatus, id], (err, result) => {
-        if (err) {
-            return sendError(res, 500, "Database error", err.message);
+            return sendSuccess(res, "Status updated", result);
         }
-
-        return sendSuccess(res, "Status updated", result);
-    });
+    );
 };
 
+
+// ===============================
+// GET REQUEST TYPES
+// ===============================
 export const getRequestTypes = async (req, res) => {
     try {
         const [results] = await db.promise().query(
@@ -146,19 +170,10 @@ export const getRequestTypes = async (req, res) => {
              ORDER BY RType_ID`
         );
 
-        return sendSuccess(
-            res,
-            "Request types fetched successfully",
-            results
-        );
+        return sendSuccess(res, "Request types fetched successfully", results);
 
     } catch (err) {
         console.error("GET TYPES ERROR:", err);
-        return sendError(
-            res,
-            500,
-            "Failed to fetch request types",
-            err.message
-        );
+        return sendError(res, 500, "Failed to fetch request types", err.message);
     }
 };
