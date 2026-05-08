@@ -40,13 +40,14 @@
     display: flex;
     align-items: center;
 }
+
 .progressBar {
     display: none;
 }
 
 .phoneRow {
     display: flex;
-    gap: 15px; 
+    gap: 15px;
 }
 
 .phoneRow .formGroup {
@@ -94,7 +95,7 @@
 }
 
 .preview {
-    width: 100px; 
+    width: 100px;
     height: 100px;
     object-fit: cover;
     border-radius: 8px;
@@ -110,7 +111,7 @@
     border: 1px dashed var(--border-color);
     padding: 25px;
     border-radius: 12px;
-    text-align: left; 
+    text-align: left;
     margin-bottom: 20px;
 }
 
@@ -125,7 +126,7 @@
 }
 
 .voucherImages img {
-    width: 100px; 
+    width: 100px;
     border-radius: 8px;
 }
 
@@ -164,8 +165,9 @@
 .printNote {
     margin-top: 15px;
     font-size: 0.9rem;
-    color: var(--text-muted);
-    text-align: center; 
+    color: #4b5563;
+    /*color: var(--text-muted);*/
+    text-align: center;
     line-height: 1.5;
 }
 
@@ -173,7 +175,7 @@
     display: flex;
     justify-content: center;
     gap: 16px;
-    margin-top: 30px; 
+    margin-top: 30px;
 }
 
 .navButtons button {
@@ -206,7 +208,9 @@
     font-weight: 600;
 }
 
-.formGroup input, .formGroup select, .formGroup textarea {
+.formGroup input,
+.formGroup select,
+.formGroup textarea {
     padding: 12px 16px;
     border-radius: 10px;
     border: 1px solid var(--border-color);
@@ -229,6 +233,89 @@
     align-items: center;
     justify-content: center;
 }
+
 .hiddenVoucher {
     display: none;
+}
+
+.formGroup input:focus,
+.formGroup select:focus,
+.formGroup textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    transition: 0.2s;
+}
+
+.submitBtn,
+.printBtn,
+.navButtons button {
+    transition: 0.2s ease;
+}
+
+.submitBtn:hover,
+.navButtons button:last-child:hover {
+    filter: brightness(95%);
+}
+
+.printBtn:hover,
+.navButtons button:first-child:hover {
+    background: #bbc6d1;
+}
+
+.formCard {
+    animation: fadeUp 0.4s ease;
+}
+
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.formGroup textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+.formGroup select {
+    background: white;
+    cursor: pointer;
+}
+
+@media (max-width: 768px) {
+
+    .formCard {
+        padding: 28px;
+    }
+
+    .topSection {
+        padding: 90px 20px 150px;
+    }
+
+    .topSection h1 {
+        font-size: 2rem;
+    }
+}
+
+.voucher {
+    display: flex;
+    flex-direction: column;
+}
+.voucherBox ul,
+.voucher ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+
+.voucherBox li,
+.voucher li {
+    margin: 4px 0;
 }

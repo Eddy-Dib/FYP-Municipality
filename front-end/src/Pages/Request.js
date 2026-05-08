@@ -447,7 +447,7 @@ function Request() {
 
                             <select
                                 name="buildingId"
-                                 value={data.buildingId || ""}
+                                value={data.buildingId || ""}
                                 onChange={handleChange}
                             >
                                 <option value="">Select building</option>
@@ -635,21 +635,35 @@ function Request() {
             </div>
 
             <div className={styles.navButtons}>
-                {step === 2 && <button onClick={() => setStep(1)}>Back</button>}
-                <button
-                    onClick={() => {
-                        const err = validateStep1();
 
-                        if (err) {
-                            setError(err);
-                            return;
-                        }
+                {step === 2 && (
+                    <button
+                        type="button"
+                        onClick={() => setStep(1)}
+                    >
+                        Back
+                    </button>
+                )}
 
-                        setError("");
-                        setStep(2);
-                    }}>
-                    Next
-                </button>
+                {step === 1 && (
+                    <button
+                        type="button"
+                        onClick={() => {
+                            const err = validateStep1();
+
+                            if (err) {
+                                setError(err);
+                                return;
+                            }
+
+                            setError("");
+                            setStep(2);
+                        }}
+                    >
+                        Next
+                    </button>
+                )}
+
             </div>
 
         </div>
