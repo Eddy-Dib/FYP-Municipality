@@ -8,6 +8,10 @@ function Request() {
 
     const [step, setStep] = useState(1);
     const [requestTypes, setRequestTypes] = useState([]);
+    const [cities, setCities] = useState([]);
+    const [streets, setStreets] = useState([]);
+    const [buildings, setBuildings] = useState([]);
+    const [locations, setLocations] = useState([]);
     const [profile, setProfile] = useState(null);
     const [error, setError] = useState("");
 
@@ -17,7 +21,10 @@ function Request() {
         if (!data.phones[0]) return "Primary phone number is required";
         if (!data.email) return "Email is required";
         if (!data.type) return "Request type is required";
-        if (!data.address) return "Address is required";
+        if (!data.cityId) return "City is required";
+        if (!data.streetId) return "Street is required";
+        if (!data.buildingId) return "Building is required";
+        if (!data.locationId) return "Location is required";
 
         return "";
     };
@@ -28,7 +35,10 @@ function Request() {
         fullName: "",
         phones: ["", ""],
         email: "",
-        address: "",
+        cityId: "",
+        streetId: "",
+        buildingId: "",
+        locationId: "",
         description: "",
         urgency: "",
         files: []
@@ -49,8 +59,102 @@ function Request() {
             }
         };
 
+        const fetchCities = async () => {
+            try {
+
+                const res = await axios.get(
+                    `${API_URL}/api/address/cities`
+                );
+
+                if (res.data.success) {
+                    setCities(res.data.data);
+                }
+
+            } catch (err) {
+                console.log(err);
+            }
+        };
+
         fetchTypes();
+        fetchCities();
     }, []);
+
+    useEffect(() => {
+
+        const fetchStreets = async () => {
+
+            if (!data.cityId) return;
+
+            try {
+
+                const res = await axios.get(
+                    `${API_URL}/api/address/streets/${data.cityId}`
+                );
+
+                if (res.data.success) {
+                    setStreets(res.data.data);
+                }
+
+            } catch (err) {
+                console.log(err);
+            }
+        };
+
+        fetchStreets();
+
+    }, [data.cityId]);
+
+    useEffect(() => {
+
+        const fetchBuildings = async () => {
+
+            if (!data.streetId) return;
+
+            try {
+
+                const res = await axios.get(
+                    `${API_URL}/api/address/buildings/${data.streetId}`
+                );
+
+                if (res.data.success) {
+                    setBuildings(res.data.data);
+                }
+
+            } catch (err) {
+                console.log(err);
+            }
+        };
+
+        fetchBuildings();
+
+    }, [data.streetId]);
+
+    useEffect(() => {
+
+        const fetchLocations = async () => {
+
+            if (!data.buildingId) return;
+
+            try {
+
+                const res = await axios.get(
+                    `${API_URL}/api/address/locations/${data.buildingId}`
+                );
+
+                if (res.data.success) {
+                    setLocations(res.data.data);
+                }
+
+            } catch (err) {
+                console.log(err);
+            }
+        };
+
+        fetchLocations();
+
+    }, [data.buildingId]);
+
+
 
     const handleChange = (e, index = null) => {
         const { name, value, files } = e.target;
@@ -75,10 +179,51 @@ function Request() {
             setData(prev => ({ ...prev, phones: updated }));
         }
 
-        else {
-            setData(prev => ({ ...prev, [name]: value }));
-            setError("");
+        if (name === "cityId") {
+
+            setData(prev => ({
+                ...prev,
+                cityId: value,
+                streetId: "",
+                buildingId: "",
+                locationId: ""
+            }));
+
+            setStreets([]);
+            setBuildings([]);
+            setLocations([]);
         }
+
+        else if (name === "streetId") {
+
+            setData(prev => ({
+                ...prev,
+                streetId: value,
+                buildingId: "",
+                locationId: ""
+            }));
+
+            setBuildings([]);
+            setLocations([]);
+        }
+
+        else if (name === "buildingId") {
+
+            setData(prev => ({
+                ...prev,
+                buildingId: value,
+                locationId: ""
+            }));
+
+            setLocations([]);
+        }
+
+        else {
+
+            setData(prev => ({ ...prev, [name]: value }));
+        }
+
+        setError("");
     };
 
     const removeImage = (index) => {
@@ -140,8 +285,6 @@ function Request() {
 
                         email: p.Email ?? "",
 
-                        address: p.Address ?? "",
-
                         phones: p.Phone_Num
                             ? [p.Phone_Num, ""]
                             : ["", ""]
@@ -164,7 +307,10 @@ function Request() {
                 fullName: data.fullName,
                 phones: data.phones,
                 email: data.email,
-                address: data.address,
+                cityId: data.cityId,
+                streetId: data.streetId,
+                buildingId: data.buildingId,
+                locationId: data.locationId,
                 description: data.description,
                 urgency: data.urgency
             };
@@ -259,8 +405,90 @@ function Request() {
                         </div>
 
                         <div className={styles.formGroup}>
-                            <label>Address *</label>
-                            <input placeholder="Enter your full address" name="address" onChange={handleChange} value={data.address} />
+                            <label>City *</label>
+
+                            <select
+                                name="cityId"
+                                value={data.cityId}
+                                onChange={handleChange}
+                            >
+                                <option value="">Select city</option>
+
+                                {cities.map(city => (
+                                    <option
+                                        key={city.City_ID}
+                                        value={city.City_ID}
+                                    >
+                                        {city.City_Name}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div className={styles.formGroup}>
+                            <label>Street *</label>
+
+                            <select
+                                name="streetId"
+                                value={data.streetId}
+                                onChange={handleChange}
+                                disabled={!data.cityId}
+                            >
+                                <option value="">Select street</option>
+
+                                {streets.map(street => (
+                                    <option
+                                        key={street.Street_ID}
+                                        value={street.Street_ID}
+                                    >
+                                        {street.Street_Name}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div className={styles.formGroup}>
+                            <label>Building *</label>
+
+                            <select
+                                name="buildingId"
+                                value={data.buildingId}
+                                onChange={handleChange}
+                                disabled={!data.streetId}
+                            >
+                                <option value="">Select building</option>
+
+                                {buildings.map(building => (
+                                    <option
+                                        key={building.Building_ID}
+                                        value={building.Building_ID}
+                                    >
+                                        {building.Building_Name}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div className={styles.formGroup}>
+                            <label>Location *</label>
+
+                            <select
+                                name="locationId"
+                                value={data.locationId}
+                                onChange={handleChange}
+                                disabled={!data.buildingId}
+                            >
+                                <option value="">Select location</option>
+
+                                {locations.map(location => (
+                                    <option
+                                        key={location.Location_ID}
+                                        value={location.Location_ID}
+                                    >
+                                        Floor {location.Floor} - {location.LocT_Type}
+                                    </option>
+                                ))}
+                            </select>
                         </div>
 
                         <div className={styles.formGroup}>
@@ -325,7 +553,20 @@ function Request() {
 
                             <p><b>Email:</b> {data.email}</p>
                             <p><b>Type:</b> {requestTypes.find(t => t.RType_ID == data.type)?.RType_Name}</p>
-                            <p><b>Address:</b> {data.address}</p>
+                            <p>
+                                <b>Address:</b>{" "}
+                                {
+                                    cities.find(c => c.City_ID == data.cityId)?.City_Name
+                                }
+                                {" - "}
+                                {
+                                    streets.find(s => s.Street_ID == data.streetId)?.Street_Name
+                                }
+                                {" - "}
+                                {
+                                    buildings.find(b => b.Building_ID == data.buildingId)?.Building_Name
+                                }
+                            </p>
                             <p><b>Urgency:</b> {data.urgency}</p>
                             <p><b>Description:</b> {data.description}</p>
 
@@ -356,7 +597,20 @@ function Request() {
                                     <b>Type:</b>{" "}
                                     {requestTypes.find(t => t.RType_ID == data.type)?.RType_Name}
                                 </p>
-                                <p><b>Address:</b> {data.address}</p>
+                                <p>
+                                    <b>Address:</b>{" "}
+                                    {
+                                        cities.find(c => c.City_ID == data.cityId)?.City_Name
+                                    }
+                                    {" - "}
+                                    {
+                                        streets.find(s => s.Street_ID == data.streetId)?.Street_Name
+                                    }
+                                    {" - "}
+                                    {
+                                        buildings.find(b => b.Building_ID == data.buildingId)?.Building_Name
+                                    }
+                                </p>
                                 <p><b>Urgency:</b> {data.urgency}</p>
                                 <p><b>Description:</b> {data.description}</p>
 
