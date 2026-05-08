@@ -157,22 +157,16 @@ function Request() {
 
     const handleSubmit = async () => {
         try {
-            const priorityMap = {
-                Low: 1,
-                Medium: 2,
-                High: 3,
-                Emergency: 4
-            };
+
             const payload = {
                 title: data.title,
                 type: data.type,
-                otherType: data.otherType,
                 fullName: data.fullName,
                 phones: data.phones,
                 email: data.email,
                 address: data.address,
                 description: data.description,
-                urgency: priorityMap[data.urgency],
+                urgency: data.urgency
             };
 
             console.log("PAYLOAD:", payload);
@@ -186,12 +180,17 @@ function Request() {
                     }
                 }
             );
+
             alert("Request sent!");
+
         } catch (err) {
+
             console.log("FULL ERROR:", err);
-            console.log("RESPONSE DATA:", err.response?.data);
-            console.log("ERROR MESSAGE:", err.response?.data?.error);
-            alert(err.response?.data?.error || "Error sending request");
+
+            alert(
+                err.response?.data?.error ||
+                "Error sending request"
+            );
         }
     };
 
@@ -216,12 +215,12 @@ function Request() {
 
                         <div className={styles.formGroup}>
                             <label>Request Title *</label>
-                            <input placeholder="e.g. Building Permit for House" name="title" onChange={handleChange} value={data.title}/>
+                            <input placeholder="e.g. Building Permit for House" name="title" onChange={handleChange} value={data.title} />
                         </div>
 
                         <div className={styles.formGroup}>
                             <label>Full Name *</label>
-                            <input placeholder="Enter your full name" name="fullName" onChange={handleChange} value={data.fullName}/>
+                            <input placeholder="Enter your full name" name="fullName" onChange={handleChange} value={data.fullName} />
                         </div>
 
                         <div className={styles.phoneRow}>
@@ -238,12 +237,16 @@ function Request() {
 
                         <div className={styles.formGroup}>
                             <label>Email *</label>
-                            <input type="email" placeholder="example@email.com" name="email" onChange={handleChange} value={data.email}/>
+                            <input type="email" placeholder="example@email.com" name="email" onChange={handleChange} value={data.email} />
                         </div>
 
                         <div className={styles.formGroup}>
                             <label>Request Type *</label>
-                            <select name="type" onChange={handleChange}>
+                            <select
+                                name="type"
+                                onChange={handleChange}
+                                value={data.type}
+                            >
                                 <option value="">Select request type</option>
 
                                 {requestTypes.map(type => (
@@ -257,12 +260,17 @@ function Request() {
 
                         <div className={styles.formGroup}>
                             <label>Address *</label>
-                            <input placeholder="Enter your full address" name="address" onChange={handleChange} value={data.address}/>
+                            <input placeholder="Enter your full address" name="address" onChange={handleChange} value={data.address} />
                         </div>
 
                         <div className={styles.formGroup}>
                             <label>Description</label>
-                            <textarea placeholder="Provide additional details about your request..." name="description" onChange={handleChange} />
+                            <textarea
+                                placeholder="Provide additional details..."
+                                name="description"
+                                onChange={handleChange}
+                                value={data.description}
+                            />
                         </div>
 
                         <div className={styles.formGroup}>
@@ -344,7 +352,10 @@ function Request() {
                                 </ul>
 
                                 <p><b>Email:</b> {data.email}</p>
-                                <p><b>Type:</b> {data.type === "Other" ? data.otherType : data.type}</p>
+                                <p>
+                                    <b>Type:</b>{" "}
+                                    {requestTypes.find(t => t.RType_ID == data.type)?.RType_Name}
+                                </p>
                                 <p><b>Address:</b> {data.address}</p>
                                 <p><b>Urgency:</b> {data.urgency}</p>
                                 <p><b>Description:</b> {data.description}</p>

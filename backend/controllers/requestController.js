@@ -39,6 +39,13 @@ export const createRequest = async (req, res) => {
             return sendError(res, 400, "Invalid request type", "INVALID_TYPE");
         }
 
+        const priorityMap = {
+            Low: 1,
+            Medium: 2,
+            High: 3,
+            Emergency: 4
+        };
+
         const jsonData = JSON.stringify({
             title,
             fullName,
@@ -54,7 +61,7 @@ export const createRequest = async (req, res) => {
             VALUES (NOW(), ?, ?, ?, 1, ?)`,
             [
                 jsonData,
-                urgency || 1,
+                priorityMap[urgency] || 1,
                 rTypeId,
                 citizenId
             ]
@@ -139,10 +146,19 @@ export const getRequestTypes = async (req, res) => {
              ORDER BY RType_ID`
         );
 
-        return sendSuccess(res, "Request types fetched successfully", results);
+        return sendSuccess(
+            res,
+            "Request types fetched successfully",
+            results
+        );
 
     } catch (err) {
         console.error("GET TYPES ERROR:", err);
-        return sendError(res, 500, "Failed to fetch request types", err.message);
+        return sendError(
+            res,
+            500,
+            "Failed to fetch request types",
+            err.message
+        );
     }
 };
