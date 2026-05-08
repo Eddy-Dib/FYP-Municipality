@@ -9,11 +9,19 @@ function Complain() {
 
     const [profile, setProfile] = useState(null);
     const [error, setError] = useState("");
+    const [cities, setCities] = useState([]);
+    const [streets, setStreets] = useState([]);
+    const [buildings, setBuildings] = useState([]);
+    const [locations, setLocations] = useState([]);
+    const [types, setTypes] = useState([]);
     const [data, setData] = useState({
         fullName: "",
         phone: "",
-        category: "",
-        location: "",
+        type: "",
+        cityId: "",
+        streetId: "",
+        buildingId: "",
+        locationId: "",
         description: "",
         priority: "",
         files: []
@@ -41,10 +49,99 @@ function Complain() {
                 );
                 return [...prev, ...newPreviews].slice(0, 3);
             });
-        } else {
-            setData(prev => ({ ...prev, [name]: value }));
+
+            return;
         }
+
+
+        if (name === "cityId") {
+            setData(prev => ({
+                ...prev,
+                cityId: value,
+                streetId: "",
+                buildingId: "",
+                locationId: ""
+            }));
+
+            setStreets([]);
+            setBuildings([]);
+            setLocations([]);
+            return;
+        }
+
+
+        if (name === "streetId") {
+            setData(prev => ({
+                ...prev,
+                streetId: value,
+                buildingId: "",
+                locationId: ""
+            }));
+
+            setBuildings([]);
+            setLocations([]);
+            return;
+        }
+
+
+        if (name === "buildingId") {
+            setData(prev => ({
+                ...prev,
+                buildingId: value,
+                locationId: ""
+            }));
+
+            setLocations([]);
+            return;
+        }
+
+
+        setData(prev => ({
+            ...prev,
+            [name]: value
+        }));
     };
+
+    useEffect(() => {
+        axios.get(`${API_URL}/api/locations/cities`)
+            .then(res => setCities(res.data.data));
+    }, []);
+
+    useEffect(() => {
+        if (!data.cityId) return;
+
+        axios.get(`${API_URL}/api/locations/streets?cityId=${data.cityId}`)
+            .then(res => setStreets(res.data.data));
+    }, [data.cityId]);
+
+    useEffect(() => {
+        if (!data.streetId) return;
+
+        axios.get(`${API_URL}/api/locations/buildings?streetId=${data.streetId}`)
+            .then(res => setBuildings(res.data.data));
+    }, [data.streetId]);
+
+    useEffect(() => {
+        if (!data.buildingId) return;
+
+        axios.get(`${API_URL}/api/locations/locations?buildingId=${data.buildingId}`)
+            .then(res => setLocations(res.data.data));
+    }, [data.buildingId]);
+
+    useEffect(() => {
+        const fetchTypes = async () => {
+            try {
+                const res = await axios.get(`${API_URL}/api/complaints/types`);
+                if (res.data.success) {
+                    setTypes(res.data.data);
+                }
+            } catch (err) {
+                console.log(err);
+            }
+        };
+
+        fetchTypes();
+    }, []);
 
     const removeImage = (index) => {
         setData(prev => ({
@@ -78,8 +175,9 @@ function Complain() {
 
         fetchProfile();
     }, [API_URL, token]);
+
     const validate = () => {
-        if (!data.category) return "Category is required";
+        if (!data.type) return "Type is required";
         if (!data.description) return "Description is required";
         return "";
     };
@@ -88,8 +186,8 @@ function Complain() {
         try {
             setLoading(true);
 
-            if (!data.category) {
-                setError("Category is required");
+            if (!data.type) {
+                setError("Type is required");
                 return;
             }
 
@@ -99,15 +197,19 @@ function Complain() {
             }
 
             const payload = {
-                subject: data.category,
+                type: data.type,
+                cityId: data.cityId,
+                streetId: data.streetId,
+                buildingId: data.buildingId,
+                locationId: data.locationId,
                 details: `
 Name: ${data.fullName}
 Phone: ${data.phone}
-Location: ${data.location || "N/A"}
+Location: ${data.cityId}-${data.streetId}-${data.buildingId}-${data.locationId}
 
 Description:
 ${data.description}
-            `
+    `
             };
 
             await axios.post(
@@ -154,20 +256,69 @@ ${data.description}
                 </div>
 
                 <div className={styles.formGroup}>
-                    <label>Category *</label>
-                    <select name="category" onChange={handleChange}>
-                        <option value="">Select category</option>
-                        <option>Infrastructure</option>
-                        <option>Sanitation</option>
-                        <option>Property Violation</option>
-                        <option>Public Safety / Noise</option>
-                        <option>Staff Service</option>
+                    <label>Type *</label>
+
+                    <select
+                        name="type"
+                        value={data.type}
+                        onChange={handleChange}
+                        className={styles.typeSelect}
+                    >
+                        <option value="">Select type</option>
+
+                        {types.map(t => (
+                            <option key={t.CType_ID} value={t.CType_ID}>
+                                {t.CType_Name}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+                <div className={styles.formGroup}>
+                    <label>City</label>
+                    <select name="cityId" onChange={handleChange}>
+                        <option value="">Select city</option>
+                        {cities.map(c => (
+                            <option key={c.City_ID} value={c.City_ID}>
+                                {c.City_Name}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+
+                <div className={styles.formGroup}>
+                    <label>Street</label>
+                    <select name="streetId" onChange={handleChange}>
+                        <option value="">Select street</option>
+                        {streets.map(s => (
+                            <option key={s.Street_ID} value={s.Street_ID}>
+                                {s.Street_Name}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+
+                <div className={styles.formGroup}>
+                    <label>Building</label>
+                    <select name="buildingId" onChange={handleChange}>
+                        <option value="">Select building</option>
+                        {buildings.map(b => (
+                            <option key={b.Building_ID} value={b.Building_ID}>
+                                {b.Building_Name}
+                            </option>
+                        ))}
                     </select>
                 </div>
 
                 <div className={styles.formGroup}>
                     <label>Location</label>
-                    <input name="location" placeholder="Street / Area" onChange={handleChange} />
+                    <select name="locationId" onChange={handleChange}>
+                        <option value="">Select location</option>
+                        {locations.map(l => (
+                            <option key={l.Location_ID} value={l.Location_ID}>
+                                Floor {l.Floor} - {l.LocT_Type}
+                            </option>
+                        ))}
+                    </select>
                 </div>
 
                 <div className={styles.formGroup}>
@@ -194,17 +345,27 @@ ${data.description}
                 </div>
 
                 <div className={styles.formGroup}>
-                    <label>Upload Photos (max 3)</label>
+                    <label>Upload Photos </label>
                     <input type="file" multiple accept="image/*" onChange={handleChange} />
                 </div>
 
-                <div className={styles.previewContainer}>
-                    {previews.map((src, i) => (
-                        <div key={i} className={styles.imageWrapper}>
-                            <img src={src} alt="preview" />
-                            <button onClick={() => removeImage(i)}>×</button>
-                        </div>
-                    ))}
+                {/* NEW WRAPPER (IMPORTANT FIX) */}
+                <div className={styles.uploadPreviewWrapper}>
+                    <div className={styles.previewContainer}>
+                        {previews.map((src, i) => (
+                            <div key={i} className={styles.imageWrapper}>
+                                <img src={src} alt="preview" />
+
+                                <button
+                                    type="button"
+                                    className={styles.removeBtn}
+                                    onClick={() => removeImage(i)}
+                                >
+                                    ×
+                                </button>
+                            </div>
+                        ))}
+                    </div>
                 </div>
 
                 <div className={styles.reference}>

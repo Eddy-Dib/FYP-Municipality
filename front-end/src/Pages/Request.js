@@ -8,6 +8,10 @@ function Request() {
 
     const [step, setStep] = useState(1);
     const [requestTypes, setRequestTypes] = useState([]);
+    const [cities, setCities] = useState([]);
+    const [streets, setStreets] = useState([]);
+    const [buildings, setBuildings] = useState([]);
+    const [locations, setLocations] = useState([]);
     const [profile, setProfile] = useState(null);
     const [error, setError] = useState("");
 
@@ -17,7 +21,10 @@ function Request() {
         if (!data.phones[0]) return "Primary phone number is required";
         if (!data.email) return "Email is required";
         if (!data.type) return "Request type is required";
-        if (!data.address) return "Address is required";
+        if (!data.cityId) return "City is required";
+        if (!data.streetId) return "Street is required";
+        if (!data.buildingId) return "Building is required";
+        if (!data.locationId) return "Location is required";
 
         return "";
     };
@@ -28,7 +35,10 @@ function Request() {
         fullName: "",
         phones: ["", ""],
         email: "",
-        address: "",
+        cityId: "",
+        streetId: "",
+        buildingId: "",
+        locationId: "",
         description: "",
         urgency: "",
         files: []
@@ -49,12 +59,94 @@ function Request() {
             }
         };
 
+        const fetchCities = async () => {
+            try {
+
+                const res = await axios.get(
+                    `${API_URL}/api/locations/cities`
+                );
+
+                if (res.data.success) {
+                    setCities(res.data.data);
+                }
+
+            } catch (err) {
+                console.log(err);
+            }
+        };
+
         fetchTypes();
+        fetchCities();
     }, []);
+
+    useEffect(() => {
+        const fetchStreets = async () => {
+            if (!data.cityId) return;
+
+            try {
+                const res = await axios.get(
+                    `${API_URL}/api/locations/streets?cityId=${data.cityId}`
+                );
+
+                if (res.data.success) {
+                    setStreets(res.data.data);
+                }
+            } catch (err) {
+                console.log(err);
+            }
+        };
+
+        fetchStreets();
+    }, [data.cityId]);
+
+    useEffect(() => {
+        const fetchBuildings = async () => {
+            if (!data.streetId) return;
+
+            try {
+                const res = await axios.get(
+                    `${API_URL}/api/locations/buildings?streetId=${data.streetId}`
+                );
+
+                if (res.data.success) {
+                    setBuildings(res.data.data);
+                }
+            } catch (err) {
+                console.log(err);
+            }
+        };
+
+        fetchBuildings();
+    }, [data.streetId]);
+
+    useEffect(() => {
+        const fetchLocations = async () => {
+            if (!data.buildingId) return;
+
+            try {
+                const res = await axios.get(
+                    `${API_URL}/api/locations/locations?buildingId=${data.buildingId}`
+                );
+
+                if (res.data.success) {
+                    setLocations(res.data.data);
+                }
+            } catch (err) {
+                console.log(err);
+            }
+        };
+
+        fetchLocations();
+    }, [data.buildingId]);
+
+
 
     const handleChange = (e, index = null) => {
         const { name, value, files } = e.target;
 
+        setError("");
+
+        // ================= FILES =================
         if (files) {
             const newFiles = Array.from(files);
 
@@ -67,20 +159,74 @@ function Request() {
                 const newPreviews = newFiles.map(file => URL.createObjectURL(file));
                 return [...prev, ...newPreviews].slice(0, 3);
             });
+
+            return;
         }
 
-        else if (name === "phones") {
+        // ================= PHONES =================
+        if (name === "phones") {
             const updated = [...data.phones];
             updated[index] = value;
-            setData(prev => ({ ...prev, phones: updated }));
+
+            setData(prev => ({
+                ...prev,
+                phones: updated
+            }));
+
+            return;
         }
 
-        else {
-            setData(prev => ({ ...prev, [name]: value }));
-            setError("");
+        // ================= CITY CHANGE =================
+        if (name === "cityId") {
+            setData(prev => ({
+                ...prev,
+                cityId: value,
+                streetId: "",
+                buildingId: "",
+                locationId: ""
+            }));
+
+            setStreets([]);
+            setBuildings([]);
+            setLocations([]);
+
+            return;
         }
+
+        // ================= STREET CHANGE =================
+        if (name === "streetId") {
+            setData(prev => ({
+                ...prev,
+                streetId: value,
+                buildingId: "",
+                locationId: ""
+            }));
+
+            setBuildings([]);
+            setLocations([]);
+
+            return;
+        }
+
+        // ================= BUILDING CHANGE =================
+        if (name === "buildingId") {
+            setData(prev => ({
+                ...prev,
+                buildingId: value,
+                locationId: ""
+            }));
+
+            setLocations([]);
+
+            return;
+        }
+
+        // ================= DEFAULT =================
+        setData(prev => ({
+            ...prev,
+            [name]: value
+        }));
     };
-
     const removeImage = (index) => {
         setData(prev => ({
             ...prev,
@@ -135,16 +281,9 @@ function Request() {
 
                     setData(prev => ({
                         ...prev,
-
-                        fullName: p.FullName ?? "",
-
-                        email: p.Email ?? "",
-
-                        address: p.Address ?? "",
-
-                        phones: p.Phone_Num
-                            ? [p.Phone_Num, ""]
-                            : ["", ""]
+                        fullName: p.FullName || prev.fullName,
+                        email: p.Email || prev.email,
+                        phones: p.Phone_Num ? [p.Phone_Num, ""] : prev.phones
                     }));
                 }
             } catch (err) {
@@ -157,22 +296,19 @@ function Request() {
 
     const handleSubmit = async () => {
         try {
-            const priorityMap = {
-                Low: 1,
-                Medium: 2,
-                High: 3,
-                Emergency: 4
-            };
+
             const payload = {
                 title: data.title,
                 type: data.type,
-                otherType: data.otherType,
                 fullName: data.fullName,
                 phones: data.phones,
                 email: data.email,
-                address: data.address,
+                cityId: data.cityId,
+                streetId: data.streetId,
+                buildingId: data.buildingId,
+                locationId: data.locationId,
                 description: data.description,
-                urgency: priorityMap[data.urgency],
+                urgency: data.urgency
             };
 
             console.log("PAYLOAD:", payload);
@@ -186,12 +322,17 @@ function Request() {
                     }
                 }
             );
+
             alert("Request sent!");
+
         } catch (err) {
+
             console.log("FULL ERROR:", err);
-            console.log("RESPONSE DATA:", err.response?.data);
-            console.log("ERROR MESSAGE:", err.response?.data?.error);
-            alert(err.response?.data?.error || "Error sending request");
+
+            alert(
+                err.response?.data?.error ||
+                "Error sending request"
+            );
         }
     };
 
@@ -216,12 +357,12 @@ function Request() {
 
                         <div className={styles.formGroup}>
                             <label>Request Title *</label>
-                            <input placeholder="e.g. Building Permit for House" name="title" onChange={handleChange} value={data.title}/>
+                            <input placeholder="e.g. Building Permit for House" name="title" onChange={handleChange} value={data.title} />
                         </div>
 
                         <div className={styles.formGroup}>
                             <label>Full Name *</label>
-                            <input placeholder="Enter your full name" name="fullName" onChange={handleChange} value={data.fullName}/>
+                            <input placeholder="Enter your full name" name="fullName" onChange={handleChange} value={data.fullName} />
                         </div>
 
                         <div className={styles.phoneRow}>
@@ -238,12 +379,16 @@ function Request() {
 
                         <div className={styles.formGroup}>
                             <label>Email *</label>
-                            <input type="email" placeholder="example@email.com" name="email" onChange={handleChange} value={data.email}/>
+                            <input type="email" placeholder="example@email.com" name="email" onChange={handleChange} value={data.email} />
                         </div>
 
                         <div className={styles.formGroup}>
                             <label>Request Type *</label>
-                            <select name="type" onChange={handleChange}>
+                            <select
+                                name="type"
+                                onChange={handleChange}
+                                value={data.type}
+                            >
                                 <option value="">Select request type</option>
 
                                 {requestTypes.map(type => (
@@ -256,13 +401,97 @@ function Request() {
                         </div>
 
                         <div className={styles.formGroup}>
-                            <label>Address *</label>
-                            <input placeholder="Enter your full address" name="address" onChange={handleChange} value={data.address}/>
+                            <label>City *</label>
+
+                            <select
+                                name="cityId"
+                                value={data.cityId || ""}
+                                onChange={handleChange}
+                            >
+                                <option value="">Select city</option>
+
+                                {cities.map(city => (
+                                    <option
+                                        key={city.City_ID}
+                                        value={city.City_ID}
+                                    >
+                                        {city.City_Name}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div className={styles.formGroup}>
+                            <label>Street *</label>
+
+                            <select
+                                name="streetId"
+                                value={data.streetId || ""}
+                                onChange={handleChange}
+                            >
+                                <option value="">Select street</option>
+
+                                {streets.map(street => (
+                                    <option
+                                        key={street.Street_ID}
+                                        value={street.Street_ID}
+                                    >
+                                        {street.Street_Name}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div className={styles.formGroup}>
+                            <label>Building *</label>
+
+                            <select
+                                name="buildingId"
+                                value={data.buildingId || ""}
+                                onChange={handleChange}
+                            >
+                                <option value="">Select building</option>
+
+                                {buildings.map(building => (
+                                    <option
+                                        key={building.Building_ID}
+                                        value={building.Building_ID}
+                                    >
+                                        {building.Building_Name}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div className={styles.formGroup}>
+                            <label>Location *</label>
+
+                            <select
+                                name="locationId"
+                                value={data.locationId || ""}
+                                onChange={handleChange}
+                            >
+                                <option value="">Select location</option>
+
+                                {locations.map(location => (
+                                    <option
+                                        key={location.Location_ID}
+                                        value={location.Location_ID}
+                                    >
+                                        Floor {location.Floor} - {location.LocT_Type}
+                                    </option>
+                                ))}
+                            </select>
                         </div>
 
                         <div className={styles.formGroup}>
                             <label>Description</label>
-                            <textarea placeholder="Provide additional details about your request..." name="description" onChange={handleChange} />
+                            <textarea
+                                placeholder="Provide additional details..."
+                                name="description"
+                                onChange={handleChange}
+                                value={data.description}
+                            />
                         </div>
 
                         <div className={styles.formGroup}>
@@ -278,7 +507,7 @@ function Request() {
                         </div>
 
                         <div className={styles.formGroup}>
-                            <label>Upload Documents (max 3)</label>
+                            <label>Upload Documents </label>
                             <input type="file" multiple accept="image/*" onChange={handleChange} />
                         </div>
 
@@ -317,7 +546,20 @@ function Request() {
 
                             <p><b>Email:</b> {data.email}</p>
                             <p><b>Type:</b> {requestTypes.find(t => t.RType_ID == data.type)?.RType_Name}</p>
-                            <p><b>Address:</b> {data.address}</p>
+                            <p>
+                                <b>Address:</b>{" "}
+                                {
+                                    cities.find(c => c.City_ID == data.cityId)?.City_Name
+                                }
+                                {" - "}
+                                {
+                                    streets.find(s => s.Street_ID == data.streetId)?.Street_Name
+                                }
+                                {" - "}
+                                {
+                                    buildings.find(b => b.Building_ID == data.buildingId)?.Building_Name
+                                }
+                            </p>
                             <p><b>Urgency:</b> {data.urgency}</p>
                             <p><b>Description:</b> {data.description}</p>
 
@@ -344,8 +586,24 @@ function Request() {
                                 </ul>
 
                                 <p><b>Email:</b> {data.email}</p>
-                                <p><b>Type:</b> {data.type === "Other" ? data.otherType : data.type}</p>
-                                <p><b>Address:</b> {data.address}</p>
+                                <p>
+                                    <b>Type:</b>{" "}
+                                    {requestTypes.find(t => t.RType_ID == data.type)?.RType_Name}
+                                </p>
+                                <p>
+                                    <b>Address:</b>{" "}
+                                    {
+                                        cities.find(c => c.City_ID == data.cityId)?.City_Name
+                                    }
+                                    {" - "}
+                                    {
+                                        streets.find(s => s.Street_ID == data.streetId)?.Street_Name
+                                    }
+                                    {" - "}
+                                    {
+                                        buildings.find(b => b.Building_ID == data.buildingId)?.Building_Name
+                                    }
+                                </p>
                                 <p><b>Urgency:</b> {data.urgency}</p>
                                 <p><b>Description:</b> {data.description}</p>
 
@@ -377,21 +635,35 @@ function Request() {
             </div>
 
             <div className={styles.navButtons}>
-                {step === 2 && <button onClick={() => setStep(1)}>Back</button>}
-                <button
-                    onClick={() => {
-                        const err = validateStep1();
 
-                        if (err) {
-                            setError(err);
-                            return;
-                        }
+                {step === 2 && (
+                    <button
+                        type="button"
+                        onClick={() => setStep(1)}
+                    >
+                        Back
+                    </button>
+                )}
 
-                        setError("");
-                        setStep(2);
-                    }}>
-                    Next
-                </button>
+                {step === 1 && (
+                    <button
+                        type="button"
+                        onClick={() => {
+                            const err = validateStep1();
+
+                            if (err) {
+                                setError(err);
+                                return;
+                            }
+
+                            setError("");
+                            setStep(2);
+                        }}
+                    >
+                        Next
+                    </button>
+                )}
+
             </div>
 
         </div>
