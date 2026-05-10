@@ -1,6 +1,7 @@
 import styles from "./Complain.module.css";
 import { useState, useEffect } from "react";
 import axios from "axios";
+import SuccessToast from "../Components/UI/SuccessToast";
 
 function Complain() {
 
@@ -31,6 +32,8 @@ function Complain() {
     const [reference] = useState(Math.floor(100000 + Math.random() * 900000));
 
     const [loading, setLoading] = useState(false);
+    const [toast, setToast] = useState(false);
+    const [fileInputKey, setFileInputKey] = useState(0);
 
     const handleChange = (e) => {
         const { name, value, files } = e.target;
@@ -182,6 +185,28 @@ function Complain() {
         return "";
     };
 
+    const resetForm = () => {
+        setData(prev => ({
+            fullName: prev.fullName,
+            phone: prev.phone,
+            type: "",
+            cityId: "",
+            streetId: "",
+            buildingId: "",
+            locationId: "",
+            description: "",
+            priority: "",
+            files: []
+        }));
+
+        setStreets([]);
+        setBuildings([]);
+        setLocations([]);
+        setPreviews([]);
+
+        setFileInputKey(k => k + 1);
+    };
+
     const handleSubmit = async () => {
         try {
             setLoading(true);
@@ -203,13 +228,10 @@ function Complain() {
                 buildingId: data.buildingId,
                 locationId: data.locationId,
                 details: `
-Name: ${data.fullName}
-Phone: ${data.phone}
-Location: ${data.cityId}-${data.streetId}-${data.buildingId}-${data.locationId}
-
-Description:
-${data.description}
-    `
+                    Name: ${data.fullName}
+                    Phone: ${data.phone}
+                    Location: ${data.cityId}-${data.streetId}-${data.buildingId}-${data.locationId}
+                    Description: ${data.description}`
             };
 
             await axios.post(
@@ -222,15 +244,16 @@ ${data.description}
                 }
             );
 
-            alert("Complaint sent!");
             setError(""); // clear error
+            setToast(true);
+            resetForm();
 
         } catch (err) {
             console.log(err);
             alert(err.response?.data?.error || "Error sending complaint");
 
         } finally {
-            setLoading(false); // 🔥 stop loading
+            setLoading(false);
         }
     };
     return (
@@ -275,7 +298,7 @@ ${data.description}
                 </div>
                 <div className={styles.formGroup}>
                     <label>City</label>
-                    <select name="cityId" onChange={handleChange}>
+                    <select name="cityId" onChange={handleChange} value={data.cityId}>
                         <option value="">Select city</option>
                         {cities.map(c => (
                             <option key={c.City_ID} value={c.City_ID}>
@@ -287,7 +310,7 @@ ${data.description}
 
                 <div className={styles.formGroup}>
                     <label>Street</label>
-                    <select name="streetId" onChange={handleChange}>
+                    <select name="streetId" onChange={handleChange} value={data.streetId}>
                         <option value="">Select street</option>
                         {streets.map(s => (
                             <option key={s.Street_ID} value={s.Street_ID}>
@@ -299,7 +322,7 @@ ${data.description}
 
                 <div className={styles.formGroup}>
                     <label>Building</label>
-                    <select name="buildingId" onChange={handleChange}>
+                    <select name="buildingId" onChange={handleChange} value={data.buildingId}>
                         <option value="">Select building</option>
                         {buildings.map(b => (
                             <option key={b.Building_ID} value={b.Building_ID}>
@@ -311,7 +334,7 @@ ${data.description}
 
                 <div className={styles.formGroup}>
                     <label>Location</label>
-                    <select name="locationId" onChange={handleChange}>
+                    <select name="locationId" onChange={handleChange} value={data.locationId}>
                         <option value="">Select location</option>
                         {locations.map(l => (
                             <option key={l.Location_ID} value={l.Location_ID}>
@@ -323,7 +346,7 @@ ${data.description}
 
                 <div className={styles.formGroup}>
                     <label>Description</label>
-                    <textarea name="description" placeholder="Describe the issue..." onChange={handleChange} />
+                    <textarea name="description" placeholder="Describe the issue..." onChange={handleChange} value={data.description} />
                 </div>
 
                 <div className={styles.formGroup}>
@@ -337,6 +360,7 @@ ${data.description}
                                     name="priority"
                                     value={level}
                                     onChange={handleChange}
+                                    checked={data.priority === level}
                                 />
                                 {level}
                             </label>
@@ -346,10 +370,9 @@ ${data.description}
 
                 <div className={styles.formGroup}>
                     <label>Upload Photos </label>
-                    <input type="file" multiple accept="image/*" onChange={handleChange} />
+                    <input key={fileInputKey} type="file" multiple accept="image/*" onChange={handleChange} />
                 </div>
 
-                {/* NEW WRAPPER (IMPORTANT FIX) */}
                 <div className={styles.uploadPreviewWrapper}>
                     <div className={styles.previewContainer}>
                         {previews.map((src, i) => (
@@ -394,6 +417,12 @@ ${data.description}
                 </button>
 
             </div>
+            {toast && (
+                <SuccessToast
+                    message={"Complaint Sent!"}
+                    onClose={() => setToast(false)}
+                />
+            )}
         </div >
     );
 }

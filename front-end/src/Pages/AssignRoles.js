@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import styles from "./Admin.module.css";
 import EmployeeRegisterForm from "../Components/Login/EmployeeRegisterForm";
+import SuccessToast from "../Components/UI/SuccessToast";
 
 function AssignRoles() {
     const API_URL = process.env.REACT_APP_API_URL;
@@ -10,6 +11,7 @@ function AssignRoles() {
     const [employees, setEmployees] = useState([]);
     const [roles, setRoles] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [toast, setToast] = useState(false);
 
     const [showModal, setShowModal] = useState(false);
 
@@ -68,6 +70,7 @@ function AssignRoles() {
             );
 
             await loadData();
+            setToast(true);
 
         } catch (err) {
             console.error(err);
@@ -208,6 +211,13 @@ function AssignRoles() {
                     </table>
                 </div>
             </div>
+
+            {toast && (
+                <SuccessToast
+                    message={"Role Updated Successfully!"}
+                    onClose={() => setToast(false)}
+                />
+            )}
 
             {showModal && (
                 <EmployeeRegisterForm
