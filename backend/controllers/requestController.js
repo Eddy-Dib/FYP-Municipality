@@ -1,10 +1,6 @@
 import db from "../config/db.js";
 import { sendSuccess, sendError } from "../utils/responses.js";
 
-
-// ===============================
-// CREATE REQUEST
-// ===============================
 export const createRequest = async (req, res) => {
     try {
         const citizenId = req.user?.id;
@@ -27,7 +23,6 @@ export const createRequest = async (req, res) => {
             urgency
         } = req.body;
 
-        // validation
         if (
             !title ||
             !type ||
@@ -126,9 +121,6 @@ export const getRequests = async (req, res) => {
 };
 
 
-// ===============================
-// UPDATE REQUEST STATUS
-// ===============================
 export const updateRequestStatus = (req, res) => {
     const { id } = req.params;
     const { action } = req.body;
@@ -158,10 +150,6 @@ export const updateRequestStatus = (req, res) => {
     );
 };
 
-
-// ===============================
-// GET REQUEST TYPES
-// ===============================
 export const getRequestTypes = async (req, res) => {
     try {
         const [results] = await db.promise().query(
