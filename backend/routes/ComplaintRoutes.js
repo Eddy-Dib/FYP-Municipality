@@ -1,6 +1,5 @@
 import express from "express";
-import { sendMessage } from "../controllers/ComplaintController.js";
-import { createComplaint, getComplaintTypes } from "../controllers/complaintsController.js";
+import { createComplaint, getComplaintTypes, sendMessage } from "../controllers/complaintsController.js";
 import { authMiddleware } from "../middleware/authMiddleware.js";
 
 const router = express.Router();

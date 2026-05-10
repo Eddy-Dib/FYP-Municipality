@@ -149,7 +149,6 @@ function Request() {
 
         setError("");
 
-        // ================= FILES =================
         if (files) {
             const newFiles = Array.from(files);
 
@@ -166,7 +165,6 @@ function Request() {
             return;
         }
 
-        // ================= PHONES =================
         if (name === "phones") {
             const updated = [...data.phones];
             updated[index] = value;
@@ -179,7 +177,6 @@ function Request() {
             return;
         }
 
-        // ================= CITY CHANGE =================
         if (name === "cityId") {
             setData(prev => ({
                 ...prev,
@@ -196,7 +193,6 @@ function Request() {
             return;
         }
 
-        // ================= STREET CHANGE =================
         if (name === "streetId") {
             setData(prev => ({
                 ...prev,
@@ -211,7 +207,6 @@ function Request() {
             return;
         }
 
-        // ================= BUILDING CHANGE =================
         if (name === "buildingId") {
             setData(prev => ({
                 ...prev,
@@ -224,7 +219,6 @@ function Request() {
             return;
         }
 
-        // ================= DEFAULT =================
         setData(prev => ({
             ...prev,
             [name]: value
@@ -323,7 +317,24 @@ function Request() {
     };
 
     const handleSubmit = async () => {
+        console.log(data);
         try {
+            const cityName =
+                cities.find(c => c.City_ID == data.cityId)?.City_Name;
+
+            const streetName =
+                streets.find(s => s.Street_ID == data.streetId)?.Street_Name;
+
+            const buildingName =
+                buildings.find(b => b.Building_ID == data.buildingId)?.Building_Name;
+
+            const locationObj =
+                locations.find(l => l.Location_ID == data.locationId);
+
+            const floorText = `floor ${locationObj.Floor}`;
+
+            const address =
+                `${cityName} - ${streetName} - ${buildingName} - ${floorText}`;
 
             const payload = {
                 title: data.title,
@@ -331,10 +342,7 @@ function Request() {
                 fullName: data.fullName,
                 phones: data.phones,
                 email: data.email,
-                cityId: data.cityId,
-                streetId: data.streetId,
-                buildingId: data.buildingId,
-                locationId: data.locationId,
+                address: address,
                 description: data.description,
                 urgency: data.urgency
             };
