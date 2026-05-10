@@ -81,7 +81,8 @@ export const getTaskDetails = async (req, res) => {
             LEFT JOIN REP_TYPE rpt on rep.RepType_ID = rpt.RepType_ID
 
             WHERE t.Task_ID = ?
-            AND t.Emp_ID = ?`,
+            AND t.Emp_ID = ?
+            AND r.FlagRejected = 0`,
             [taskId, empId]
         );
 

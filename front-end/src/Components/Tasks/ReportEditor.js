@@ -19,6 +19,7 @@ function ReportEditor() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [showToast, setShowToast] = useState(false);
+    const [formError, setFormError] = useState("");
 
     const getDefaultType = () => {
         switch (user?.role) {
@@ -78,7 +79,12 @@ function ReportEditor() {
     }, [id]);
 
     const handleSubmit = async () => {
+        if (!title.trim() || !content.trim()) {
+            setFormError("Report must include both a title and body.");
+            return;
+        }
         try {
+            setFormError("");
             await axios.post(
                 `${API_URL}/employee/report/${id}`,
                 {
@@ -132,6 +138,11 @@ function ReportEditor() {
             </div>
 
             <div className={styles.actions}>
+                {formError && (
+                    <p style={{ color: "red", marginBottom: "10px" }}>
+                        {formError}
+                    </p>
+                )}
                 <button onClick={handleSubmit}>
                     Submit Report
                 </button>
