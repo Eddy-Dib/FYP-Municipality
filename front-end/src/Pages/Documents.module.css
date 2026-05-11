@@ -1,0 +1,326 @@
+.documentsPage {
+    background-color: var(--bg-light);
+    min-height: 100vh;
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+    color: var(--text-main);
+    padding-bottom: 80px;
+}
+
+.topSection {
+    text-align: center;
+    padding: 120px 20px 180px;
+    background: var(--primary-darker);
+    color: white;
+}
+
+.topSection h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.topSection p {
+    opacity: 0.85;
+    font-size: 1.05rem;
+}
+
+.mainCard {
+    max-width: 760px;
+    width: 90%;
+    margin: -100px auto 30px;
+    background: white;
+    padding: 40px;
+    border-radius: 24px;
+    box-shadow: var(--card-shadow);
+    position: relative;
+    z-index: 10;
+}
+
+/* ========================= */
+/* UPLOAD AREA */
+/* ========================= */
+
+.uploadArea {
+    border: 2px dashed var(--border-color);
+    background: #f8fafc;
+    border-radius: 20px;
+    padding: 55px 20px;
+    text-align: center;
+    position: relative;
+    transition: 0.25s ease;
+}
+
+.uploadArea:hover {
+    border-color: var(--primary);
+    background: #eff6ff;
+}
+
+.uploadIcon {
+    font-size: 42px;
+    color: var(--primary);
+    margin-bottom: 15px;
+}
+
+.uploadArea h3 {
+    font-size: 1.3rem;
+    margin-bottom: 10px;
+}
+
+.uploadArea p {
+    color: #475569;
+    margin-bottom: 5px;
+}
+
+.uploadArea span {
+    color: gray;
+    font-size: 0.9rem;
+}
+
+.uploadArea input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+
+/* ========================= */
+/* DETAILS BOX */
+/* ========================= */
+
+.detailsBox {
+    margin-top: 25px;
+    background: #f8fafc;
+    padding: 22px;
+    border-radius: 20px;
+    border: 1px solid var(--border-color);
+}
+
+.detailsBox select,
+.detailsBox textarea {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    margin-bottom: 15px;
+    font-size: 0.95rem;
+    background: white;
+}
+
+.detailsBox textarea {
+    min-height: 120px;
+    resize: none;
+}
+
+.detailsBox select:focus,
+.detailsBox textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+}
+
+.saveBtn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 13px 18px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+.saveBtn:hover {
+    transform: translateY(-1px);
+}
+
+/* ========================= */
+/* DOCUMENT LIST */
+/* ========================= */
+
+.uploadsSection {
+    margin-top: 35px;
+}
+
+.uploadsSection h4 {
+    margin-bottom: 18px;
+    font-size: 1.1rem;
+}
+
+.documentsList {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.documentCard {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 18px;
+    border-radius: 18px;
+    border: 1px solid #e5e7eb;
+    background: white;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.documentCard:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+}
+
+.leftSide {
+    flex-shrink: 0;
+}
+
+.imageBox,
+.pdfBox {
+    width: 60px;
+    height: 60px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: white;
+}
+
+.imageBox {
+    background: #2563eb;
+}
+
+.pdfBox {
+    background: #ef4444;
+}
+
+.middleSide {
+    flex: 1;
+}
+
+.middleSide h5 {
+    font-size: 1rem;
+    margin-bottom: 5px;
+}
+
+.middleSide p {
+    color: #475569;
+    font-size: 0.92rem;
+    margin-bottom: 6px;
+}
+
+.middleSide span {
+    color: gray;
+    font-size: 0.82rem;
+}
+
+.validity {
+    margin-top: 8px;
+    color: var(--primary);
+    font-size: 0.82rem;
+    font-weight: 600;
+}
+
+.removeBtn {
+    width: 34px;
+    height: 34px;
+    border: none;
+    border-radius: 50%;
+    background: #f1f5f9;
+    color: #0f172a;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.2s;
+}
+
+.removeBtn:hover {
+    background: #ef4444;
+    color: white;
+}
+
+/* ========================= */
+/* SUBMIT */
+/* ========================= */
+
+.submitBtn {
+    width: 100%;
+    margin-top: 30px;
+    background: var(--primary);
+    color: white;
+    padding: 16px;
+    border: none;
+    border-radius: 16px;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: 0.25s;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+}
+
+.submitBtn:hover {
+    transform: translateY(-2px);
+}
+
+/* ========================= */
+/* MODAL */
+/* ========================= */
+
+.modalOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.7);
+    z-index: 999;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal {
+    width: 85%;
+    max-width: 1000px;
+    height: 85vh;
+    background: white;
+    border-radius: 24px;
+    overflow: hidden;
+    position: relative;
+}
+
+.modalImage {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background: #f8fafc;
+}
+
+.pdfViewer {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+.closeBtn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+
+    width: 40px;
+    height: 40px;
+
+    border: none;
+    border-radius: 50%;
+
+    background: #ef4444;
+    color: white;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 18px;
+    cursor: pointer;
+
+    z-index: 100;
+}

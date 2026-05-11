@@ -19,6 +19,7 @@ import CitizenLayout from "./Pages/CitizenLayout";
 import CitizenDashboard from "./Pages/CitizenDashboard";
 import Request from "./Pages/Request";
 import Complain from "./Pages/Complain";
+import Documents from "./Pages/Documents";
 import PayFees from "./Pages/PayFees";
 import Profile from "./Pages/Profile";
 
@@ -97,6 +98,7 @@ function App() {
           <Route index element={<CitizenDashboard />} />
           <Route path="request" element={<Request />} />
           <Route path="complain" element={<Complain />} />
+          <Route path="Documents" element={<Documents/>} />
           <Route path="payfees" element={<PayFees />} />
           <Route path="profile" element={<Profile />} />
         </Route>
