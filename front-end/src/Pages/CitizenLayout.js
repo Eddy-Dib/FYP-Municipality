@@ -40,6 +40,14 @@ function CitizenLayout() {
                                 }}>
                                     Complain
                                 </span>
+
+                                <span onClick={() => {
+                                    navigate("/citizen/Documents");
+                                    setOpen(false);
+                                }}>
+                                    Upload Documents
+                                </span>
+                                
                             </div>
                         )}
                     </div>
