@@ -1,6 +1,7 @@
 import styles from "./Request.module.css";
 import { useState, useEffect } from "react";
 import axios from "axios";
+import SuccessToast from "../Components/UI/SuccessToast";
 
 function Request() {
     const API_URL = process.env.REACT_APP_API_URL;
@@ -14,6 +15,8 @@ function Request() {
     const [locations, setLocations] = useState([]);
     const [profile, setProfile] = useState(null);
     const [error, setError] = useState("");
+
+    const [toast, setToast] = useState(false);
 
     const validateStep1 = () => {
         if (!data.title) return "Request title is required";
@@ -283,7 +286,12 @@ function Request() {
                         ...prev,
                         fullName: p.FullName || prev.fullName,
                         email: p.Email || prev.email,
-                        phones: p.Phone_Num ? [p.Phone_Num, ""] : prev.phones
+                        phones: p.Phone_Num ? [p.Phone_Num, ""] : prev.phones,
+
+                        cityId: p.City_ID || "",
+                        streetId: p.Street_ID || "",
+                        buildingId: p.Building_ID || "",
+                        locationId: p.Location_ID || ""
                     }));
                 }
             } catch (err) {
@@ -293,6 +301,26 @@ function Request() {
 
         fetchProfile();
     }, []);
+
+    const resetForm = () => {
+        setData({
+            title: "",
+            type: "",
+            fullName: profile?.FullName || "",
+            phones: [profile?.Phone_Num || "", ""],
+            email: profile?.Email || "",
+            cityId: profile?.City_ID || "",
+            streetId: profile?.Street_ID || "",
+            buildingId: profile?.Building_ID || "",
+            locationId: profile?.Location_ID || "",
+            description: "",
+            urgency: "",
+            files: []
+        });
+
+        setPreviews([]);
+        setError("");
+    };
 
     const handleSubmit = async () => {
         try {
@@ -323,7 +351,10 @@ function Request() {
                 }
             );
 
-            alert("Request sent!");
+            setToast(true);
+            setStep(1);
+            resetForm();
+            setError("");
 
         } catch (err) {
 
@@ -338,6 +369,9 @@ function Request() {
 
     return (
         <div className={styles.requestPage}>
+            {toast && (
+                <SuccessToast message="Request Sent!" onClose={() => setToast(false)}/>
+            )}
 
             <div className={styles.topSection}>
                 <h1>Submit a Request</h1>
@@ -499,7 +533,7 @@ function Request() {
                             <div className={styles.urgencyGroup}>
                                 {["Low", "Medium", "High", "Emergency"].map(level => (
                                     <label key={level}>
-                                        <input type="radio" name="urgency" value={level} onChange={handleChange} />
+                                        <input type="radio" name="urgency" value={level} onChange={handleChange} checked={data.urgency === level} />
                                         {level}
                                     </label>
                                 ))}

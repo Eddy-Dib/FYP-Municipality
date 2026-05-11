@@ -83,9 +83,12 @@ export const getDashboard = async (req, res) => {
             JOIN TASK_STATUSES s ON t.TStat_Code = s.TStat_Code
             JOIN REQUEST r ON t.Req_ID = r.Req_ID
             JOIN REQUEST_TYPES rt ON r.RType_ID = rt.RType_ID
+            LEFT JOIN REPORT rep ON rep.Task_ID = t.Task_ID
 
             WHERE t.Emp_ID = ?
-            AND t.TStat_Code != 5
+            AND r.FlagRejected = 0
+            AND ( t.TStat_Code != 5 OR (t.TStat_Code = 5 AND rep.Report_ID IS NULL) )
+
 
             ORDER BY t.DateAssigned DESC`,
             [empId]

@@ -15,7 +15,8 @@
     z-index: 1000;
 
     border-radius: 12px;
-    background-color: #ffffff;
+    background-color: #ffffffbc;
+    color: black;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
 
     display: flex;

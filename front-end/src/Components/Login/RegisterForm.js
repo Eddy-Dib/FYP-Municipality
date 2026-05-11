@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import styles from "./RegisterForm.module.css";
+import SuccessToast from "../UI/SuccessToast";
 
 function RegisterForm() {
     const API_URL = process.env.REACT_APP_API_URL;
@@ -28,6 +29,7 @@ function RegisterForm() {
 
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState("");
+    const [toast, setToast] = useState(false);
 
     useEffect(() => {
         const fetchCities = async () => {
@@ -131,7 +133,7 @@ function RegisterForm() {
                 headers: { "Content-Type": "multipart/form-data" }
             });
 
-            setMessage("Request sent. Waiting for verification.");
+            setToast(true);
 
         } catch (err) {
             setMessage(err?.response?.data?.message || "Error submitting request");
@@ -238,6 +240,9 @@ function RegisterForm() {
             </button>
 
             {message && <p className={styles.error}>{message}</p>}
+            {toast && (
+                <SuccessToast message="Request Sent! We'll be in touch." onClose={() => setToast(false)}/>
+            )}
         </form>
     );
 }
