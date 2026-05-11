@@ -369,3 +369,127 @@ export const finalApproveRequest = async (req, res) => {
         }
     }
 };
+
+export const getOperationsOverview = async (req, res) => {
+
+    const empId = req.user?.empId;
+
+    if (!req.user || !req.user.isEmployee) {
+        return sendError(res, 403, "Employees only", "NOT_EMPLOYEE");
+    }
+
+    if (!empId) {
+        return sendError(res, 401, "Invalid session", "INVALID_USER_ID");
+    }
+
+    try {
+
+        const [rows] = await db.promise().query(
+            `
+            SELECT 
+                r.Req_ID,
+                r.DateMade,
+                r.Description,
+                r.Priority,
+                r.RStat_Code,
+
+                rt.RType_Name,
+
+                c.First_Name,
+                c.Last_Name,
+
+                t.Task_ID,
+                t.Name AS TaskName,
+                t.DateAssigned,
+                t.DateCompleted,
+                t.Priority AS TaskPriority,
+
+                s.TStat_Name,
+
+                rep.Report_ID,
+                rep.Title AS ReportTitle,
+                rep.Description AS ReportText,
+
+                d.Doc_ID,
+                d.FilePath
+
+            FROM REQUEST r
+
+            LEFT JOIN REQUEST_TYPES rt 
+                ON r.RType_ID = rt.RType_ID
+
+            LEFT JOIN CITIZEN c 
+                ON r.C_ID = c.C_ID
+
+            LEFT JOIN TASK t 
+                ON t.Req_ID = r.Req_ID 
+                AND t.Emp_ID = ?
+
+            LEFT JOIN TASK_STATUSES s 
+                ON t.TStat_Code = s.TStat_Code
+
+            LEFT JOIN REPORT rep 
+                ON rep.Task_ID = t.Task_ID
+
+            LEFT JOIN DOCUMENT d 
+                ON d.Req_ID = r.Req_ID 
+                AND d.IsValid = 1
+
+            WHERE r.FlagRejected = 0
+
+            ORDER BY r.DateMade DESC
+            `,
+            [empId]
+        );
+
+        const formatted = rows.map(r => {
+
+            const hasTask = !!r.Task_ID;
+            const hasReport = !!r.Report_ID;
+            const hasDoc = !!r.Doc_ID;
+
+            return {
+                requestId: r.Req_ID,
+                type: r.RType_Name,
+                citizen: `${r.First_Name} ${r.Last_Name}`,
+                date: r.DateMade,
+
+                task: hasTask ? {
+                    id: r.Task_ID,
+                    name: r.TaskName,
+                    assignedTo: "You",
+                    status: r.TStat_Name,
+                    priority: r.TaskPriority
+                } : null,
+
+                report: hasReport
+                    ? `${r.ReportTitle}: ${r.ReportText}`
+                    : null,
+
+                issuedDocument: {
+                    exists: hasDoc,
+                    url: hasDoc ? r.FilePath : null
+                },
+
+                requestNumber: formatRequestNumber({
+                    date: r.DateMade,
+                    requestTypeId: r.RType_ID,
+                    requestId: r.Req_ID
+                })
+            };
+        });
+
+        return sendSuccess(res, "Operations overview loaded", {
+            operations: formatted
+        });
+
+    } catch (err) {
+        console.error("OPERATIONS OVERVIEW ERROR:", err);
+        return sendError(
+            res,
+            500,
+            "Failed to load operations overview",
+            "OPERATIONS_OVERVIEW_ERROR"
+        );
+    }
+};

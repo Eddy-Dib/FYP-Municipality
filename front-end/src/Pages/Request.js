@@ -5,7 +5,7 @@ import SuccessToast from "../Components/UI/SuccessToast";
 
 function Request() {
     const API_URL = process.env.REACT_APP_API_URL;
-    const token = localStorage.getItem("token"); // 👈 where you store it
+    const token = localStorage.getItem("token");
 
     const [step, setStep] = useState(1);
     const [requestTypes, setRequestTypes] = useState([]);

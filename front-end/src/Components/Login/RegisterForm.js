@@ -235,14 +235,16 @@ function RegisterForm() {
                 <input type="file" onChange={(e) => setFile(e.target.files[0])} required />
             </div>
 
+            {message && <p className={styles.error}>{message}</p>}
+
             <button type="submit" disabled={loading} className={styles.button}>
                 {loading ? "Submitting..." : "Send Request"}
             </button>
 
-            {message && <p className={styles.error}>{message}</p>}
             {toast && (
-                <SuccessToast message="Request Sent! We'll be in touch." onClose={() => setToast(false)}/>
+                <SuccessToast message="Request Sent! We'll be in touch." onClose={() => setToast(false)} />
             )}
+            
         </form>
     );
 }
