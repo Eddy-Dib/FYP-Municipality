@@ -1,6 +1,7 @@
 export const getPriority = (priorityCode) => {
-    if (priorityCode >= 2) return "High";
-    if (priorityCode === 1) return "Medium";
+    if (priorityCode >= 4) return "Urgent";
+    if (priorityCode === 3) return "High";
+    if (priorityCode === 2) return "Medium";
     return "Low";
 };
 

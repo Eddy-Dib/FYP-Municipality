@@ -12,15 +12,17 @@ import Footer from "./Footer.js";
 function CitizenDashboard() {
     return (
         <div>
-            <div className={styles.videoSection}>
-                <video autoPlay loop muted className={styles.video}>
-                    <source src={videoFile} type="video/mp4" />
-                </video>
-            </div>
+            <div className={styles.homeBg}>
+                <div className={styles.videoSection}>
+                    <video autoPlay loop muted className={styles.video}>
+                        <source src={videoFile} type="video/mp4" />
+                    </video>
+                </div>
 
-            <div className={styles.introText}>
-                <h1> Welcome to your Municipality </h1>
-                <p> Our Town, Our Future, building a stronger community together. </p>
+                <div className={styles.introText}>
+                    <h1> Welcome to your Municipality </h1>
+                    <p> Our Town, Our Future, building a stronger community together. </p>
+                </div>
             </div>
 
             <div className={styles.weatherSection}>
@@ -87,7 +89,7 @@ function CitizenDashboard() {
             </div>
 
             <div className={styles.Map}>
-                <Map/>
+                <Map />
             </div>
 
             <div className={styles.contactBar}>

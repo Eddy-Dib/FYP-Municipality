@@ -1,6 +1,7 @@
 import Card from "./Card";
 import styles from "./RequestCard.module.css";
 import { FaFileAlt } from "react-icons/fa";
+import { PriorityBadge, StatusBadge } from "../UI/Badge";
 
 function RequestCard({ request, onSelect }) {
 
@@ -37,14 +38,11 @@ function RequestCard({ request, onSelect }) {
                 </p>
 
                 <p>
-                    <strong>Status:</strong>{" "}
-                    <span className={`${styles.status} ${styles[statusKey] || ""}`}>
-                        {request.status}
-                    </span>
+                    <strong>Status:</strong>{" "} <StatusBadge value={request.status} />
                 </p>
 
                 <p>
-                    <strong>Priority:</strong> {request.priority}
+                    <strong>Priority:</strong> <PriorityBadge value={request.priority} />
                 </p>
 
                 <p>
