@@ -21,6 +21,7 @@ import Request from "./Pages/Request";
 import Complain from "./Pages/Complain";
 import Documents from "./Pages/Documents";
 import PayFees from "./Pages/PayFees";
+import MyRequest from "./Pages/MyRequests";
 import Profile from "./Pages/Profile";
 
 // Mayor
@@ -100,6 +101,7 @@ function App() {
           <Route path="complain" element={<Complain />} />
           <Route path="Documents" element={<Documents/>} />
           <Route path="payfees" element={<PayFees />} />
+          <Route path="myrequests" element={<MyRequest/>} />
           <Route path="profile" element={<Profile />} />
         </Route>
 
