@@ -6,7 +6,7 @@ import { PriorityBadge, StatusBadge } from "../UI/Badge";
 
 function OperationsChainCard({ data, onSelect }) {
     const [open, setOpen] = useState(false);
-
+    const API_URL = process.env.REACT_APP_API_URL;
     if (!data) return null;
 
     const {
@@ -74,7 +74,7 @@ function OperationsChainCard({ data, onSelect }) {
                     <div className={styles.expanded}>
 
                         <div className={styles.block}>
-                            <p className={styles.blockTitle}>Task</p>
+                            <h3 className={styles.blockTitle}>Task</h3>
 
                             {task ? (
                                 <>
@@ -86,10 +86,6 @@ function OperationsChainCard({ data, onSelect }) {
                                         Status:{" "}
                                         <StatusBadge value={task.status} />
                                     </p>
-                                    <p>
-                                        Priority:{" "}
-                                        <PriorityBadge value={task.priority} />
-                                    </p>
                                 </>
                             ) : (
                                 <p>No task assigned</p>
@@ -97,15 +93,22 @@ function OperationsChainCard({ data, onSelect }) {
                         </div>
 
                         <div className={styles.block}>
-                            <p className={styles.blockTitle}>Report</p>
+                            <h3 className={styles.blockTitle}>Report</h3>
 
-                            <p>
-                                {typeof report === "string"
-                                    ? report
-                                    : report
-                                        ? JSON.stringify(report)
-                                        : "No report available"}
-                            </p>
+                            {report ? (
+                                typeof report === "string" ? (
+                                    <p>{report}</p>
+                                ) : (
+                                    <div>
+                                        <p>
+                                            <strong>Title:</strong> {report.title}
+                                        </p>
+                                        <p>{report.text}</p>
+                                    </div>
+                                )
+                            ) : (
+                                <p>No report available</p>
+                            )}
                         </div>
 
                         <div className={styles.block}>
@@ -117,7 +120,7 @@ function OperationsChainCard({ data, onSelect }) {
 
                             {issuedDocument?.exists && issuedDocument?.url && (
                                 <a
-                                    href={issuedDocument.url}
+                                    href={API_URL + issuedDocument.url}
                                     target="_blank"
                                     rel="noreferrer"
                                     className={styles.pdf}

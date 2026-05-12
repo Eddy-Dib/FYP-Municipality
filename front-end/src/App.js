@@ -39,6 +39,7 @@ import SystemLogs from "./Pages/SystemLogs";
 // Secretary
 import ManageRequests from "./Pages/Secretary/ManageRequests";
 import RequestDetailsPage from "./Pages/Secretary/RequestDetailsPage";
+import VerifyDocuments from "./Pages/Secretary/VerifyDocuments";
 
 // Print
 import ReportPrint from "./Pages/ReportPrint";
@@ -84,6 +85,8 @@ function App() {
           {/* SECRETARY ROUTES*/}
           <Route path="secretary/managereq" element={<ProtectedRoute allowedRoles={["Secretary"]}><ManageRequests /></ProtectedRoute>}/>
           <Route path="secretary/managereq/:id" element={<ProtectedRoute allowedRoles={["Secretary"]}><RequestDetailsPage /></ProtectedRoute>} />
+          <Route path="secretary/verifydoc" element={<ProtectedRoute allowedRoles={["Secretary"]}><VerifyDocuments /></ProtectedRoute>} />
+
         </Route>
 
         {/* CITIZEN */}

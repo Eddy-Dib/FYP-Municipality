@@ -18,6 +18,7 @@ const app = express();
 
 app.use(cors());
 app.use(json());
+app.use("/files", express.static(process.env.DOC_ROOT));
 
 // Routes
 app.use("/auth", authRoutes);

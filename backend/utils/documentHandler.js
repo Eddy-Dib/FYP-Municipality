@@ -35,3 +35,15 @@ export const saveCitizenDocument = async ({
 
     return finalPath;
 };
+
+
+export const toPublicPath = (fullPath) => {
+    if (!fullPath) {
+        return null;
+    };
+
+    const normalized = fullPath.replace(/\\/g, "/");
+
+    const base = process.env.DOC_ROOT.replace(/\\/g, "/");
+    return normalized.replace(base, "/files");
+};

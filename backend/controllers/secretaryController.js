@@ -3,6 +3,7 @@ import { sendSuccess, sendError } from "../utils/responses.js";
 import { formatDate, safeParseJSON } from "../utils/formats.js";
 import { getPriority } from "../utils/labels.js";
 import { sendRequestStatusEmail } from "../utils/notificationService.js";
+import { toPublicPath } from "../utils/documentHandler.js"
 import { text } from "express";
 
 const requireSecretary = (req, res) => {
@@ -142,21 +143,25 @@ export const getRequestDocuments = async (req, res) => {
                 d.Doc_Type,
                 d.DateUploaded,
                 d.FilePath,
-                d.IsValid
+                d.IsValid,
+
+                dt.Doc_Type_Name
+
             FROM REQUEST r
             JOIN CITIZEN c ON r.C_ID = c.C_ID
             JOIN DOCUMENT d ON d.C_ID = c.C_ID
-            WHERE r.Req_ID = ?
+            JOIN DOC_TYPE dt ON dt.Doc_Type_ID = d.Doc_Type
+            WHERE r.Req_ID = ? AND d.IsValid = 1 AND (d.ExpDate IS NULL OR d.ExpDate > NOW())
             ORDER BY d.DateUploaded DESC
         `, [id]);
 
         const formatted = rows.map(d => ({
             id: d.Doc_ID,
-            type: d.Doc_Type,
+            type: d.Doc_Type_Name,
             uploadedAt: d.DateUploaded ? formatDate(new Date(d.DateUploaded)) : null,
-            filePath: d.FilePath,
-            isValid: Number(d.IsValid) === 1,
-            status: Number(d.IsValid) === 1 ? "Valid" : "Invalid"
+            filePath: toPublicPath(d.FilePath),
+            isValid: true,
+            status: false
         }));
 
         return sendSuccess(res, "Documents fetched", formatted);
@@ -378,5 +383,99 @@ export const rejectRequest = async (req, res) => {
     } catch (err) {
         console.error("REJECT ERROR:", err);
         return sendError(res, 500, "Failed to reject request", "REJECT_ERROR");
+    }
+};
+
+export const getValidationDocuments = async (req, res) => {
+    try {
+
+        const [rows] = await db.promise().query(`
+            SELECT 
+                d.Doc_ID,
+                d.FilePath,
+                d.DateUploaded,
+                d.ExpDate,
+                d.IsValid,
+                d.IsReviewed,
+
+                c.First_Name,
+                c.Last_Name,
+
+                dt.Doc_Type_Name
+
+            FROM DOCUMENT d
+            JOIN CITIZEN c ON d.C_ID = c.C_ID
+            JOIN DOC_TYPE dt ON d.Doc_Type = dt.Doc_Type_ID
+
+            WHERE d.IsReviewed = 0
+              AND d.IsValid = 1
+              AND (d.ExpDate IS NULL OR d.ExpDate > NOW())
+
+            ORDER BY d.DateUploaded ASC
+        `);
+
+        const formatted = rows.map(doc => ({
+            ...doc, FilePath: toPublicPath(doc.FilePath)
+        }))
+
+        return sendSuccess(res, "Documents fetched successfully", formatted);
+
+    } catch (err) {
+        console.error(err);
+        return sendError(res, 500, "Failed to fetch documents", "SERVER_ERROR");
+    }
+};
+
+export const validateDocument = async (req, res) => {
+    try {
+        const docId = req.params.id;
+
+        const [result] = await db.promise().query(
+            `
+            UPDATE DOCUMENT
+            SET 
+                IsValid = 1,
+                IsReviewed = 1
+            WHERE Doc_ID = ?
+            `,
+            [docId]
+        );
+
+        if (result.affectedRows === 0) {
+            return sendError(res, 404, "Document not found", "NOT_FOUND");
+        }
+
+        return sendSuccess(res, "Document validated successfully");
+
+    } catch (err) {
+        console.error(err);
+        return sendError(res, 500, "Failed to validate document", "SERVER_ERROR");
+    }
+};
+
+export const rejectDocument = async (req, res) => {
+    try {
+        const docId = req.params.id;
+
+        const [result] = await db.promise().query(
+            `
+            UPDATE DOCUMENT
+            SET 
+                IsValid = 0,
+                IsReviewed = 1
+            WHERE Doc_ID = ?
+            `,
+            [docId]
+        );
+
+        if (result.affectedRows === 0) {
+            return sendError(res, 404, "Document not found", "NOT_FOUND");
+        }
+
+        return sendSuccess(res, "Document rejected successfully");
+
+    } catch (err) {
+        console.error(err);
+        return sendError(res, 500, "Failed to reject document", "SERVER_ERROR");
     }
 };

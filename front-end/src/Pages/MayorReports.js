@@ -131,12 +131,7 @@ export default function MayorReports() {
 
                                 date: op.date,
 
-                                report:
-                                    typeof op.report === "string"
-                                        ? op.report
-                                        : op.report
-                                            ? JSON.stringify(op.report)
-                                            : null,
+                                report: op.report,
 
                                 task: op.task,
                                 issuedDocument: op.issuedDocument

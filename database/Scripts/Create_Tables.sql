@@ -48,7 +48,7 @@ CREATE TABLE TASK_STATUSES (
 CREATE TABLE DOC_TYPE(
 	Doc_Type_ID INT NOT NULL,
 	Doc_Type_Name VARCHAR(100) NOT NULL UNIQUE,
-	Valid_for INT DEFAULT 0, -- in number of months, if 0, valid forever
+	Valid_for INT DEFAULT 0, -- if 0, valid forever
 	
 	PRIMARY KEY (Doc_Type_ID)
 );
@@ -290,6 +290,7 @@ CREATE TABLE DOCUMENT (
     Req_ID INT,
     Comp_ID INT,
     IsValid TINYINT DEFAULT 1,	-- 1 = valid, 0 = invalid
+    IsReviewed TINYINT DEFAULT 0 NOT NULL, -- 1 = reviewd by sec, 0 = not
     PRIMARY KEY (Doc_ID),
     FOREIGN KEY (C_ID) REFERENCES CITIZEN(C_ID),
     FOREIGN KEY (Doc_Type) REFERENCES DOC_TYPE(Doc_Type_ID),
