@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import styles from "./Admin.module.css";
 import EmployeeRegisterForm from "../Components/Login/EmployeeRegisterForm";
+import SuccessToast from "../Components/UI/SuccessToast";
 
 function AssignRoles() {
     const API_URL = process.env.REACT_APP_API_URL;
@@ -10,6 +11,7 @@ function AssignRoles() {
     const [employees, setEmployees] = useState([]);
     const [roles, setRoles] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [toast, setToast] = useState(false);
 
     const [showModal, setShowModal] = useState(false);
 
@@ -31,7 +33,7 @@ function AssignRoles() {
             const disabledRole = {
                 Role_ID: -1,
                 Role_Type: "Disabled"
-            }
+            };
 
             setEmployees(employeesRes.data.data);
             setRoles([...realRoles, disabledRole]);
@@ -52,7 +54,7 @@ function AssignRoles() {
             prev.map(emp =>
                 emp.Emp_ID === empId
                     ? { ...emp, Role_ID: Number(roleId) }
-                    : emp
+                    : emp                    
             )
         );
     };
@@ -68,12 +70,23 @@ function AssignRoles() {
             );
 
             await loadData();
+            setToast(true);
 
         } catch (err) {
             console.error(err);
             alert("Failed to update role");
         }
     };
+
+    const adminRole = roles.find(
+        role => role.Role_Type.toLowerCase() === "admin"
+    );
+
+    const adminCount = employees.filter(
+        emp =>
+            emp.Active_Flg !== 0 &&
+            emp.Role_ID === adminRole?.Role_ID
+    ).length;
 
     return (
         <div className={styles.page}>
@@ -117,43 +130,76 @@ function AssignRoles() {
                                     </td>
                                 </tr>
                             ) : employees.length > 0 ? (
-                                employees.map(emp => (
-                                    <tr key={emp.Emp_ID}>
-                                        <td>#{emp.Emp_ID}</td>
-                                        <td>{emp.name}</td>
-                                        <td>{emp.Active_Flg === 0 ? "Disabled" : emp.Role_Type}</td>
 
-                                        <td>
-                                            <select
-                                                className={styles.select}
-                                                value={emp.Active_Flg === 0 ? -1 : emp.Role_ID}
-                                                onChange={(e) =>
-                                                    changeRole(emp.Emp_ID, e.target.value)
-                                                }
-                                            >
-                                                {roles.map(role => (
-                                                    <option
-                                                        key={role.Role_ID}
-                                                        value={role.Role_ID}
-                                                    >
-                                                        {role.Role_Type}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                        </td>
+                                employees.map(emp => {
 
-                                        <td>
-                                            <button
-                                                className={styles.blueBtn}
-                                                onClick={() =>
-                                                    saveRole(emp.Emp_ID, emp.Role_ID)
-                                                }
-                                            >
-                                                Save
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))
+                                    const isLastAdmin =
+                                        emp.Active_Flg !== 0 &&
+                                        emp.Role_ID === adminRole?.Role_ID &&
+                                        adminCount === 1;
+
+                                    return (
+                                        <tr key={emp.Emp_ID}>
+                                            <td>#{emp.Emp_ID}</td>
+
+                                            <td>{emp.name}</td>
+
+                                            <td>
+                                                {emp.Active_Flg === 0
+                                                    ? "Disabled"
+                                                    : emp.Role_Type}
+                                            </td>
+
+                                            <td>
+                                                <select
+                                                    className={styles.select}
+
+                                                    value={emp.Role_ID}
+
+                                                    disabled={isLastAdmin}
+
+                                                    onChange={(e) =>
+                                                        changeRole(
+                                                            emp.Emp_ID,
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                >
+                                                    {roles.map(role => (
+                                                        <option
+                                                            key={role.Role_ID}
+                                                            value={role.Role_ID}
+
+                                                            disabled={
+                                                                isLastAdmin &&
+                                                                role.Role_Type !== "Admin"
+                                                            }
+                                                        >
+                                                            {role.Role_Type}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </td>
+
+                                            <td>
+                                                <button
+                                                    className={styles.blueBtn}
+                                                    disabled={isLastAdmin}
+
+                                                    onClick={() =>
+                                                        saveRole(
+                                                            emp.Emp_ID,
+                                                            emp.Role_ID
+                                                        )
+                                                    }
+                                                >
+                                                    Save
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    );
+                                })
+
                             ) : (
                                 <tr>
                                     <td colSpan="5" style={{ textAlign: "center", padding: "40px" }}>
@@ -165,6 +211,13 @@ function AssignRoles() {
                     </table>
                 </div>
             </div>
+
+            {toast && (
+                <SuccessToast
+                    message={"Role Updated Successfully!"}
+                    onClose={() => setToast(false)}
+                />
+            )}
 
             {showModal && (
                 <EmployeeRegisterForm

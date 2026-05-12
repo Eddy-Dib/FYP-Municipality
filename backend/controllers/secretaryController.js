@@ -297,7 +297,7 @@ export const rejectRequest = async (req, res) => {
     if (!requireSecretary(req, res)) return;
 
     const { id } = req.params;
-    const {rejTitle, rejText } = req.body;
+    const { rejTitle, rejText } = req.body;
 
     if (!id || isNaN(id)) {
         return sendError(res, 400, "Invalid request ID", "BAD_REQUEST_ID");
@@ -348,6 +348,17 @@ export const rejectRequest = async (req, res) => {
         if (result.affectedRows === 0) {
             return sendError(res, 404, "Request not found", "REQ_NOT_FOUND");
         }
+
+        await db.promise().query(
+            `
+            UPDATE TASK
+            SET 
+                TStat_Code = 6
+                WHERE Req_ID = ?
+            AND TStat_Code != 5
+            `,
+            [id]
+        );
 
         try {
             await sendRequestStatusEmail({

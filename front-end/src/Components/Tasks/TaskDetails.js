@@ -138,6 +138,8 @@ function TaskDetails() {
                     <button
                         className={styles.completeTaskBtn}
                         onClick={() => updateStatus("Completed")}
+                        disabled={!data?.report}
+                        title={!data?.report ? "Write a report before completing the task" : ""}
                     >
                         Mark Completed
                     </button>

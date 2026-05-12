@@ -15,6 +15,10 @@ export const getMyProfile = (req, res) => {
                 CONCAT(c.First_Name, ' ', c.Last_Name) AS FullName,
                 c.Email,
                 c.Phone_Num,
+                ci.City_ID,
+                s.Street_ID,
+                b.Building_ID,
+                l.Location_ID,
                 CONCAT(
                     ci.City_Name, ' - ',
                     s.Street_Name, ' - ',

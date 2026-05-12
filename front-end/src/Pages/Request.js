@@ -1,6 +1,7 @@
 import styles from "./Request.module.css";
 import { useState, useEffect } from "react";
 import axios from "axios";
+import SuccessToast from "../Components/UI/SuccessToast";
 
 function Request() {
     const API_URL = process.env.REACT_APP_API_URL;
@@ -14,6 +15,8 @@ function Request() {
     const [locations, setLocations] = useState([]);
     const [profile, setProfile] = useState(null);
     const [error, setError] = useState("");
+
+    const [toast, setToast] = useState(false);
 
     const validateStep1 = () => {
         if (!data.title) return "Request title is required";
@@ -146,7 +149,6 @@ function Request() {
 
         setError("");
 
-        // ================= FILES =================
         if (files) {
             const newFiles = Array.from(files);
 
@@ -163,7 +165,6 @@ function Request() {
             return;
         }
 
-        // ================= PHONES =================
         if (name === "phones") {
             const updated = [...data.phones];
             updated[index] = value;
@@ -176,7 +177,6 @@ function Request() {
             return;
         }
 
-        // ================= CITY CHANGE =================
         if (name === "cityId") {
             setData(prev => ({
                 ...prev,
@@ -193,7 +193,6 @@ function Request() {
             return;
         }
 
-        // ================= STREET CHANGE =================
         if (name === "streetId") {
             setData(prev => ({
                 ...prev,
@@ -208,7 +207,6 @@ function Request() {
             return;
         }
 
-        // ================= BUILDING CHANGE =================
         if (name === "buildingId") {
             setData(prev => ({
                 ...prev,
@@ -221,7 +219,6 @@ function Request() {
             return;
         }
 
-        // ================= DEFAULT =================
         setData(prev => ({
             ...prev,
             [name]: value
@@ -283,7 +280,12 @@ function Request() {
                         ...prev,
                         fullName: p.FullName || prev.fullName,
                         email: p.Email || prev.email,
-                        phones: p.Phone_Num ? [p.Phone_Num, ""] : prev.phones
+                        phones: p.Phone_Num ? [p.Phone_Num, ""] : prev.phones,
+
+                        cityId: p.City_ID || "",
+                        streetId: p.Street_ID || "",
+                        buildingId: p.Building_ID || "",
+                        locationId: p.Location_ID || ""
                     }));
                 }
             } catch (err) {
@@ -294,8 +296,45 @@ function Request() {
         fetchProfile();
     }, []);
 
+    const resetForm = () => {
+        setData({
+            title: "",
+            type: "",
+            fullName: profile?.FullName || "",
+            phones: [profile?.Phone_Num || "", ""],
+            email: profile?.Email || "",
+            cityId: profile?.City_ID || "",
+            streetId: profile?.Street_ID || "",
+            buildingId: profile?.Building_ID || "",
+            locationId: profile?.Location_ID || "",
+            description: "",
+            urgency: "",
+            files: []
+        });
+
+        setPreviews([]);
+        setError("");
+    };
+
     const handleSubmit = async () => {
+        console.log(data);
         try {
+            const cityName =
+                cities.find(c => c.City_ID == data.cityId)?.City_Name;
+
+            const streetName =
+                streets.find(s => s.Street_ID == data.streetId)?.Street_Name;
+
+            const buildingName =
+                buildings.find(b => b.Building_ID == data.buildingId)?.Building_Name;
+
+            const locationObj =
+                locations.find(l => l.Location_ID == data.locationId);
+
+            const floorText = `floor ${locationObj.Floor}`;
+
+            const address =
+                `${cityName} - ${streetName} - ${buildingName} - ${floorText}`;
 
             const payload = {
                 title: data.title,
@@ -303,10 +342,7 @@ function Request() {
                 fullName: data.fullName,
                 phones: data.phones,
                 email: data.email,
-                cityId: data.cityId,
-                streetId: data.streetId,
-                buildingId: data.buildingId,
-                locationId: data.locationId,
+                address: address,
                 description: data.description,
                 urgency: data.urgency
             };
@@ -323,7 +359,10 @@ function Request() {
                 }
             );
 
-            alert("Request sent!");
+            setToast(true);
+            setStep(1);
+            resetForm();
+            setError("");
 
         } catch (err) {
 
@@ -338,6 +377,9 @@ function Request() {
 
     return (
         <div className={styles.requestPage}>
+            {toast && (
+                <SuccessToast message="Request Sent!" onClose={() => setToast(false)}/>
+            )}
 
             <div className={styles.topSection}>
                 <h1>Submit a Request</h1>
@@ -499,7 +541,7 @@ function Request() {
                             <div className={styles.urgencyGroup}>
                                 {["Low", "Medium", "High", "Emergency"].map(level => (
                                     <label key={level}>
-                                        <input type="radio" name="urgency" value={level} onChange={handleChange} />
+                                        <input type="radio" name="urgency" value={level} onChange={handleChange} checked={data.urgency === level} />
                                         {level}
                                     </label>
                                 ))}

@@ -1,43 +1,45 @@
 import db from "../config/db.js";
 import { sendSuccess, sendError } from "../utils/responses.js";
 
-
-// ===============================
-// CREATE REQUEST
-// ===============================
 export const createRequest = async (req, res) => {
     try {
-        const citizenId = req.user?.id;
+        const userId = req.user?.id;
 
-        if (!citizenId) {
+        if (!userId) {
             return sendError(res, 401, "Unauthorized", "NO_USER");
         }
 
+        const [citizens] = await db.promise().query(
+            `SELECT C_ID
+            FROM CITIZEN
+            WHERE U_ID = ?`,
+            [userId]
+        );
+
+        if (!citizens.length) {
+            return sendError(res, 404, "Citizen profile not found", "CITIZEN_NOT_FOUND");
+        }
+
+        const citizenId = citizens[0].C_ID;
+        
         const {
             title,
             type,
             fullName,
             phones,
             email,
-            cityId,
-            streetId,
-            buildingId,
-            locationId,
+            address,
             description,
             urgency
         } = req.body;
 
-        // validation
         if (
             !title ||
             !type ||
             !fullName ||
             !phones?.[0] ||
             !email ||
-            !cityId ||
-            !streetId ||
-            !buildingId ||
-            !locationId
+            !address
         ) {
             return sendError(res, 400, "Missing required fields", "MISSING_FIELDS");
         }
@@ -60,10 +62,7 @@ export const createRequest = async (req, res) => {
             fullName,
             phones,
             email,
-            cityId,
-            streetId,
-            buildingId,
-            locationId,
+            address,
             description
         });
 
@@ -126,9 +125,6 @@ export const getRequests = async (req, res) => {
 };
 
 
-// ===============================
-// UPDATE REQUEST STATUS
-// ===============================
 export const updateRequestStatus = (req, res) => {
     const { id } = req.params;
     const { action } = req.body;
@@ -158,10 +154,6 @@ export const updateRequestStatus = (req, res) => {
     );
 };
 
-
-// ===============================
-// GET REQUEST TYPES
-// ===============================
 export const getRequestTypes = async (req, res) => {
     try {
         const [results] = await db.promise().query(
