@@ -12,7 +12,7 @@ function MyRequests() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const res = await axios.get(`${API_URL}/api/citizen/my-activity`, {
+                const res = await axios.get(`${API_URL}/api/my-requests`, {
                     headers: {
                         Authorization: `Bearer ${token}`
                     }
@@ -29,45 +29,68 @@ function MyRequests() {
         fetchData();
     }, []);
 
+    const isEmpty =
+        (!requests || requests.length === 0) &&
+        (!complaints || complaints.length === 0);
+
     return (
         <div className={styles.page}>
-            <h2>My Requests & Complaints</h2>
+
+            {/* HERO */}
+            <div className={styles.heroSection}>
+                <div className={styles.heroContent}>
+                    <div className={styles.heroText}>
+                        <h1>My Requests & Complaints</h1>
+                        <p>Review your submissions and track their real-time status</p>
+                    </div>
+                </div>
+            </div>
+
+            {/* EMPTY STATE */}
+            {isEmpty && (
+                <div className={styles.emptyState}>
+                    <h2>Nothing submitted yet</h2>
+                    <p>Your requests and complaints will appear here once you submit them.</p>
+                </div>
+            )}
 
             {/* REQUESTS */}
-            <h3>Requests</h3>
-            <div className={styles.grid}>
-                {requests.map(r => (
-                    <div key={r.Req_ID} className={styles.card}>
-                        <h4>{r.RType_Name}</h4>
-                        <p>ID: #{r.Req_ID}</p>
-                        <p>Status: {r.RStat_Name}</p>
-                        <p>Priority: {r.Priority}</p>
-                        <p>Date: {new Date(r.DateMade).toLocaleDateString()}</p>
+            {requests.map(r => (
+                <div key={r.Req_ID} className={styles.cardFull}>
+                    <div className={styles.cardHeader}>
+                        <h3>{r.RType_Name}</h3>
+                        <span className={styles.badge}>{r.RStat_Name}</span>
                     </div>
-                ))}
-            </div>
+
+                    <div className={styles.cardBody}>
+                        <p><b>ID:</b> #{r.Req_ID}</p>
+                        <p><b>Priority:</b> {r.Priority}</p>
+                        <p><b>Date:</b> {new Date(r.DateMade).toLocaleDateString()}</p>
+                    </div>
+                </div>
+            ))}
 
             {/* COMPLAINTS */}
-            <h3>Complaints</h3>
-            <div className={styles.grid}>
-                {complaints.map(c => (
-                    <div key={c.Cmpt_ID} className={styles.card}>
-                        <h4>{c.Subject}</h4>
-                        <p>Type: {c.CType_Name}</p>
-                        <p>Date: {new Date(c.DateMade).toLocaleDateString()}</p>
-
-                        <p>
-                            Status: {
-                                c.DateResolved
-                                    ? "Resolved"
-                                    : c.DateRejected
-                                        ? "Rejected"
-                                        : "Pending"
-                            }
-                        </p>
+            {complaints.map(c => (
+                <div key={c.Cmpt_ID} className={styles.cardFull}>
+                    <div className={styles.cardHeader}>
+                        <h3>{c.Subject}</h3>
+                        <span className={styles.badge}>
+                            {c.DateResolved
+                                ? "Resolved"
+                                : c.DateRejected
+                                    ? "Rejected"
+                                    : "Pending"}
+                        </span>
                     </div>
-                ))}
-            </div>
+
+                    <div className={styles.cardBody}>
+                        <p><b>Type:</b> {c.CType_Name}</p>
+                        <p><b>Date:</b> {new Date(c.DateMade).toLocaleDateString()}</p>
+                    </div>
+                </div>
+            ))}
+
         </div>
     );
 }

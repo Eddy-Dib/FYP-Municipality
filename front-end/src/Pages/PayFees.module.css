@@ -7,12 +7,20 @@
 /* ================= HERO ================= */
 
 .hero {
-    background: linear-gradient(135deg, #10376a 0%, #1f4f88 100%);
-    padding: 120px 20px 70px;
+    background: linear-gradient(135deg, #16365f 0%, #2d62a6 100%);
+    padding: 45px 0 90px 0;
+    color: white;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
     text-align: center;
+
+    width: 100%;
     position: relative;
     overflow: hidden;
-    color: white;
 }
 
 .hero::before {
@@ -22,36 +30,46 @@
     left: -50%;
     width: 200%;
     height: 200%;
-    background: radial-gradient(circle, rgba(255,255,255,0.12) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.12) 0%, transparent 70%);
     animation: rotateGlow 20s linear infinite;
 }
 
 @keyframes rotateGlow {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 .hero h1 {
-    font-size: 42px;
-    margin-bottom: 10px;
+    position: relative;
+    z-index: 1;
+
+    font-size: 2.4rem;
+    margin: 60px 0 8px;
+    font-weight: 750;
+    line-height: 1.1;
 }
 
 .hero p {
-    font-size: 17px;
-    opacity: 0.95;
-}
+    position: relative;
+    z-index: 1;
 
-/* ================= CONTAINER ================= */
+    font-size: 1.1rem;
+    opacity: 0.92;
+    margin: 0;
+}
 
 .container {
     max-width: 850px;
-    margin: 40px auto;
+    margin: 35px auto 40px;
     padding: 0 20px;
+    position: relative;
+    z-index: 2;
 }
-
-/* =====================================================
-   🧑‍💼 CITIZEN CARD (FIRST CARD — IMPROVED DESIGN)
-   ===================================================== */
 
 .card:first-child {
     padding: 22px;
@@ -75,14 +93,16 @@
     text-align: left;
 }
 
-/* ================= GENERAL CARD ================= */
-
 .card {
     background: white;
-    padding: 18px;
+    padding: 25px;
     border-radius: 16px;
-    margin-bottom: 16px;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.05);
+
+    border-left: 5px solid #253965;
+
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+    margin-bottom: 20px;
+
     transition: 0.25s;
 }
 
@@ -106,7 +126,15 @@
     font-size: 14px;
 }
 
-/* ================= TOTAL ================= */
+.paid {
+    color: #16a34a;
+    font-weight: bold;
+}
+
+.unpaid {
+    color: #dc2626;
+    font-weight: bold;
+}
 
 .totalBox {
     background: white;
@@ -115,7 +143,7 @@
     text-align: right;
     font-size: 18px;
     font-weight: bold;
-    box-shadow: 0 6px 15px rgba(0,0,0,0.06);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.06);
     margin-top: 10px;
 }
 
@@ -127,7 +155,7 @@
     padding: 14px;
     border: none;
     border-radius: 12px;
-    background: #2563eb;
+    background: #18377a;
     color: white;
     font-weight: bold;
     cursor: pointer;
@@ -202,6 +230,7 @@
         border: 1px solid #ddd;
     }
 }
+
 /* Citizen Card Better Layout */
 
 .citizenName {
