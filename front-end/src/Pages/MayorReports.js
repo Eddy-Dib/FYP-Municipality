@@ -119,7 +119,28 @@ export default function MayorReports() {
                     getFiltered.map((op) => (
                         <OperationsChainCard
                             key={op.requestId}
-                            data={op}
+                            data={{
+                                requestNumber: op.requestNumber,
+                                requestTitle: op.requestTitle,
+                                type: op.type,
+
+                                citizen:
+                                    typeof op.citizen === "string"
+                                        ? op.citizen
+                                        : op.citizen?.fullName || "Unknown",
+
+                                date: op.date,
+
+                                report:
+                                    typeof op.report === "string"
+                                        ? op.report
+                                        : op.report
+                                            ? JSON.stringify(op.report)
+                                            : null,
+
+                                task: op.task,
+                                issuedDocument: op.issuedDocument
+                            }}
                             onSelect={handleSelect}
                         />
                     ))

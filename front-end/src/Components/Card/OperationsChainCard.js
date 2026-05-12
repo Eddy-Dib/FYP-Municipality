@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import Card from "./Card";
 import styles from "./OperationsChainCard.module.css";
 import { FaFilePdf, FaChevronDown, FaChevronUp, FaFileAlt } from "react-icons/fa";
-
 import { PriorityBadge, StatusBadge } from "../UI/Badge";
 
 function OperationsChainCard({ data, onSelect }) {
@@ -12,6 +11,7 @@ function OperationsChainCard({ data, onSelect }) {
 
     const {
         requestNumber,
+        requestTitle,
         type,
         citizen,
         date,
@@ -27,7 +27,7 @@ function OperationsChainCard({ data, onSelect }) {
 
                 <div className={styles.header}>
                     <h3 className={styles.title}>
-                        {requestNumber}
+                        {requestNumber}: {requestTitle}
                     </h3>
 
                     <button
@@ -46,7 +46,10 @@ function OperationsChainCard({ data, onSelect }) {
                 </p>
 
                 <p>
-                    <strong>Citizen:</strong> {citizen}
+                    <strong>Citizen:</strong>{" "}
+                    {typeof citizen === "string"
+                        ? citizen
+                        : JSON.stringify(citizen)}
                 </p>
 
                 <p>
@@ -95,7 +98,14 @@ function OperationsChainCard({ data, onSelect }) {
 
                         <div className={styles.block}>
                             <p className={styles.blockTitle}>Report</p>
-                            <p>{report || "No report available"}</p>
+
+                            <p>
+                                {typeof report === "string"
+                                    ? report
+                                    : report
+                                        ? JSON.stringify(report)
+                                        : "No report available"}
+                            </p>
                         </div>
 
                         <div className={styles.block}>

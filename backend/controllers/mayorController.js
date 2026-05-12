@@ -392,7 +392,7 @@ export const getOperationsOverview = async (req, res) => {
                 r.Description,
                 r.Priority,
                 r.RStat_Code,
-
+                r.RType_ID,
                 rt.RType_Name,
 
                 c.First_Name,
@@ -410,8 +410,8 @@ export const getOperationsOverview = async (req, res) => {
                 rep.Title AS ReportTitle,
                 rep.Description AS ReportText,
 
-                d.Doc_ID,
-                d.FilePath
+                idoc.IssDoc_ID,
+                idoc.Content AS FilePath
 
             FROM REQUEST r
 
@@ -431,9 +431,8 @@ export const getOperationsOverview = async (req, res) => {
             LEFT JOIN REPORT rep 
                 ON rep.Task_ID = t.Task_ID
 
-            LEFT JOIN DOCUMENT d 
-                ON d.Req_ID = r.Req_ID 
-                AND d.IsValid = 1
+            LEFT JOIN ISSUED_DOCUMENT idoc 
+                ON idoc.Req_ID = r.Req_ID 
 
             WHERE r.FlagRejected = 0
 
@@ -446,13 +445,24 @@ export const getOperationsOverview = async (req, res) => {
 
             const hasTask = !!r.Task_ID;
             const hasReport = !!r.Report_ID;
-            const hasDoc = !!r.Doc_ID;
+            const hasDoc = !!r.IssDoc_ID;
+
+            let description = r.Description;
+
+            if (typeof description === "string") {
+                try {
+                    description = JSON.parse(description);
+                } catch {
+                    description = { title: description };
+                }
+            }
 
             return {
                 requestId: r.Req_ID,
                 type: r.RType_Name,
                 citizen: `${r.First_Name} ${r.Last_Name}`,
                 date: r.DateMade,
+                requestTitle: description.title.slice(0, 90) + (description.title.length > 90 ? "..." : ""),
 
                 task: hasTask ? {
                     id: r.Task_ID,
@@ -485,11 +495,6 @@ export const getOperationsOverview = async (req, res) => {
 
     } catch (err) {
         console.error("OPERATIONS OVERVIEW ERROR:", err);
-        return sendError(
-            res,
-            500,
-            "Failed to load operations overview",
-            "OPERATIONS_OVERVIEW_ERROR"
-        );
+        return sendError(res, 500, "Failed to load operations overview", "OPERATIONS_OVERVIEW_ERROR");
     }
 };
