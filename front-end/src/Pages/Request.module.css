@@ -129,6 +129,27 @@
     display: inline-block;
 }
 
+.imageWrapper select {
+    width: 100%;
+    margin-top: 8px;
+    padding: 10px 12px;
+
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+
+    background: white;
+    font-size: 0.85rem;
+    cursor: pointer;
+
+    transition: 0.2s;
+}
+
+.imageWrapper select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
 .voucherBox {
     background: #f9fafb;
     border: 1px dashed var(--border-color);

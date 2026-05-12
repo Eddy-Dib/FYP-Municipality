@@ -168,7 +168,11 @@ function Complain() {
                     setData(prev => ({
                         ...prev,
                         fullName: p.FullName ?? "",
-                        phone: p.Phone_Num ?? ""
+                        phone: p.Phone_Num ?? "",
+                        cityId: p.City_ID ?? "",
+                        streetId: p.Street_ID ?? "",
+                        buildingId: p.Building_ID ?? "",
+                        locationId: p.Location_ID ?? ""
                     }));
                 }
             } catch (err) {
@@ -234,7 +238,7 @@ function Complain() {
                     Description: ${data.description}`
             };
 
-            await axios.post(
+            const res = await axios.post(
                 `${API_URL}/api/complaints/createcomplaint`,
                 payload,
                 {
@@ -244,7 +248,28 @@ function Complain() {
                 }
             );
 
-            setError(""); // clear error
+            const complaintId = res.data.data.insertId;
+
+            if(data.files.length > 0){
+                const formData = new FormData();
+
+                data.files.forEach(file => {
+                    formData.append("documents", file);
+                });
+
+                await axios.post(
+                    `${API_URL}/api/documents/complaints/${complaintId}/upload`,
+                    formData,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                            "Content-Type": "multipart/form-data"
+                        }
+                    }
+                );
+            }
+
+            setError("");
             setToast(true);
             resetForm();
 

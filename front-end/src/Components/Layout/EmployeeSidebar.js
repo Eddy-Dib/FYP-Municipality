@@ -29,7 +29,7 @@ function EmployeeSideBar() {
             roleItems = [
                 //{ label: "Dashboard", path: "/employee/mayor/dashboard" },
                 { label: "Review Requests", path: "/employee/mayor/requests" },
-                { label: "Employee Reports", path: "/employee/mayor/reports" },
+                { label: "Activity Overview", path: "/employee/mayor/reports" },
                 { label: "Complaints", path: "/employee/mayor/complaints" },
                 //{label: "Send Alerts", path: "/employee/mayor/alerts"}
             ];
@@ -38,7 +38,7 @@ function EmployeeSideBar() {
         case "Secretary":
             roleItems = [
                 { label: "Register Request", path: "/employee/secretary/register" },
-                { label: "Verify Documents", path: "/employee/secretary/verify" },
+                { label: "Verify Documents", path: "/employee/secretary/verifydoc" },
                 { label: "Manage Requests", path: "/employee/secretary/managereq" },
                 { label: "Events", path: "/employee/secretary/events" },
                 { label: "Announcements", path: "/employee/secretary/announcements" },

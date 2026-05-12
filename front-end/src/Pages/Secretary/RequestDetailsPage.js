@@ -199,7 +199,7 @@ function RequestDetails() {
                             </div>
 
                             <a
-                                href={`${API_URL}${doc.file}`}
+                                href={`${API_URL}${doc.filePath}`}
                                 target="_blank"
                                 rel="noreferrer"
                                 className={styles.viewBtn}

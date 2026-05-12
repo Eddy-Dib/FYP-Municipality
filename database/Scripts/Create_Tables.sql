@@ -48,6 +48,7 @@ CREATE TABLE TASK_STATUSES (
 CREATE TABLE DOC_TYPE(
 	Doc_Type_ID INT NOT NULL,
 	Doc_Type_Name VARCHAR(100) NOT NULL UNIQUE,
+	Valid_for INT DEFAULT 0, -- if 0, valid forever
 	
 	PRIMARY KEY (Doc_Type_ID)
 );
@@ -178,7 +179,7 @@ CREATE TABLE USERS (
     U_ID INT NOT NULL AUTO_INCREMENT,
     Username VARCHAR(50) NOT NULL UNIQUE,
     Password VARCHAR(255) NOT NULL,
-    RegDate DATETIME NOT NULL,
+    RegDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     Active_Flg TINYINT DEFAULT 1 NOT NULL, -- flag for if user is active (1) or delted (0)
     PRIMARY KEY (U_ID)
 );
@@ -209,7 +210,6 @@ CREATE TABLE CITIZEN (
     CreatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     U_ID INT UNIQUE,				-- can be a user or not (NULL => not registered)
     Location_ID INT,
-    Rejected TINYINT NOT NULL DEFAULT 0,
     PRIMARY KEY (C_ID),
     FOREIGN KEY (U_ID) REFERENCES USERS(U_ID),
     FOREIGN KEY (Location_ID) REFERENCES LOCATION(Location_ID)
@@ -290,6 +290,7 @@ CREATE TABLE DOCUMENT (
     Req_ID INT,
     Comp_ID INT,
     IsValid TINYINT DEFAULT 1,	-- 1 = valid, 0 = invalid
+    IsReviewed TINYINT DEFAULT 0 NOT NULL, -- 1 = reviewd by sec, 0 = not
     PRIMARY KEY (Doc_ID),
     FOREIGN KEY (C_ID) REFERENCES CITIZEN(C_ID),
     FOREIGN KEY (Doc_Type) REFERENCES DOC_TYPE(Doc_Type_ID),

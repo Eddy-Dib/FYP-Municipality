@@ -1,7 +1,8 @@
 import db from "../config/db.js";
 import { sendSuccess, sendError } from "../utils/responses.js";
 import { saveCitizenDocument } from "../utils/documentHandler.js";
-import bcrypt from "bcrypt";
+import {verifyPassword, hashPassword} from "../utils/hash.js"
+
 export const getMyProfile = (req, res) => {
     try {
         const userId = req.user?.id;
@@ -52,8 +53,6 @@ export const changePassword = async (req, res) => {
 
         const userId = req.user?.id;
 
-        console.log(req.user);
-
         const {
             currentPassword,
             newPassword
@@ -82,23 +81,13 @@ export const changePassword = async (req, res) => {
 
         const user = users[0];
 
-        const isMatch = await bcrypt.compare(
-            currentPassword,
-            user.Password
-        );
+        const isMatch = await verifyPassword(currentPassword, user.Password);
 
         if (!isMatch) {
-            return sendError(
-                res,
-                400,
-                "Current password is incorrect"
-            );
+            return sendError(res, 400, "Current password is incorrect");
         }
 
-        const hashedPassword = await bcrypt.hash(
-            newPassword,
-            10
-        );
+        const hashedPassword = await hashPassword(newPassword);
 
         await db.promise().query(
             `
@@ -109,20 +98,11 @@ export const changePassword = async (req, res) => {
             [hashedPassword, userId]
         );
 
-        return sendSuccess(
-            res,
-            "Password updated successfully"
-        );
+        return sendSuccess(res, "Password updated successfully");
 
     } catch (err) {
-
         console.log(err);
-
-        return sendError(
-            res,
-            500,
-            "Server error"
-        );
+        return sendError(res, 500, "Server error");
     }
 };
 

@@ -4,6 +4,7 @@ import { sendSuccess, sendError } from "../utils/responses.js";
 import { formatDate, formatRequestNumber } from "../utils/formats.js";
 import { createIssuedDocumentFile } from "../utils/officialDoc/generateOfficialDoc.js"
 import { sendRequestStatusEmail } from "../utils/notificationService.js";
+import { toPublicPath } from "../utils/documentHandler.js";
 
 export const getMayorRequests = async (req, res) => {
     const empId = req.user?.empId;
@@ -367,5 +368,162 @@ export const finalApproveRequest = async (req, res) => {
                 }
             });
         }
+    }
+};
+
+export const getOperationsOverview = async (req, res) => {
+
+    const empId = req.user?.empId;
+
+    if (!req.user || !req.user.isEmployee) {
+        return sendError(res, 403, "Employees only", "NOT_EMPLOYEE");
+    }
+
+    if (!empId) {
+        return sendError(res, 401, "Invalid session", "INVALID_USER_ID");
+    }
+
+    try {
+
+        const [rows] = await db.promise().query(
+            `
+            SELECT
+                r.Req_ID,
+                r.DateMade,
+                r.Description,
+                r.Priority,
+                r.RStat_Code,
+                r.RType_ID,
+                rt.RType_Name,
+
+                c.First_Name,
+                c.Last_Name,
+
+                t.Task_ID,
+                t.Name AS TaskName,
+                t.DateAssigned,
+                t.DateCompleted,
+                t.Priority AS TaskPriority,
+
+                s.TStat_Name,
+
+                rep.Report_ID,
+                rep.Title AS ReportTitle,
+                rep.Description AS ReportText,
+
+                idoc.IssDoc_ID,
+                idoc.Content AS FilePath,
+
+                e.First_Name AS EmpFirstName,
+                e.Last_Name AS EmpLastName
+
+            FROM REQUEST r
+
+            LEFT JOIN REQUEST_TYPES rt
+                ON r.RType_ID = rt.RType_ID
+
+            LEFT JOIN CITIZEN c
+                ON r.C_ID = c.C_ID
+
+            LEFT JOIN TASK t
+                ON t.Req_ID = r.Req_ID
+
+            LEFT JOIN EMPLOYEE e
+                ON t.Emp_ID = e.Emp_ID
+
+            LEFT JOIN TASK_STATUSES s
+                ON t.TStat_Code = s.TStat_Code
+
+            LEFT JOIN REPORT rep
+                ON rep.Task_ID = t.Task_ID
+
+            LEFT JOIN ISSUED_DOCUMENT idoc
+                ON idoc.Req_ID = r.Req_ID
+
+            WHERE r.FlagRejected = 0
+
+            ORDER BY r.DateMade DESC
+            `
+        );
+
+        const map = new Map();
+
+        for (const r of rows) {
+
+            if (!map.has(r.Req_ID)) {
+
+                let description = r.Description;
+
+                if (typeof description === "string") {
+                    try {
+                        description = JSON.parse(description);
+                    } catch {
+                        description = { title: description };
+                    }
+                }
+
+                map.set(r.Req_ID, {
+                    requestId: r.Req_ID,
+                    type: r.RType_Name,
+                    citizen: `${r.First_Name} ${r.Last_Name}`,
+                    date: r.DateMade,
+                    requestTitle: description?.title
+                        ? description.title.slice(0, 90) + (description.title.length > 90 ? "..." : "")
+                        : "No title",
+
+                    task: null,
+                    report: null,
+                    issuedDocument: null,
+
+                    requestNumber: formatRequestNumber({
+                        date: r.DateMade,
+                        requestTypeId: r.RType_ID,
+                        requestId: r.Req_ID
+                    })
+                });
+            }
+
+            const entry = map.get(r.Req_ID);
+
+            if (r.Task_ID && !entry.task) {
+                entry.task = {
+                    id: r.Task_ID,
+                    name: r.TaskName,
+                    assignedTo: r.EmpFirstName && r.EmpLastName
+                        ? `${r.EmpFirstName} ${r.EmpLastName}`
+                        : "Unassigned",
+                    status: r.TStat_Name,
+                    priority: r.TaskPriority,
+                    dateAssigned: r.DateAssigned,
+                    dateCompleted: r.DateCompleted
+                };
+            }
+
+            if (r.Report_ID && !entry.report) {
+                entry.report = {
+                    id: r.Report_ID,
+                    title: r.ReportTitle,
+                    text: r.ReportText
+                };
+            }
+
+            if (r.IssDoc_ID && !entry.issuedDocument) {
+                entry.issuedDocument = {
+                    id: r.IssDoc_ID,
+                    exists: true,
+                    url: toPublicPath(r.FilePath)
+                };
+            }
+        }
+
+        const formatted = [...map.values()];
+
+        return sendSuccess(res, "Operations overview loaded", {
+            operations: formatted
+        });
+
+    } catch (err) {
+        console.error("OPERATIONS OVERVIEW ERROR:", err);
+        return sendError(res, 500, "Failed to load operations overview", "OPERATIONS_OVERVIEW_ERROR");
     }
 };
