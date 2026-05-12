@@ -13,18 +13,45 @@ function ComplaintCard({ complaint, onResolve, onDelete }) {
         return "pending";
     };
 
+    const detailLines = complaint.Details
+        ?.split("\n")
+        .map(line => line.trim())
+        .filter(Boolean);
+
+    const detailMap = {};
+
+    detailLines.forEach(line => {
+        const [key, ...rest] = line.split(":");
+        detailMap[key.trim()] = rest.join(":").trim();
+    });
+
     return (
         <Card className={styles.complaint}>
 
             <div className={styles.middle}>
-                <h3 className={styles.title}>Complaint</h3>
+                <h3 className={styles.title}>Complaint: {complaint.CType_Name}</h3>
 
-                <p><strong>Subject:</strong> {complaint.Subject}</p>
+                <div className={styles.description}>
 
-                <p><strong>Details:</strong></p>
-                <p className={styles.description}>
-                    {complaint.Details}
-                </p>
+                    {detailMap.Name && (
+                        <p>
+                            <strong>Name:</strong> {detailMap.Name}
+                        </p>
+                    )}
+
+                    {detailMap.Location && (
+                        <p>
+                            <strong>Address:</strong> {detailMap.Location}
+                        </p>
+                    )}
+
+                    {detailMap.Description && (
+                        <p>
+                            <strong>Description:</strong> {detailMap.Description}
+                        </p>
+                    )}
+
+                </div>
 
                 <p>
                     <strong>Status:</strong> {getStatus()}
