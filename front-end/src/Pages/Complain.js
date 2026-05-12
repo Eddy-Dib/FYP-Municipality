@@ -168,7 +168,11 @@ function Complain() {
                     setData(prev => ({
                         ...prev,
                         fullName: p.FullName ?? "",
-                        phone: p.Phone_Num ?? ""
+                        phone: p.Phone_Num ?? "",
+                        cityId: p.City_ID ?? "",
+                        streetId: p.Street_ID ?? "",
+                        buildingId: p.Building_ID ?? "",
+                        locationId: p.Location_ID ?? ""
                     }));
                 }
             } catch (err) {
