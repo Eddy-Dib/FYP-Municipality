@@ -1,74 +1,76 @@
 import styles from "./PayFees.module.css";
-import { useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import axios from "axios";
 
 function PayFees() {
-    const [entries, setEntries] = useState([]);
 
-    const addEntry = (type) => {
-        const newEntry = {
-            id: Date.now(),
-            type,
-            name: "",
-            businessType: "",
-            fees: type === "house"
-                ? [
-                    { label: "Property Tax", amount: 120 },
-                    { label: "Waste Collection", amount: 50 }
-                ]
-                : [
-                    { label: "Business License", amount: 200 }
-                ]
-        };
+    const API_URL = process.env.REACT_APP_API_URL;
+    const token = localStorage.getItem("token");
 
-        setEntries([...entries, newEntry]);
+    const [citizen, setCitizen] = useState(null);
+    const [fees, setFees] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    const printRef = useRef();
+
+    useEffect(() => {
+        fetchFees();
+    }, []);
+
+    const fetchFees = async () => {
+        try {
+            const res = await axios.get(
+                `${API_URL}/api/citizen/fees`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            );
+
+            const data = res.data?.data;
+
+            setCitizen(data?.citizen || null);
+            setFees(data?.fees || []);
+
+        } catch (err) {
+            console.log(err);
+
+            setCitizen(null);
+            setFees([]);
+
+        } finally {
+            setLoading(false);
+        }
     };
 
-
-    const removeEntry = (id) => {
-        setEntries(entries.filter(e => e.id !== id));
-    };
-
-    const updateField = (id, field, value) => {
-        setEntries(entries.map(e =>
-            e.id === id ? { ...e, [field]: value } : e
-        ));
-    };
+    const formatDate = (date) =>
+        new Date(date).toLocaleDateString("en-GB");
 
     const getTotal = () => {
-        let total = 0;
-        entries.forEach(e =>
-            e.fees.forEach(f => total += f.amount)
-        );
-        return total;
+        return fees.reduce((sum, f) => sum + Number(f.FinalAmount || 0), 0);
     };
 
     const handlePrint = () => {
-        const content = document.getElementById("invoice").innerHTML;
+        const content = printRef.current;
 
-        const printWindow = window.open("", "", "width=800,height=600");
+        const printWindow = window.open("", "", "width=900,height=650");
 
         printWindow.document.write(`
             <html>
                 <head>
-                    <title>Fees Statement</title>
+                    <title>Municipality Fees</title>
                     <style>
-                        body { font-family: Arial; padding: 40px; }
-                        h3 { margin-bottom: 20px; }
-                        h4 { margin-top: 20px; }
-                        .row {
-                            display: flex;
-                            justify-content: space-between;
-                        }
-                        .total {
-                            margin-top: 15px;
-                            font-weight: bold;
-                            border-top: 1px solid #ccc;
-                            padding-top: 10px;
-                        }
+                        body { font-family: Arial; padding: 20px; }
+                        h2 { text-align: center; }
+                        .card { border: 1px solid #ddd; padding: 12px; margin-bottom: 10px; border-radius: 8px; }
+                        .row { display: flex; justify-content: space-between; margin: 5px 0; }
+                        .total { font-weight: bold; text-align: right; margin-top: 20px; font-size: 18px; }
                     </style>
                 </head>
                 <body>
-                    ${content}
+                    <h2>Municipality Fees Statement</h2>
+                    ${content.innerHTML}
                 </body>
             </html>
         `);
@@ -77,9 +79,14 @@ function PayFees() {
         printWindow.print();
     };
 
+    if (loading) {
+        return <div className={styles.feesPage}>Loading...</div>;
+    }
+
     return (
         <div className={styles.feesPage}>
 
+            {/* HERO */}
             <div className={styles.hero}>
                 <h1>Your Municipality Fees</h1>
                 <p>Review your dues and print your statement</p>
@@ -87,119 +94,99 @@ function PayFees() {
 
             <div className={styles.container}>
 
-                <div className={styles.actions}>
-                    <button onClick={() => addEntry("house")}>
-                        + Add House
-                    </button>
-                    <button onClick={() => addEntry("business")}>
-                        + Add Business
-                    </button>
+                {/* ================= CITIZEN CARD (FIXED SAFETY) ================= */}
+                <div className={styles.card}>
+
+                    <h3 className={styles.citizenName}>
+                        {citizen
+                            ? `${citizen.First_Name} ${citizen.Last_Name}`
+                            : "Guest Citizen"}
+                    </h3>
+
+                    <div className={styles.infoRow}>
+                        <span className={styles.label}>Email:</span>
+                        <span className={styles.value}>{citizen?.Email}</span>
+                    </div>
+
+                    <div className={styles.infoRow}>
+                        <span className={styles.label}>City:</span>
+                        <span className={styles.value}>{citizen?.City_Name}</span>
+                    </div>
+
+                    <div className={styles.infoRow}>
+                        <span className={styles.label}>Street:</span>
+                        <span className={styles.value}>{citizen?.Street_Name}</span>
+                    </div>
+
+                    <div className={styles.infoRow}>
+                        <span className={styles.label}>Building:</span>
+                        <span className={styles.value}>{citizen?.Building_Name}</span>
+                    </div>
+
                 </div>
 
-                {entries.map((entry, index) => (
-                    <div key={entry.id} className={styles.card}>
+                {/* ================= PRINT AREA ================= */}
+                <div ref={printRef}>
 
-                        <div className={styles.cardHeader}>
-                            <h3>
-                                {entry.type === "house" ? "House" : "Business"} #{index + 1}
-                            </h3>
-
-                            <button
-                                className={styles.removeBtn}
-                                onClick={() => removeEntry(entry.id)}
-                            >
-                                ✕
-                            </button>
+                    {fees.length === 0 ? (
+                        <div className={styles.card}>
+                            No fees found.
                         </div>
+                    ) : (
+                        fees.map((fee) => (
+                            <div key={fee.Fee_ID} className={styles.card}>
 
-                        {entry.type === "business" && (
-                            <>
-                                <input
-                                    type="text"
-                                    placeholder="Business name"
-                                    value={entry.name}
-                                    onChange={(e) =>
-                                        updateField(entry.id, "name", e.target.value)
-                                    }
-                                />
+                                {/* TYPE */}
+                                <h3>
+                                    {fee.LocT_Type} Municipal Fee
+                                </h3>
 
-                                <select
-                                    value={entry.businessType}
-                                    onChange={(e) =>
-                                        updateField(entry.id, "businessType", e.target.value)
-                                    }
-                                >
-                                    <option value="">Select type</option>
-                                    <option>Mini Market</option>
-                                    <option>Supermarket</option>
-                                    <option>Clothing Store</option>
-                                    <option>Salon</option>
-                                    <option>Restaurant</option>
-                                    <option>Cafe</option>
-                                    <option>Pharmacy</option>
-                                    <option>Other</option>
-                                </select>
-                            </>
-                        )}
-
-                        <div className={styles.feesList}>
-                            {entry.fees.map((f, i) => (
-                                <div key={i} className={styles.feeRow}>
-                                    <span>{f.label}</span>
-                                    <span>${f.amount}</span>
+                                <div className={styles.feeRow}>
+                                    <span>Amount</span>
+                                    <span>${fee.Amount}</span>
                                 </div>
-                            ))}
-                        </div>
 
-                    </div>
-                ))}
+                                <div className={styles.feeRow}>
+                                    <span>Due Date</span>
+                                    <span>{formatDate(fee.DateExpected)}</span>
+                                </div>
 
-                {entries.length > 0 && (
-                    <div id="invoice" className={styles.hiddenInvoice}>
-                        <h3>Fees Statement</h3>
-
-                        {entries.map((e, i) => (
-                            <div key={i}>
-                                <h4>
-                                    {e.type === "house"
-                                        ? `House ${i + 1}`
-                                        : `${e.name || "Business"} (${e.businessType || ""})`}
-                                </h4>
-
-                                {e.fees.map((f, j) => (
-                                    <div key={j} className="row">
-                                        <span>{f.label}</span>
-                                        <span>${f.amount}</span>
+                                {fee.LateFee > 0 && (
+                                    <div className={styles.feeRow}>
+                                        <span>Late Fee</span>
+                                        <span>${fee.LateFee}</span>
                                     </div>
-                                ))}
+                                )}
+
+                                <div className={styles.feeRow}>
+                                    <span>Status</span>
+                                    <span>
+                                        {fee.IsPaid ? "PAID" : "UNPAID"}
+                                    </span>
+                                </div>
+
                             </div>
-                        ))}
+                        ))
+                    )}
 
-                        <div className="total">
-                            Total: ${getTotal()}
-                        </div>
-                    </div>
-                )}
-
-                {entries.length > 0 && (
+                    {/* TOTAL */}
                     <div className={styles.totalBox}>
-                        Total: ${getTotal()}
+                        Total Due: ${getTotal()}
                     </div>
-                )}
 
-                {entries.length > 0 && (
-                    <>
-                        <button className={styles.printBtn} onClick={handlePrint}>
-                            Print Statement
-                        </button>
+                </div>
 
-                        <p className={styles.note}>
-                            Please print this statement and visit the municipality to complete your payment.
-                        </p>
-                    </>
-                )}
+                {/* PRINT BUTTON */}
+                <button className={styles.printBtn} onClick={handlePrint}>
+                    Print Statement
+                </button>
+
+                <p className={styles.note}>
+                    Please print this statement and visit the municipality office for payment.
+                </p>
 
             </div>
+
 
         </div>
     );
