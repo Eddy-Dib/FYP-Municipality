@@ -13,10 +13,11 @@ function Footer() {
 
     const sendMessage = async () => {
         try {
-            const res = await axios.post(`${API_URL}/api/complaints/message`, {
-                message: message,
-                C_ID: user?.id
-            });
+            const res = await axios.post(`${API_URL}/api/complaints/message`,
+                {message: message},
+                {headers: {
+                        Authorization: `Bearer ${token}`
+                    }});
 
             if (res.data.success) {
                 alert("Message sent successfully");

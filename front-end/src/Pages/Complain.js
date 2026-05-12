@@ -231,11 +231,7 @@ function Complain() {
                 streetId: data.streetId,
                 buildingId: data.buildingId,
                 locationId: data.locationId,
-                details: `
-                    Name: ${data.fullName}
-                    Phone: ${data.phone}
-                    Location: ${data.cityId}-${data.streetId}-${data.buildingId}-${data.locationId}
-                    Description: ${data.description}`
+                description: data.description
             };
 
             const res = await axios.post(

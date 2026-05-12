@@ -10,7 +10,9 @@ export const createComplaint = async (req, res) => {
 		}
 
 		const [citizens] = await db.promise().query(
-			`SELECT C_ID
+			`SELECT C_ID,
+			First_Name,
+			Last_Name,
       		FROM CITIZEN
       		WHERE U_ID = ?`,
 			[userId]
@@ -24,12 +26,41 @@ export const createComplaint = async (req, res) => {
 
 		const {
 			type,
-			details
+			locationId,
+			description
 		} = req.body;
 
-		if (!type || !details) {
+		if (!type || !description) {
 			return sendError(res, 400, "Missing fields", "MISSING_FIELDS");
 		}
+
+		let locationString = "N/A";
+
+		const locationQuery = `
+			SELECT 
+				ci.City_Name,
+				s.Street_Name,
+				b.Building_Name,
+				l.Floor
+			FROM LOCATION l
+			LEFT JOIN BUILDING b ON l.Building_ID = b.Building_ID
+			LEFT JOIN STREET s ON b.Street_ID = s.Street_ID
+			LEFT JOIN CITY ci ON s.City_ID = ci.City_ID
+			WHERE l.Location_ID = ?
+		`;
+
+		const [locRows] = await db.promise().query(locationQuery, [locationId]);
+
+		if (locRows.length) {
+			const loc = locRows[0];
+			locationString = `${loc.City_Name} - ${loc.Street_Name} - ${loc.Building_Name} - Floor ${loc.Floor}`;
+		}
+
+		const details = `
+			Name: ${citizens[0].First_Name} ${citizens[0].Last_Name}
+			Location: ${locationString}
+			Description: ${description}
+			`
 
 		const [result] = await db.promise().query(
 			`INSERT INTO COMPLAINT 
@@ -127,50 +158,88 @@ export const getComplaintTypes = async (req, res) => {
 	}
 };
 
-export const sendMessage = (req, res) => {
-	const { message, C_ID } = req.body;
+export const sendMessage = async (req, res) => {
+	try {
 
-	if (!message) {
-		return res.json({
-			success: false,
-			message: "Message is required",
-			data: null,
-			error: "Missing message"
-		});
-	}
+		const userId = req.user?.id;
 
-	if (!C_ID) {
-		return res.json({
-			success: false,
-			message: "Citizen ID is required",
-			data: null,
-			error: "Missing C_ID"
-		});
-	}
-
-	const DEFAULT_CTYPE = 10;
-
-	const query = `
-        INSERT INTO COMPLAINT 
-        (Subject, Details, DateMade, CType, C_ID)
-        VALUES (?, ?, NOW(), ?, ?)
-    `;
-
-	db.query(query, ["General Message", message, DEFAULT_CTYPE, C_ID], (err, result) => {
-		if (err) {
-			return res.json({
-				success: false,
-				message: "Database error",
-				data: null,
-				error: err.message
-			});
+		if (!userId) {
+			return sendError(
+				res,
+				401,
+				"Unauthorized",
+				"NO_USER"
+			);
 		}
 
-		return res.json({
-			success: true,
-			message: "Message sent successfully to secretary",
-			data: result,
-			error: null
-		});
-	});
+		const { message } = req.body;
+
+		if (!message) {
+			return sendError(
+				res,
+				400,
+				"Message is required",
+				"MISSING_MESSAGE"
+			);
+		}
+
+		const [citizens] = await db.promise().query(
+			`
+			SELECT C_ID, First_Name, Last_Name
+			FROM CITIZEN
+			WHERE U_ID = ?
+			`,
+			[userId]
+		);
+
+		if (!citizens.length) {
+			return sendError(
+				res,
+				404,
+				"Citizen profile not found",
+				"CITIZEN_NOT_FOUND"
+			);
+		}
+
+		const citizenId = citizens[0].C_ID;
+
+		const DEFAULT_CTYPE = 10;
+
+		const details = 
+			`Name: ${citizens[0].First_Name} ${citizens[0].Last_Name}
+			Description: ${message}
+			`
+		const [result] = await db.promise().query(
+			`
+			INSERT INTO COMPLAINT 
+			(Subject, Details, DateMade, CType, C_ID)
+			VALUES (?, ?, NOW(), ?, ?)
+			`,
+			[
+				"General Message",
+				details,
+				DEFAULT_CTYPE,
+				citizenId
+			]
+		);
+
+		return sendSuccess(
+			res,
+			"Message sent successfully",
+			{
+				insertId: result.insertId
+			}
+		);
+
+	} catch (err) {
+
+		console.error(err);
+
+		return sendError(
+			res,
+			500,
+			"Error sending message",
+			err.message
+		);
+	}
 };
