@@ -121,3 +121,33 @@
     max-width: 100%;
     margin-top: 40px;
 }
+/* Default calendar day text */
+.react-calendar__tile {
+    color: #1a1a1a !important; /* dark text */
+}
+
+/* Optional: improve hover visibility */
+.react-calendar__tile:enabled:hover,
+.react-calendar__tile:enabled:focus {
+    background: #e6f0ff;
+    color: #000 !important;
+}
+
+/* Active selected day */
+.react-calendar__tile--active {
+    background: #3b82f6 !important;
+    color: white !important;
+}
+.react-calendar,
+.react-calendar * {
+    color: #1a1a1a;
+}
+.eventDay {
+    color: #1a1a1a !important;
+}
+:global(.react-calendar__tile) {
+    color: #1a1a1a !important;
+}
+:global(.react-calendar__month-view__days__day) {
+    color: #1a1a1a !important;
+}
