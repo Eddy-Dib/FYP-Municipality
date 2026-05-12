@@ -231,9 +231,6 @@ function Profile() {
 
                         <div>
                             <h3>Sign out</h3>
-                            <p>
-                                You will be redirected to login
-                            </p>
                         </div>
 
                         <button onClick={handleLogout}>
