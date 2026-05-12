@@ -404,8 +404,10 @@ function Request() {
 
                 data.files.forEach((item) => {
                     formData.append("files", item.file);
-                    formData.append("docTypes", item.docType); // parallel array
                 });
+
+                const docTypes = data.files.map(item => item.docType);
+                formData.append("docTypes", JSON.stringify(docTypes));
 
                 await axios.post(
                     `${API_URL}/api/documents/request/${requestId}/upload`,

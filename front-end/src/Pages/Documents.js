@@ -23,10 +23,6 @@ function Documents() {
         description: ""
     });
 
-    /* ========================= */
-    /* FETCH DOCUMENT TYPES */
-    /* ========================= */
-
     useEffect(() => {
         const fetchTypes = async () => {
             try {
@@ -36,7 +32,6 @@ function Documents() {
 
                 const data = res.data?.data;
 
-                // ✅ SAFE CHECK (fixes your crash)
                 if (Array.isArray(data)) {
                     setTypes(data);
                 } else {
@@ -53,9 +48,6 @@ function Documents() {
         fetchTypes();
     }, [API_URL]);
 
-    /* ========================= */
-    /* FILE SELECT */
-    /* ========================= */
 
     const handleFileSelect = (e) => {
         const file = e.target.files[0];
@@ -68,10 +60,6 @@ function Documents() {
 
         setSelectedFile(file);
     };
-
-    /* ========================= */
-    /* ADD DOCUMENT */
-    /* ========================= */
 
     const addDocument = () => {
         if (!selectedFile) return;
@@ -102,23 +90,11 @@ function Documents() {
         setForm({ docType: "", description: "" });
     };
 
-    /* ========================= */
-    /* REMOVE DOCUMENT */
-    /* ========================= */
-
     const removeDocument = (index) => {
         setDocuments(prev => prev.filter((_, i) => i !== index));
     };
 
-    /* ========================= */
-    /* CHECK IMAGE */
-    /* ========================= */
-
     const isImage = (type) => type?.startsWith("image/");
-
-    /* ========================= */
-    /* SUBMIT DOCUMENTS */
-    /* ========================= */
 
     const handleSubmit = async () => {
         try {
@@ -132,9 +108,13 @@ function Documents() {
 
             documents.forEach((doc, index) => {
                 formData.append("files", doc.file);
-                formData.append(`docType_${index}`, Number(doc.docType));
-                formData.append(`description_${index}`, doc.description || "");
             });
+            
+            const docTypes = documents.map(doc => doc.docType);
+            const descriptions = documents.map(doc => doc.description || "");
+
+            formData.append("docTypes", JSON.stringify(docTypes));
+            formData.append("descriptions", JSON.stringify(descriptions));
 
             const res = await axios.post(
                 `${API_URL}/api/documents/upload`,

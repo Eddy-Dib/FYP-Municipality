@@ -50,100 +50,88 @@ export const uploadDocuments = async (req, res) => {
     try {
         const userId = req.user?.id;
 
-		if (!userId) {
-			return sendError(res, 401, "Unauthorized", "NO_USER");
-		}
+        if (!userId) {
+            return sendError(res, 401, "Unauthorized", "NO_USER");
+        }
 
-		const [citizens] = await db.promise().query(
-			`SELECT C_ID, First_Name, Last_Name
-      		FROM CITIZEN
-      		WHERE U_ID = ?`,
-			[userId]
-		);
+        const [citizens] = await db.promise().query(
+            `
+            SELECT C_ID, First_Name, Last_Name
+            FROM CITIZEN
+            WHERE U_ID = ?
+            `,
+            [userId]
+        );
 
-		if (!citizens.length) {
-			return sendError(res, 404, "Citizen profile not found", "CITIZEN_NOT_FOUND");
-		}
+        if (!citizens.length) {
+            return sendError(res, 404, "Citizen profile not found", "CITIZEN_NOT_FOUND");
+        }
 
-		const citizenId = citizens[0].C_ID;
+        const citizenId = citizens[0].C_ID;
         const files = req.files;
 
         if (!files || files.length === 0) {
-            return sendError(
-                res,
-                400,
-                "No files uploaded",
-                "NO_FILES"
-            );
+            return sendError(res, 400, "No files uploaded", "NO_FILES");
         }
 
+        const docTypes = JSON.parse(req.body.docTypes || "[]");
+        const descriptions = JSON.parse(req.body.descriptions || "[]");
+
+        if (docTypes.length !== files.length) {
+            return sendError(res, 400, "Mismatch between files and document types", "INVALID_PAYLOAD");
+        }
+
+        const [docTypeRows] = await db.promise().query(
+            `SELECT Doc_Type_ID, Doc_Type_Name FROM DOC_TYPE`
+        );
+
+        const docTypeMap = new Map(
+            docTypeRows.map(d => [Number(d.Doc_Type_ID), d.Doc_Type_Name])
+        );
+
         const uploadTasks = files.map((file, i) => {
+            return (async () => {
+                const docTypeId = Number(docTypes[i]);
+                const description = descriptions[i];
 
-            return new Promise((resolve, reject) => {
-
-                const docType = req.body[`docType_${i}`];
-                const description = req.body[`description_${i}`];
-
-                if (!docType) {
-                    return reject(`Missing document type for file ${i}`);
+                if (!docTypeId) {
+                    throw new Error(`Missing document type for file ${i}`);
                 }
 
-                saveCitizenDocument({
+                const docTypeName = docTypeMap.get(docTypeId) || "unknown";
+
+                const filePath = await saveCitizenDocument({
                     file,
                     firstName: citizens[0].First_Name,
                     lastName: citizens[0].Last_Name,
                     citizenId,
-                    docType
-                })
-                    .then((filePath) => {
+                    docTypeName
+                });
 
-                        db.query(
-                            `
-                        INSERT INTO DOCUMENT
-                        (
-                            DateUploaded,
-                            Description,
-                            FilePath,
-                            C_ID,
-                            Doc_Type
-                        )
-                        VALUES
-                        (NOW(), ?, ?, ?, ?)
-                        `,
-                            [
-                                description || null,
-                                filePath,
-                                citizenId,
-                                docType
-                            ],
-                            (err) => {
-                                if (err) return reject(err);
-                                resolve();
-                            }
-                        );
-
-                    })
-                    .catch(reject);
+                await db.promise().query(
+                    `
+                    INSERT INTO DOCUMENT
+                    (DateUploaded, Description, FilePath, C_ID, Doc_Type)
+                    VALUES (NOW(), ?, ?, ?, ?)
+                    `,
+                    [
+                        description || null,
+                        filePath,
+                        citizenId,
+                        docTypeId
+                    ]
+                );
             });
         });
 
         await Promise.all(uploadTasks);
 
-        return sendSuccess(
-            res,
-            "Documents uploaded successfully",
-            null
-        );
+        return sendSuccess(res, "Documents uploaded successfully", null);
 
     } catch (err) {
         console.log(err);
 
-        return sendError(
-            res,
-            500,
-            err.message || "Failed to upload documents",
-            "UPLOAD_ERROR"
-        );
+        return sendError(res, 500, err.message || "Failed to upload documents", "UPLOAD_ERROR");
     }
 };
 
@@ -184,7 +172,7 @@ export const uploadComplaintDocuments = async (req, res) => {
                 firstName: citizens[0].First_Name,
                 lastName: citizens[0].Last_Name,
                 citizenId,
-                docType: SUPPORTING_DOC_TYPE
+                docType: "Complaint_Document"
             });
 
             await db.promise().query(
@@ -204,19 +192,11 @@ export const uploadComplaintDocuments = async (req, res) => {
 
         await Promise.all(uploadTasks);
 
-        return sendSuccess(
-            res,
-            "Complaint documents uploaded successfully"
-        );
+        return sendSuccess(res, "Complaint documents uploaded successfully");
 
     } catch (err) {
         console.error(err);
-        return sendError(
-            res,
-            500,
-            "Failed to upload complaint documents",
-            err.message
-        );
+        return sendError(res, 500, "Failed to upload complaint documents", err.message);
     }
 };
 
@@ -248,11 +228,25 @@ export const uploadRequestDocuments = async (req, res) => {
             return sendError(res, 400, "No files uploaded", "NO_FILES");
         }
 
+        const docTypes = JSON.parse(req.body.docTypes || "[]");
+        if (docTypes.length !== files.length) {
+            return sendError(res, 400, "Document types mismatch", "DOC_TYPE_MISMATCH");
+        }
+
+        const [typesRows] = await db.promise().query(
+            `SELECT Doc_Type_ID, Doc_Type_Name FROM DOC_TYPE`
+        );
+
+        const typeMap = new Map(
+            typesRows.map(t => [String(t.Doc_Type_ID), t.Doc_Type_Name])
+        );
+
         const uploadTasks = files.map((file, i) => {
 
-            const docType = req.body[`docType_${i}`];
+            const docTypeId = docTypes[i];
+            const docTypeName = typeMap.get(String(docTypeId));
 
-            if (!docType) {
+            if (!docTypeName) {
                 return Promise.reject(`Missing docType for file ${i}`);
             }
 
@@ -261,7 +255,7 @@ export const uploadRequestDocuments = async (req, res) => {
                 firstName: citizens[0].First_Name,
                 lastName: citizens[0].Last_Name,
                 citizenId,
-                docType
+                docType: docTypeName
             }).then((filePath) => {
 
                 return db.promise().query(
@@ -273,7 +267,7 @@ export const uploadRequestDocuments = async (req, res) => {
                     [
                         filePath,
                         citizenId,
-                        docType,
+                        docTypeId,
                         reqId
                     ]
                 );
@@ -282,18 +276,10 @@ export const uploadRequestDocuments = async (req, res) => {
 
         await Promise.all(uploadTasks);
 
-        return sendSuccess(
-            res,
-            "Request documents uploaded successfully"
-        );
+        return sendSuccess(res, "Request documents uploaded successfully");
 
     } catch (err) {
         console.error(err);
-        return sendError(
-            res,
-            500,
-            "Failed to upload request documents",
-            err.message
-        );
+        return sendError(res, 500, "Failed to upload request documents", err.message);
     }
 };

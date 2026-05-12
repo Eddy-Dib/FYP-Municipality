@@ -16,18 +16,16 @@ export const saveCitizenDocument = async ({
         throw new Error("DOC_ROOT is not defined in .env");
     }
 
-    const folderName = `${firstName}.${lastName}${citizenId}`;
-    const finalDir = path.join(baseDir, "municipality", folderName);
+    const citizenFolder = `${firstName}.${lastName}${citizenId}`;
+    const safeDocType = String(docType).trim().replace(/\s+/g, "_").replace(/[^a-zA-Z0-9_-]/g, "");
+
+    const finalDir = path.join(baseDir, "municipality", citizenFolder, safeDocType);
 
     fs.mkdirSync(finalDir, { recursive: true });
 
     const ext = path.extname(file.originalname);
 
-    const timestamp = new Date()
-        .toISOString()
-        .replace(/[:.]/g, "-");
-
-    const safeDocType = String(docType).replace(/\s+/g, "_");
+    const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
 
     const fileName = `${safeDocType}-${timestamp}${ext}`;
 

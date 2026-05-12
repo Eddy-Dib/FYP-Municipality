@@ -254,7 +254,7 @@ function Complain() {
                 });
 
                 await axios.post(
-                    `${API_URL}/api/documents/${complaintId}/upload`,
+                    `${API_URL}/api/documents/complaints/${complaintId}/upload`,
                     formData,
                     {
                         headers: {
