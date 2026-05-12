@@ -9,6 +9,7 @@ function Request() {
 
     const [step, setStep] = useState(1);
     const [requestTypes, setRequestTypes] = useState([]);
+    const [documentTypes, setDocumentTypes] = useState([]);
     const [cities, setCities] = useState([]);
     const [streets, setStreets] = useState([]);
     const [buildings, setBuildings] = useState([]);
@@ -28,6 +29,12 @@ function Request() {
         if (!data.streetId) return "Street is required";
         if (!data.buildingId) return "Building is required";
         if (!data.locationId) return "Location is required";
+        
+        for (let i = 0; i < data.files.length; i++) {
+            if (!data.files[i].docType) {
+                return `Please select a document type for uploaded file ${i + 1}`;
+            }
+        }
 
         return "";
     };
@@ -48,7 +55,6 @@ function Request() {
     });
 
     const [previews, setPreviews] = useState([]);
-    const [reference] = useState(Math.floor(100000 + Math.random() * 900000));
 
     useEffect(() => {
         const fetchTypes = async () => {
@@ -59,6 +65,22 @@ function Request() {
                 }
             } catch (err) {
                 console.log("Error fetching request types:", err);
+            }
+        };
+
+        const fetchDocumentTypes = async () => {
+            try {
+
+                const res = await axios.get(
+                    `${API_URL}/api/documents/types`
+                );
+
+                if (res.data.success) {
+                    setDocumentTypes(res.data.data || []);
+                }
+
+            } catch (err) {
+                console.log("Error fetching document types:", err);
             }
         };
 
@@ -80,6 +102,7 @@ function Request() {
 
         fetchTypes();
         fetchCities();
+        fetchDocumentTypes();
     }, []);
 
     useEffect(() => {
@@ -142,7 +165,18 @@ function Request() {
         fetchLocations();
     }, [data.buildingId]);
 
+    const handleDocumentTypeChange = (index, value) => {
 
+        setData(prev => ({
+            ...prev,
+
+            files: prev.files.map((item, i) =>
+                i === index
+                    ? { ...item, docType: value }
+                    : item
+            )
+        }));
+    };
 
     const handleChange = (e, index = null) => {
         const { name, value, files } = e.target;
@@ -152,8 +186,12 @@ function Request() {
         if (files) {
             const newFiles = Array.from(files);
 
+            const mappedFiles = newFiles.map(file => ({
+                file, docType: ""
+            }));
+
             setData(prev => {
-                const combined = [...prev.files, ...newFiles].slice(0, 3);
+                const combined = [...prev.files, ...mappedFiles].slice(0, 3);
                 return { ...prev, files: combined };
             });
 
@@ -557,6 +595,25 @@ function Request() {
                             {previews.map((src, i) => (
                                 <div key={i} className={styles.imageWrapper}>
                                     <img src={src} className={styles.preview} />
+                                    <select 
+                                        value={data.files[i]?.docType || ""}
+                                        onChange={(e) => handleDocumentTypeChange(i, e.target.value)}
+                                    >
+                                        <option value="">
+                                            Select document type
+                                        </option>
+
+                                        {documentTypes.map(type => (
+
+                                            <option
+                                                key={type.Doc_Type_ID}
+                                                value={type.Doc_Type_ID}
+                                            >
+                                                {type.Doc_Type_Name}
+                                            </option>
+
+                                        ))}
+                                    </select>
                                     <button type="button" className={styles.removeBtn} onClick={() => removeImage(i)}>×</button>
                                 </div>
                             ))}
@@ -604,8 +661,6 @@ function Request() {
                             </p>
                             <p><b>Urgency:</b> {data.urgency}</p>
                             <p><b>Description:</b> {data.description}</p>
-
-                            <p><b>Reference ID:</b> #{reference}</p>
 
                             <div>
                                 {previews.map((src, i) => (
@@ -655,9 +710,6 @@ function Request() {
                                     ))}
                                 </div>
 
-                                <p className={styles.reference}>
-                                    Reference ID: #{reference}
-                                </p>
                             </div>
 
                             <button className={styles.submitBtn} onClick={handleSubmit}>
