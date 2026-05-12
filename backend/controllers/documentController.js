@@ -179,9 +179,6 @@ export const uploadComplaintDocuments = async (req, res) => {
 
         const uploadTasks = files.map(async (file) => {
 
-            const description =
-                req.body.description || "Complaint supporting document";
-
             const savedFilePath = await saveCitizenDocument({
                 file,
                 firstName: citizens[0].First_Name,
@@ -193,11 +190,10 @@ export const uploadComplaintDocuments = async (req, res) => {
             await db.promise().query(
                 `
                 INSERT INTO DOCUMENT
-                (DateUploaded, Description, FilePath, C_ID, Doc_Type, Comp_ID)
-                VALUES (NOW(), ?, ?, ?, ?, ?)
+                (DateUploaded, FilePath, C_ID, Doc_Type, Comp_ID)
+                VALUES (NOW(), ?, ?, ?, ?)
                 `,
                 [
-                    description,
                     savedFilePath,
                     citizenId,
                     SUPPORTING_DOC_TYPE,
@@ -219,6 +215,84 @@ export const uploadComplaintDocuments = async (req, res) => {
             res,
             500,
             "Failed to upload complaint documents",
+            err.message
+        );
+    }
+};
+
+export const uploadRequestDocuments = async (req, res) => {
+    try {
+        const userId = req.user?.id;
+
+        if (!userId) {
+            return sendError(res, 401, "Unauthorized", "NO_USER");
+        }
+
+        const reqId = req.params.id;
+
+        const [citizens] = await db.promise().query(
+            `SELECT C_ID, First_Name, Last_Name
+             FROM CITIZEN
+             WHERE U_ID = ?`,
+            [userId]
+        );
+
+        if (!citizens.length) {
+            return sendError(res, 404, "Citizen profile not found", "CITIZEN_NOT_FOUND");
+        }
+
+        const citizenId = citizens[0].C_ID;
+        const files = req.files;
+
+        if (!files || files.length === 0) {
+            return sendError(res, 400, "No files uploaded", "NO_FILES");
+        }
+
+        const uploadTasks = files.map((file, i) => {
+
+            const docType = req.body[`docType_${i}`];
+
+            if (!docType) {
+                return Promise.reject(`Missing docType for file ${i}`);
+            }
+
+            return saveCitizenDocument({
+                file,
+                firstName: citizens[0].First_Name,
+                lastName: citizens[0].Last_Name,
+                citizenId,
+                docType
+            }).then((filePath) => {
+
+                return db.promise().query(
+                    `
+                    INSERT INTO DOCUMENT
+                    (DateUploaded, FilePath, C_ID, Doc_Type, Req_ID)
+                    VALUES (NOW(), ?, ?, ?, ?)
+                    `,
+                    [
+                        filePath,
+                        citizenId,
+                        docType,
+                        reqId
+                    ]
+                );
+            });
+        });
+
+        await Promise.all(uploadTasks);
+
+        return sendSuccess(
+            res,
+            "Request documents uploaded successfully"
+        );
+
+    } catch (err) {
+        console.error(err);
+        return sendError(
+            res,
+            500,
+            "Failed to upload request documents",
             err.message
         );
     }

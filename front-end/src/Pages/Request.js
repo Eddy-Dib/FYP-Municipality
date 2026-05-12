@@ -387,7 +387,7 @@ function Request() {
 
             console.log("PAYLOAD:", payload);
 
-            await axios.post(
+            const res = await axios.post(
                 `${API_URL}/api/requests`,
                 payload,
                 {
@@ -396,6 +396,28 @@ function Request() {
                     }
                 }
             );
+
+            const requestId = res.data.data.insertId;
+
+            if (data.files.length > 0) {
+                const formData = new FormData();
+
+                data.files.forEach((item) => {
+                    formData.append("files", item.file);
+                    formData.append("docTypes", item.docType); // parallel array
+                });
+
+                await axios.post(
+                    `${API_URL}/api/documents/request/${requestId}/upload`,
+                    formData,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                            "Content-Type": "multipart/form-data"
+                        }
+                    }
+                );
+            }
 
             setToast(true);
             setStep(1);

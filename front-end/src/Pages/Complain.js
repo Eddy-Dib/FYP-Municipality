@@ -234,7 +234,7 @@ function Complain() {
                     Description: ${data.description}`
             };
 
-            await axios.post(
+            const res = await axios.post(
                 `${API_URL}/api/complaints/createcomplaint`,
                 payload,
                 {
@@ -244,7 +244,28 @@ function Complain() {
                 }
             );
 
-            setError(""); // clear error
+            const complaintId = res.data.data.insertId;
+
+            if(data.files.length > 0){
+                const formData = new FormData();
+
+                data.files.forEach(file => {
+                    formData.append("documents", file);
+                });
+
+                await axios.post(
+                    `${API_URL}/api/documents/${complaintId}/upload`,
+                    formData,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                            "Content-Type": "multipart/form-data"
+                        }
+                    }
+                );
+            }
+
+            setError("");
             setToast(true);
             resetForm();
 
