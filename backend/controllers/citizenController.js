@@ -1,10 +1,12 @@
 import db from "../config/db.js";
 import { sendSuccess, sendError } from "../utils/responses.js";
 import { saveCitizenDocument } from "../utils/documentHandler.js";
-
+import bcrypt from "bcrypt";
 export const getMyProfile = (req, res) => {
     try {
         const userId = req.user?.id;
+
+        console.log(req.user);
 
         if (!userId) {
             return sendError(res, 401, "Unauthorized", "NO_USER");
@@ -44,7 +46,85 @@ export const getMyProfile = (req, res) => {
         return sendError(res, 500, "Server error", err.message);
     }
 };
+export const changePassword = async (req, res) => {
 
+    try {
+
+        const userId = req.user?.id;
+
+        console.log(req.user);
+
+        const {
+            currentPassword,
+            newPassword
+        } = req.body;
+
+        if (!userId) {
+            return sendError(res, 401, "Unauthorized");
+        }
+
+        if (!currentPassword || !newPassword) {
+            return sendError(res, 400, "Missing password fields");
+        }
+
+        const [users] = await db.promise().query(
+            `
+            SELECT Password
+            FROM USERS
+            WHERE U_ID = ?
+            `,
+            [userId]
+        );
+
+        if (users.length === 0) {
+            return sendError(res, 404, "User not found");
+        }
+
+        const user = users[0];
+
+        const isMatch = await bcrypt.compare(
+            currentPassword,
+            user.Password
+        );
+
+        if (!isMatch) {
+            return sendError(
+                res,
+                400,
+                "Current password is incorrect"
+            );
+        }
+
+        const hashedPassword = await bcrypt.hash(
+            newPassword,
+            10
+        );
+
+        await db.promise().query(
+            `
+            UPDATE USERS
+            SET Password = ?
+            WHERE U_ID = ?
+            `,
+            [hashedPassword, userId]
+        );
+
+        return sendSuccess(
+            res,
+            "Password updated successfully"
+        );
+
+    } catch (err) {
+
+        console.log(err);
+
+        return sendError(
+            res,
+            500,
+            "Server error"
+        );
+    }
+};
 
 export const registerCitizen = async (req, res) => {
     const {
