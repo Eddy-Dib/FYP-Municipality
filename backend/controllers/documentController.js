@@ -19,30 +19,16 @@ export const getDocumentTypes = async (req, res) => {
             if (err) {
                 console.log(err);
 
-                return sendError(
-                    res,
-                    500,
-                    "Failed to fetch document types",
-                    "SERVER_ERROR"
-                );
+                return sendError(res, 500, "Failed to fetch document types", "SERVER_ERROR");
             }
 
-            return sendSuccess(
-                res,
-                "Document types fetched successfully",
-                rows
-            );
+            return sendSuccess(res, "Document types fetched successfully", rows);
         });
 
     } catch (err) {
         console.log(err);
 
-        return sendError(
-            res,
-            500,
-            "Failed to fetch document types",
-            "SERVER_ERROR"
-        );
+        return sendError(res, 500, "Failed to fetch document types", "SERVER_ERROR");
     }
 };
 
@@ -82,46 +68,46 @@ export const uploadDocuments = async (req, res) => {
         }
 
         const [docTypeRows] = await db.promise().query(
-            `SELECT Doc_Type_ID, Doc_Type_Name FROM DOC_TYPE`
+            `SELECT Doc_Type_ID, Doc_Type_Name, Valid_for FROM DOC_TYPE`
         );
 
         const docTypeMap = new Map(
-            docTypeRows.map(d => [Number(d.Doc_Type_ID), d.Doc_Type_Name])
+            docTypeRows.map(d => [Number(d.Doc_Type_ID), d])
         );
 
-        const uploadTasks = files.map((file, i) => {
-            return (async () => {
-                const docTypeId = Number(docTypes[i]);
-                const description = descriptions[i];
+        const uploadTasks = files.map(async (file, i) => {
 
-                if (!docTypeId) {
-                    throw new Error(`Missing document type for file ${i}`);
-                }
+            const docTypeId = Number(docTypes[i]);
+            const description = descriptions[i];
 
-                const docTypeName = docTypeMap.get(docTypeId) || "unknown";
+            const docType = docTypeMap.get(docTypeId);
+            if (!docType) throw new Error(`Invalid doc type at index ${i}`);
 
-                const filePath = await saveCitizenDocument({
-                    file,
-                    firstName: citizens[0].First_Name,
-                    lastName: citizens[0].Last_Name,
-                    citizenId,
-                    docTypeName
-                });
-
-                await db.promise().query(
-                    `
-                    INSERT INTO DOCUMENT
-                    (DateUploaded, Description, FilePath, C_ID, Doc_Type)
-                    VALUES (NOW(), ?, ?, ?, ?)
-                    `,
-                    [
-                        description || null,
-                        filePath,
-                        citizenId,
-                        docTypeId
-                    ]
-                );
+            const filePath = await saveCitizenDocument({
+                file,
+                firstName: citizens[0].First_Name,
+                lastName: citizens[0].Last_Name,
+                citizenId,
+                docType: docType.Doc_Type_Name
             });
+
+            const expDate = docType.Valid_for && docType.Valid_for > 0
+                ? `DATE_ADD(NOW(), INTERVAL ${docType.Valid_for} MONTH)`
+                : null;
+
+            await db.promise().query(
+                `
+                    INSERT INTO DOCUMENT
+                    (DateUploaded, Description, FilePath, C_ID, Doc_Type, ExpDate)
+                    VALUES (NOW(), ?, ?, ?, ?, ${expDate ?? 'NULL'})
+                    `,
+                [
+                    description || null,
+                    filePath,
+                    citizenId,
+                    docTypeId
+                ]
+            );
         });
 
         await Promise.all(uploadTasks);
@@ -165,6 +151,13 @@ export const uploadComplaintDocuments = async (req, res) => {
 
         const SUPPORTING_DOC_TYPE = 15;
 
+        const [docTypeRow] = await db.promise().query(
+            `SELECT Valid_for FROM DOC_TYPE WHERE Doc_Type_ID = ?`,
+            [SUPPORTING_DOC_TYPE]
+        );
+
+        const validity = docTypeRow[0]?.Valid_for || 0;
+
         const uploadTasks = files.map(async (file) => {
 
             const savedFilePath = await saveCitizenDocument({
@@ -178,8 +171,8 @@ export const uploadComplaintDocuments = async (req, res) => {
             await db.promise().query(
                 `
                 INSERT INTO DOCUMENT
-                (DateUploaded, FilePath, C_ID, Doc_Type, Comp_ID)
-                VALUES (NOW(), ?, ?, ?, ?)
+                (DateUploaded, FilePath, C_ID, Doc_Type, Comp_ID, ExpDate)
+                VALUES (NOW(), ?, ?, ?, ?, ${validity > 0 ? `DATE_ADD(NOW(), INTERVAL ${validity} MONTH)` : 'NULL'})
                 `,
                 [
                     savedFilePath,
@@ -224,54 +217,58 @@ export const uploadRequestDocuments = async (req, res) => {
         const citizenId = citizens[0].C_ID;
         const files = req.files;
 
-        if (!files || files.length === 0) {
+        if (!files?.length) {
             return sendError(res, 400, "No files uploaded", "NO_FILES");
         }
 
         const docTypes = JSON.parse(req.body.docTypes || "[]");
+
         if (docTypes.length !== files.length) {
             return sendError(res, 400, "Document types mismatch", "DOC_TYPE_MISMATCH");
         }
 
-        const [typesRows] = await db.promise().query(
-            `SELECT Doc_Type_ID, Doc_Type_Name FROM DOC_TYPE`
-        );
+        const [typesRows] = await db.promise().query(`
+            SELECT Doc_Type_ID, Doc_Type_Name, Valid_for
+            FROM DOC_TYPE
+        `);
 
         const typeMap = new Map(
-            typesRows.map(t => [String(t.Doc_Type_ID), t.Doc_Type_Name])
+            typesRows.map(t => [Number(t.Doc_Type_ID), t])
         );
 
-        const uploadTasks = files.map((file, i) => {
+        const uploadTasks = files.map(async (file, i) => {
 
-            const docTypeId = docTypes[i];
-            const docTypeName = typeMap.get(String(docTypeId));
+            const docTypeId = Number(docTypes[i]);
+            const docType = typeMap.get(docTypeId);
 
-            if (!docTypeName) {
-                return Promise.reject(`Missing docType for file ${i}`);
-            }
+            if (!docType) throw new Error(`Invalid doc type at index ${i}`);
 
-            return saveCitizenDocument({
+            const filePath = await saveCitizenDocument({
                 file,
                 firstName: citizens[0].First_Name,
                 lastName: citizens[0].Last_Name,
                 citizenId,
-                docType: docTypeName
-            }).then((filePath) => {
-
-                return db.promise().query(
-                    `
-                    INSERT INTO DOCUMENT
-                    (DateUploaded, FilePath, C_ID, Doc_Type, Req_ID)
-                    VALUES (NOW(), ?, ?, ?, ?)
-                    `,
-                    [
-                        filePath,
-                        citizenId,
-                        docTypeId,
-                        reqId
-                    ]
-                );
+                docType: docType.Doc_Type_Name
             });
+
+            const exp =
+                docType.Valid_for > 0
+                    ? `DATE_ADD(NOW(), INTERVAL ${docType.Valid_for} MONTH)`
+                    : null;
+
+            await db.promise().query(
+                `
+                INSERT INTO DOCUMENT
+                (DateUploaded, FilePath, C_ID, Doc_Type, Req_ID, ExpDate)
+                VALUES (NOW(), ?, ?, ?, ?, ${exp ?? 'NULL'})
+                `,
+                [
+                    filePath,
+                    citizenId,
+                    docTypeId,
+                    reqId
+                ]
+            );
         });
 
         await Promise.all(uploadTasks);

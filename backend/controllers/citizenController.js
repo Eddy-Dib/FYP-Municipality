@@ -53,8 +53,6 @@ export const changePassword = async (req, res) => {
 
         const userId = req.user?.id;
 
-        console.log(req.user);
-
         const {
             currentPassword,
             newPassword
