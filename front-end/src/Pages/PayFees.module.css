@@ -1,18 +1,18 @@
 .feesPage {
     min-height: 100vh;
-    background: #f8fafc;
+    background: #f4f7fb;
     font-family: 'Inter', sans-serif;
 }
 
+/* ================= HERO ================= */
+
 .hero {
-    background: linear-gradient(135deg, #10376a 0%, #1e4a7a 100%);
-    padding: 120px 20px 60px;
-    /* keeps space under header */
+    background: linear-gradient(135deg, #10376a 0%, #1f4f88 100%);
+    padding: 120px 20px 70px;
     text-align: center;
     position: relative;
     overflow: hidden;
     color: white;
-    z-index: 0;
 }
 
 .hero::before {
@@ -22,195 +22,212 @@
     left: -50%;
     width: 200%;
     height: 200%;
-    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
-    animation: slowRotate 20s linear infinite;
-    z-index: 0;
+    background: radial-gradient(circle, rgba(255,255,255,0.12) 0%, transparent 70%);
+    animation: rotateGlow 20s linear infinite;
 }
 
-.hero h1,
+@keyframes rotateGlow {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.hero h1 {
+    font-size: 42px;
+    margin-bottom: 10px;
+}
+
 .hero p {
-    position: relative;
-    z-index: 1;
+    font-size: 17px;
+    opacity: 0.95;
 }
 
-@keyframes slowRotate {
-    from {
-        transform: rotate(0deg);
-    }
-
-    to {
-        transform: rotate(360deg);
-    }
-}
+/* ================= CONTAINER ================= */
 
 .container {
-    max-width: 800px;
+    max-width: 850px;
     margin: 40px auto;
     padding: 0 20px;
 }
 
-.actions {
-    display: flex;
-    gap: 15px;
-    margin-bottom: 25px;
+/* =====================================================
+   🧑‍💼 CITIZEN CARD (FIRST CARD — IMPROVED DESIGN)
+   ===================================================== */
+
+.card:first-child {
+    padding: 22px;
+    border-left: 5px solid #253965;
+    background: white;
 }
 
-.actions button {
-    flex: 1;
-    padding: 14px;
-    border: none;
-    border-radius: 12px;
-    background: #1e4a7a;
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
-    transition: 0.2s;
+/* Name styling */
+.card:first-child h3 {
+    font-size: 22px;
+    color: #10376a;
+    text-transform: capitalize;
+    margin-bottom: 10px;
 }
 
-.actions button:hover {
-    background: #163a61;
+/* Info lines nicely structured */
+.card:first-child p {
+    margin: 4px 0;
+    font-size: 14px;
+    color: #374151;
+    text-align: left;
 }
+
+/* ================= GENERAL CARD ================= */
 
 .card {
     background: white;
-    padding: 20px;
+    padding: 18px;
     border-radius: 16px;
-    margin-bottom: 20px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+    margin-bottom: 16px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.05);
+    transition: 0.25s;
 }
 
-.cardHeader {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+.card:hover {
+    transform: translateY(-2px);
 }
 
-.removeBtn {
-    background: red;
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 28px;
-    height: 28px;
-    cursor: pointer;
+.card h3 {
+    margin-bottom: 12px;
+    color: #10376a;
+    font-size: 18px;
 }
 
-.card input {
-    width: 100%;
-    margin-top: 10px;
-    padding: 10px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-}
-
-.feesList {
-    margin-top: 15px;
-}
+/* ================= FEES ROW ================= */
 
 .feeRow {
     display: flex;
     justify-content: space-between;
     padding: 6px 0;
     border-bottom: 1px solid #eee;
+    font-size: 14px;
 }
+
+/* ================= TOTAL ================= */
 
 .totalBox {
-    margin-top: 30px;
-    padding: 20px;
     background: white;
-    border-radius: 16px;
-    font-weight: bold;
-    text-align: right;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
-}
-
-.actions {
-    display: flex;
-    gap: 15px;
-    margin-bottom: 25px;
-}
-
-.actions button {
-    flex: 1;
     padding: 14px;
-    border: none;
-    border-radius: 12px;
-    background: #1e4a7a;
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-
-.card {
-    background: white;
-    padding: 20px;
-    border-radius: 16px;
-    margin-bottom: 20px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
-}
-
-.cardHeader {
-    display: flex;
-    justify-content: space-between;
-}
-
-.removeBtn {
-    background: red;
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 28px;
-    height: 28px;
-    cursor: pointer;
-}
-
-.card input,
-.card select {
-    width: 100%;
-    margin-top: 10px;
-    padding: 10px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-}
-
-.feesList {
-    margin-top: 15px;
-}
-
-.feeRow {
-    display: flex;
-    justify-content: space-between;
-    padding: 6px 0;
-}
-
-.totalBox {
-    margin-top: 30px;
-    padding: 20px;
-    background: white;
-    border-radius: 16px;
+    border-radius: 14px;
     text-align: right;
+    font-size: 18px;
     font-weight: bold;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.06);
+    margin-top: 10px;
 }
+
+/* ================= BUTTON ================= */
 
 .printBtn {
     width: 100%;
     margin-top: 20px;
     padding: 14px;
-    border-radius: 12px;
     border: none;
+    border-radius: 12px;
     background: #2563eb;
     color: white;
     font-weight: bold;
     cursor: pointer;
 }
 
-.hiddenInvoice {
-    display: none;
+.printBtn:hover {
+    background: #1d4ed8;
 }
+
+/* ================= NOTE ================= */
+
 .note {
-    margin-top: 10px;
     text-align: center;
+    margin-top: 10px;
     font-size: 13px;
-    color: #555;
+    color: #6b7280;
+}
+
+/* ================= STATUS ================= */
+
+.paid {
+    color: #16a34a;
+    font-weight: bold;
+}
+
+.unpaid {
+    color: #dc2626;
+    font-weight: bold;
+}
+
+/* ================= PRINT (CLEAN & SAFE) ================= */
+
+@media print {
+
+    .hero,
+    .printBtn,
+    .note {
+        display: none !important;
+    }
+
+    body {
+        background: white;
+    }
+
+    .container {
+        margin: 0;
+        padding: 0;
+    }
+
+    .card {
+        box-shadow: none;
+        border: 1px solid #ddd;
+        padding: 10px;
+        margin-bottom: 8px;
+    }
+
+    .card:first-child {
+        border-left: 3px solid #000;
+    }
+
+    .card h3 {
+        font-size: 14px;
+    }
+
+    .feeRow {
+        font-size: 12px;
+    }
+
+    .totalBox {
+        font-size: 14px;
+        padding: 10px;
+        border: 1px solid #ddd;
+    }
+}
+/* Citizen Card Better Layout */
+
+.citizenName {
+    font-size: 22px;
+    font-weight: 700;
+    color: #10376a;
+    margin-bottom: 12px;
+}
+
+/* each row */
+.infoRow {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    border-bottom: 1px solid #f1f1f1;
+    font-size: 14px;
+}
+
+/* labels like Email, City */
+.label {
+    font-weight: 600;
+    color: #374151;
+}
+
+/* values */
+.value {
+    color: #111827;
+    font-weight: 400;
 }

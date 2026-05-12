@@ -11,6 +11,7 @@ import secretaryRoutes from "./routes/secretaryRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import mayorRoutes from "./routes/mayorRoutes.js"
 import locationRoutes from "./routes/locationRoutes.js"
+import feesRoutes from "./routes/feesRoutes.js";
 import documentRoutes from "./routes/documentRoutes.js"
 
 const app = express();
@@ -27,6 +28,8 @@ app.use("/api/citizen", citizenRoutes);
 app.use("/secretary", secretaryRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/locations", locationRoutes);
+app.use("/api/mayor", mayorRoutes)
+app.use("/api", feesRoutes);
 app.use("/api/mayor", mayorRoutes);
 app.use("/api/documents", documentRoutes);
 
