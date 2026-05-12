@@ -1,5 +1,6 @@
 import db from "../config/db.js";
 import { sendSuccess, sendError } from "../utils/responses.js";
+import { formatRequestNumber } from "../utils/formats.js";
 
 export const getMyRequestsAndComplaints = async (req, res) => {
     try {
@@ -24,6 +25,7 @@ export const getMyRequestsAndComplaints = async (req, res) => {
                 r.Req_ID,
                 r.DateMade,
                 r.Priority,
+                r.RType_ID,
                 rs.RStat_Name,
                 rt.RType_Name
             FROM REQUEST r
@@ -34,6 +36,15 @@ export const getMyRequestsAndComplaints = async (req, res) => {
             `,
             [citizenId]
         );
+
+        const formattedRequests = requests.map(r => ({
+            ...r,
+            Request_Number: formatRequestNumber({
+                date: r.DateMade,
+                requestTypeId: r.RType_ID,
+                requestId: r.Req_ID
+            })
+        }));
 
         // COMPLAINTS
         const [complaints] = await db.promise().query(
@@ -54,7 +65,7 @@ export const getMyRequestsAndComplaints = async (req, res) => {
         );
 
         return sendSuccess(res, "My requests fetched successfully", {
-            requests,
+            requests: formattedRequests,
             complaints
         });
 

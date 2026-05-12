@@ -29,6 +29,20 @@ function MyRequests() {
         fetchData();
     }, []);
 
+    const formatPriority = (value) => {
+        switch (Number(value)) {
+            case 4:
+                return "Urgent";
+            case 3:
+                return "High";
+            case 2:
+                return "Medium";
+            case 1:
+            default:
+                return "Low";
+        }
+    };
+
     const isEmpty =
         (!requests || requests.length === 0) &&
         (!complaints || complaints.length === 0);
@@ -55,6 +69,7 @@ function MyRequests() {
             )}
 
             {/* REQUESTS */}
+            {requests.length > 0 && (<h1 className={styles.sectionTitle}>Requests</h1>)}
             {requests.map(r => (
                 <div key={r.Req_ID} className={styles.cardFull}>
                     <div className={styles.cardHeader}>
@@ -63,14 +78,16 @@ function MyRequests() {
                     </div>
 
                     <div className={styles.cardBody}>
-                        <p><b>ID:</b> #{r.Req_ID}</p>
-                        <p><b>Priority:</b> {r.Priority}</p>
+                        <p><b>ID:</b> {r.Request_Number}</p>
+                        <p><b>Priority:</b> {formatPriority(r.Priority)}</p>
                         <p><b>Date:</b> {new Date(r.DateMade).toLocaleDateString()}</p>
                     </div>
                 </div>
             ))}
 
             {/* COMPLAINTS */}
+            {complaints.length > 0 && (<h1 className={styles.sectionTitle}>Complaints</h1>)}
+
             {complaints.map(c => (
                 <div key={c.Cmpt_ID} className={styles.cardFull}>
                     <div className={styles.cardHeader}>

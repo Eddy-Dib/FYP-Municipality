@@ -1,6 +1,6 @@
 import db from "../config/db.js";
 import { sendSuccess, sendError } from "../utils/responses.js";
-import { formatDate, safeParseJSON } from "../utils/formats.js";
+import { formatDate, formatRequestNumber, safeParseJSON } from "../utils/formats.js";
 import { getPriority } from "../utils/labels.js";
 import { sendRequestStatusEmail } from "../utils/notificationService.js";
 import { toPublicPath } from "../utils/documentHandler.js"
@@ -47,13 +47,7 @@ export const getSubmittedRequests = async (req, res) => {
                 r.Priority,
                 rs.RStat_Name,
                 rt.RType_ID,
-                rt.RType_Name,
-                CONCAT(
-                    'REQ-',
-                    DATE_FORMAT(r.DateMade, '%y'),
-                    LPAD(rt.RType_ID, 2, '0'),
-                    LPAD(r.Req_ID, 3, '0')
-                ) AS RequestNumber
+                rt.RType_Name
             FROM REQUEST r
             JOIN REQ_STATUSES rs ON r.RStat_Code = rs.RStat_Code
             JOIN REQUEST_TYPES rt ON r.RType_ID = rt.RType_ID
@@ -62,7 +56,11 @@ export const getSubmittedRequests = async (req, res) => {
 
         const formatted = rows.map(r => ({
             id: r.Req_ID,
-            requestNumber: r.RequestNumber,
+            requestNumber: formatRequestNumber({
+                date: r.DateMade,
+                requestTypeId: r.RType_ID,
+                requestId: r.Req_ID
+            }),
             type: r.RType_Name,
             status: r.RStat_Name,
             priority: getPriority(r.Priority),

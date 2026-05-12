@@ -3,6 +3,7 @@ import axios from "axios";
 import RequestCard from "../../Components/Card/RequestCard";
 import styles from "./ManageRequests.module.css";
 import { useNavigate } from "react-router-dom";
+import { PriorityBadge, StatusBadge } from "../../Components/UI/Badge";
 
 function ManageRequests() {
     const navigate = useNavigate();
@@ -63,16 +64,13 @@ function ManageRequests() {
                 return true;
 
             case "High Priority":
-                return priority === "high";
+                return Number(req.priority) === 3 || Number(req.priority) === 4;
 
             case "Submitted":
                 return status === "submitted";
 
             case "Under Review":
                 return status === "underreview";
-
-            case "Missing Documents":
-                return status === "missingdocuments";
 
             default:
                 return true;
@@ -92,8 +90,7 @@ function ManageRequests() {
                     "All",
                     "High Priority",
                     "Submitted",
-                    "Under Review",
-                    "Missing Documents"
+                    "Under Review"
                 ].map(tab => (
                     <button
                         key={tab}
