@@ -92,12 +92,6 @@ function ManageEvents() {
         }
 
         const tags = [];
-
-        // FIX IMPORTANT: accept string OR number OR boolean
-        if (Number(ev.Updated_Flag) === 1 || ev.Updated_Flag === true) {
-            tags.push("updated");
-        }
-
         return { primary, tags };
     };
 
@@ -118,12 +112,6 @@ function ManageEvents() {
                             {primary}
                         </div>
 
-                        {/* FORCE UPDATED VISIBILITY */}
-                        {Number(ev.Updated_Flag) === 1 && (
-                            <div className={`${styles.badge} ${styles.updated}`}>
-                                updated
-                            </div>
-                        )}
 
                     </div>
                 </div>
@@ -138,7 +126,12 @@ function ManageEvents() {
                 </div>
 
                 <div className={styles.cardSub}>
-                    {ev.Details}
+                    {ev.Details?.split("\n").map((line, i) => (
+                        <span key={i}>
+                            {line}
+                            <br />
+                        </span>
+                    ))}
                 </div>
 
                 <div className={styles.cardValue}>

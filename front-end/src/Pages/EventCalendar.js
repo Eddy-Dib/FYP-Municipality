@@ -10,40 +10,62 @@ function EventCalendar() {
 
     const [date, setDate] = useState(new Date());
     const [events, setEvents] = useState([]);
+    const [announcements, setAnnouncements] = useState([]);
+
+    // SAFE DATE FORMAT (NO UTC SHIFT)
+    const formatDateOnly = (d) => {
+        const date = new Date(d);
+        return (
+            date.getFullYear() +
+            "-" +
+            String(date.getMonth() + 1).padStart(2, "0") +
+            "-" +
+            String(date.getDate()).padStart(2, "0")
+        );
+    };
 
     // FETCH EVENTS
     const fetchEvents = async () => {
         try {
             const res = await axios.get(`${API_URL}/api/secretary/events`, {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
+                headers: { Authorization: `Bearer ${token}` }
             });
-
             setEvents(res.data.data || []);
         } catch (err) {
             console.error("Failed to load events", err);
         }
     };
 
-    useEffect(() => {
-        fetchEvents();
-    }, []);
-
-    const formatDate = (d) => new Date(d).toISOString().split("T")[0];
-
-    // GET EVENTS FOR SELECTED DAY
-    const getEvents = (dateObj) => {
-        const d = dateObj.toISOString().split("T")[0];
-
-        return events.filter(ev => {
-            const start = formatDate(ev.StartDate);
-            const end = formatDate(ev.EndDate);
-            return d >= start && d <= end;
-        });
+    // FETCH ANNOUNCEMENTS
+    const fetchAnnouncements = async () => {
+        try {
+            const res = await axios.get(`${API_URL}/api/secretary/announcements`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setAnnouncements(res.data.data || []);
+        } catch (err) {
+            console.error("Failed to load announcements", err);
+        }
     };
 
-    const selectedEvents = getEvents(date);
+    useEffect(() => {
+        fetchEvents();
+        fetchAnnouncements();
+    }, []);
+
+    const selectedDate = formatDateOnly(date);
+
+    // EVENTS FOR SELECTED DAY
+    const selectedEvents = events.filter(ev => {
+        const start = formatDateOnly(ev.StartDate);
+        const end = formatDateOnly(ev.EndDate);
+        return selectedDate >= start && selectedDate <= end;
+    });
+
+    // ANNOUNCEMENTS FOR SELECTED DAY
+    const selectedAnnouncements = announcements.filter(a =>
+        formatDateOnly(a.Created_Date) === selectedDate
+    );
 
     return (
         <div className={styles.wrapper}>
@@ -54,44 +76,58 @@ function EventCalendar() {
                     <Calendar
                         onChange={setDate}
                         value={date}
-
-                        // ✅ IMPORTANT FIX: NO styles.eventDay here
                         tileClassName={({ date }) => {
-                            const d = date.toISOString().split("T")[0];
+                            const d = formatDateOnly(date);
 
                             const dayEvents = events.filter(ev => {
-                                const start = formatDate(ev.StartDate);
-                                const end = formatDate(ev.EndDate);
+                                const start = formatDateOnly(ev.StartDate);
+                                const end = formatDateOnly(ev.EndDate);
                                 return d >= start && d <= end;
                             });
 
-                            if (dayEvents.length === 0) return "";
+                            const dayAnnouncements = announcements.filter(a =>
+                                formatDateOnly(a.Created_Date) === d
+                            );
 
-                            const hasCancelled = dayEvents.some(ev => ev.Active_Flag === 0);
-                            const hasActive = dayEvents.some(ev => ev.Active_Flag === 1);
+                            const hasEvent = dayEvents.length > 0;
+                            const hasAnn = dayAnnouncements.length > 0;
 
-                            if (hasCancelled && !hasActive) return "cancelledDay";
-                            if (hasActive) return "eventDay";
+                            const hasCancelledEvent = dayEvents.some(e => e.Active_Flag === 0);
+                            const hasCancelledAnn = dayAnnouncements.some(a => Number(a.Active_Flag) === 0);
+
+                            const hasActiveEvent = dayEvents.some(e => e.Active_Flag === 1);
+                            const hasActiveAnn = dayAnnouncements.some(a => Number(a.Active_Flag) === 1);
+
+                            // 🚨 PRIORITY RULES
+
+                            if (hasAnn && !hasEvent) {
+                                return "announcementDay"; // ONLY announcements → yellow background
+                            }
+
+                            if ((hasCancelledEvent || hasCancelledAnn) && !(hasActiveEvent || hasActiveAnn)) {
+                                return "cancelledDay";
+                            }
+
+                            if (hasEvent || hasAnn) {
+                                return "eventDay";
+                            }
 
                             return "";
                         }}
                     />
                 </div>
 
-                {/* EVENT BOX */}
+                {/* EVENTS */}
                 {selectedEvents.length > 0 && (
                     <div className={styles.eventBox}>
-                        {selectedEvents.map((ev) => {
+                        {selectedEvents.map(ev => {
                             const isCancelled = ev.Active_Flag === 0;
 
                             return (
                                 <div key={ev.Event_ID} className={styles.eventItem}>
 
-                                    {/* HEADER ROW */}
                                     <div className={styles.eventHeader}>
-                                        <h3 className={styles.title}>
-                                            {ev.Name}
-                                        </h3>
+                                        <h3 className={styles.title}>{ev.Name}</h3>
 
                                         {isCancelled && (
                                             <span className={styles.cancelLabel}>
@@ -100,7 +136,6 @@ function EventCalendar() {
                                         )}
                                     </div>
 
-                                    {/* TIME */}
                                     <p className={styles.timeLine}>
                                         ⏰ <strong>Start:</strong>{" "}
                                         {new Date(ev.StartDate).toLocaleString()}
@@ -111,30 +146,58 @@ function EventCalendar() {
                                         {new Date(ev.EndDate).toLocaleString()}
                                     </p>
 
-                                    {/* DETAILS */}
                                     {!isCancelled && ev.Details && (
                                         <p className={styles.details}>
-                                            {ev.Details.split("\n").map((line, i) => (
-                                                <span key={i}>
-                                                    {line}
-                                                    <br />
-                                                </span>
-                                            ))}
+                                            {ev.Details}
                                         </p>
                                     )}
 
-                                    {/* CANCELLED TEXT */}
                                     {isCancelled && (
                                         <p className={styles.cancelText}>
                                             This event was cancelled
                                         </p>
                                     )}
-
                                 </div>
                             );
                         })}
                     </div>
                 )}
+
+                {/* ANNOUNCEMENTS */}
+                {selectedAnnouncements.length > 0 && (
+                    <div className={styles.announcementBox}>
+                        {selectedAnnouncements.map(a => {
+                            const isCancelled = Number(a.Active_Flag) === 0;
+
+                            return (
+                                <div key={a.Anc_ID} className={styles.announcementItem}>
+
+                                    <h3 className={styles.announcementTitle}>
+                                        {a.Name}
+                                        {isCancelled && (
+                                            <span className={styles.cancelLabel}>Cancelled</span>
+                                        )}
+                                    </h3>
+
+                                    <p className={styles.announcementDate}>
+                                         {new Date(a.Created_Date).toLocaleString()}
+                                    </p>
+
+                                    <p className={styles.announcementDetails}>
+                                        {a.Details}
+                                    </p>
+
+                                    {isCancelled && (
+                                        <p className={styles.cancelText}>
+                                            This announcement was cancelled
+                                        </p>
+                                    )}
+                                </div>
+                            );
+                        })}
+                    </div>
+                )}
+
             </div>
         </div>
     );

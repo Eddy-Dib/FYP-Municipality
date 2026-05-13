@@ -489,8 +489,7 @@ export const getEvents = async (req, res) => {
                 EndDate,
                 Details,
                 Entrance,
-                Active_Flag,
-                Updated_Flag
+                Active_Flag
             FROM EVENT
             ORDER BY StartDate DESC
         `);
@@ -569,8 +568,6 @@ export const updateEvent = async (req, res) => {
         console.log("UPDATE EVENT ID:", id);
         console.log("UPDATE BODY:", req.body);
 
-        console.log(events)
-
         if (!id || isNaN(id)) {
             return sendError(res, 400, "Invalid event ID", "BAD_EVENT_ID");
         }
@@ -613,5 +610,144 @@ export const updateEvent = async (req, res) => {
     } catch (err) {
         console.error("UPDATE EVENT ERROR:", err);
         return sendError(res, 500, "Failed to update event", "UPDATE_EVENT_ERROR");
+    }
+};
+
+/* GET ANNOUNCEMENTS */
+export const getAnnouncements = async (req, res) => {
+    try {
+        const [rows] = await db.promise().query(`
+    SELECT 
+        Anc_ID,
+        Name,
+        Details,
+        Emp_ID,
+        Active_Flag,
+        Created_Date
+    FROM ANNOUNCEMENT
+    ORDER BY Created_Date DESC
+`);
+
+        const formatted = rows.map(a => ({
+            ...a,
+            Active_Flag: a.Active_Flag ?? 1
+        }));
+
+        return res.status(200).json({
+            success: true,
+            data: formatted
+        });
+
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({
+            success: false,
+            message: "Failed to fetch announcements"
+        });
+    }
+};
+
+/* CREATE ANNOUNCEMENT */
+export const createAnnouncement = async (req, res) => {
+    try {
+        const { name, details, createdDate } = req.body;
+
+        const empId = req.user.empId || req.user.Emp_ID || 3;
+
+        const finalDate = createdDate
+            ? new Date(createdDate)
+            : new Date();
+
+        await db.promise().query(
+            `
+            INSERT INTO ANNOUNCEMENT
+            (Name, Details, Emp_ID, Active_Flag, Created_Date)
+            VALUES (?, ?, ?, 1, ?)
+            `,
+            [name, details, empId, finalDate]
+        );
+
+        return res.status(201).json({
+            success: true,
+            message: "Announcement created successfully"
+        });
+
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({
+            success: false,
+            message: "Failed to create announcement"
+        });
+    }
+};
+/* UPDATE ANNOUNCEMENT */
+export const updateAnnouncement = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { name, details, createdDate } = req.body;
+
+        const [result] = await db.promise().query(`
+            UPDATE ANNOUNCEMENT
+            SET 
+                Name = ?,
+                Details = ?,
+                Created_Date = ?
+            WHERE Anc_ID = ?
+        `, [
+            name,
+            details || "",
+            createdDate || new Date(),
+            id
+        ]);
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({
+                success: false,
+                message: "Announcement not found"
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "Announcement updated successfully"
+        });
+
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({
+            success: false,
+            message: "Failed to update announcement"
+        });
+    }
+};
+export const cancelAnnouncement = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const [result] = await db.promise().query(`
+            UPDATE ANNOUNCEMENT
+            SET Active_Flag = 0
+            WHERE Anc_ID = ?
+        `, [id]);
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({
+                success: false,
+                message: "Announcement not found"
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "Announcement cancelled successfully"
+        });
+
+    } catch (err) {
+        console.error("CANCEL ANNOUNCEMENT ERROR:", err);
+
+        return res.status(500).json({
+            success: false,
+            message: "Failed to cancel announcement"
+        });
     }
 };

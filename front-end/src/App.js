@@ -44,6 +44,7 @@ import VerifyDocuments from "./Pages/Secretary/VerifyDocuments";
 // Print
 import ReportPrint from "./Pages/ReportPrint";
 import ManageEvents from "./Pages/Secretary/ManageEvents";
+import ManageAnnouncements from "./Pages/Secretary/ManageAnnouncements";
 
 function App() {
   return (
@@ -88,6 +89,7 @@ function App() {
           <Route path="secretary/managereq/:id" element={<ProtectedRoute allowedRoles={["Secretary"]}><RequestDetailsPage /></ProtectedRoute>} />
           <Route path="secretary/verifydoc" element={<ProtectedRoute allowedRoles={["Secretary"]}><VerifyDocuments /></ProtectedRoute>} />
           <Route path="secretary/events" element={<ProtectedRoute allowedRoles={["Secretary"]}><ManageEvents/></ProtectedRoute>} />
+          <Route path="secretary/announcements" element={<ProtectedRoute allowedRoles={["Secretary"]}><ManageAnnouncements/></ProtectedRoute>} />
 
         </Route>
 

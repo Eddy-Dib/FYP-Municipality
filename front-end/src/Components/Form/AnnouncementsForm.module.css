@@ -1,0 +1,83 @@
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.modal {
+    width: 450px;
+    background: white;
+    padding: 25px;
+    border-radius: 14px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.modal h2 {
+    margin-bottom: 15px;
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #334155;
+}
+
+input, textarea {
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #cbd5e1;
+    font-size: 14px;
+}
+
+textarea {
+    min-height: 120px;
+    resize: none;
+}
+
+.actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.actions button {
+    padding: 8px 14px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* CANCEL BUTTON */
+.actions button:first-child {
+    background: #e2e8f0;
+    color: #1e293b;
+}
+
+.actions button:first-child:hover {
+    background: #3b82f6;
+    color: white;
+}
+
+/* SUBMIT BUTTON */
+.actions button:last-child {
+    background: #3b82f6;
+    color: white;
+}
+
+.actions button:last-child:hover {
+    background: #2563eb;
+}
