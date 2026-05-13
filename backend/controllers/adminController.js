@@ -388,3 +388,4 @@ export const createEmployee = async (req, res) => {
         return sendError(res, 500, "Server error");
     }
 };
+
