@@ -121,6 +121,7 @@ export const registerCitizen = async (req, res) => {
         !firstName ||
         !lastName ||
         !birthDate ||
+        !phone ||
         !email ||
         !locationId
     ) {
@@ -141,6 +142,15 @@ export const registerCitizen = async (req, res) => {
             return sendError(res, 400, "Invalid location selected", "INVALID_LOCATION");
         }
 
+        const [existing] = await db.promise().query(
+            `SELECT C_ID FROM CITIZEN WHERE Email = ?`,
+            [email]
+        );
+
+        if (existing.length > 0) {
+            return sendError(res, 409, "Account already exists", "EMAIL_EXISTS");
+        }
+
         const [citizenResult] = await db.promise().query(
             `INSERT INTO CITIZEN 
             (First_Name, Last_Name, BirthDate, Email, Phone_Num, Location_ID, U_ID)
@@ -155,7 +165,7 @@ export const registerCitizen = async (req, res) => {
             firstName,
             lastName,
             citizenId,
-            docType: docType || 1
+            docType: 1
         });
 
         await db.promise().query(

@@ -31,6 +31,33 @@ function RegisterForm() {
     const [message, setMessage] = useState("");
     const [toast, setToast] = useState(false);
 
+    const getMaxBirthDate = () => {
+        const today = new Date();
+        today.setFullYear(today.getFullYear() - 18);
+        return today.toISOString().split("T")[0];
+    };
+
+    const isValidEmail = (email) => {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    };
+
+    const isValidPhone = (phone) => {
+        return /^\d{8}$/.test(phone);
+    };
+
+    const validate = () => {
+        if (!form.firstName.trim()) return "First name is required";
+        if (!form.lastName.trim()) return "Last name is required";
+        if (!form.birthDate) return "Birth date is required";
+        if (!form.email.trim()) return "Email is required";
+        if(!isValidEmail(form.email.trim())) return "Invalid Email";
+        if(!form.phone) return "Phone number is required"
+        if(!isValidPhone(form.phone)) return "Phone must be exactly 8 digits"
+        if (!form.locationId) return "Location must be selected";
+        if (!file) return "Verification document is required";
+        return "";
+    };
+
     useEffect(() => {
         const fetchCities = async () => {
             const res = await axios.get(`${API_URL}/api/locations/cities`);
@@ -111,6 +138,13 @@ function RegisterForm() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        
+        const validationError = validate();
+        if (validationError) {
+            setMessage(validationError);
+            return;
+        }
+
         setLoading(true);
         setMessage("");
 
@@ -148,28 +182,28 @@ function RegisterForm() {
             <div className={styles.row}>
                 <div className={styles.group}>
                     <label>First Name</label>
-                    <input name="firstName" value={form.firstName} onChange={handleChange} required />
+                    <input name="firstName" value={form.firstName} onChange={handleChange} placeholder="ex: Johnathaniel"/>
                 </div>
 
                 <div className={styles.group}>
                     <label>Last Name</label>
-                    <input name="lastName" value={form.lastName} onChange={handleChange} required />
+                    <input name="lastName" value={form.lastName} onChange={handleChange} placeholder="ex: Doenathaniel"/>
                 </div>
             </div>
 
             <div className={styles.group}>
                 <label>Birth Date</label>
-                <input type="date" name="birthDate" value={form.birthDate} onChange={handleChange} required />
+                <input type="date" name="birthDate" value={form.birthDate} onChange={handleChange} max={getMaxBirthDate()} />
             </div>
 
             <div className={styles.group}>
                 <label>Email</label>
-                <input type="email" name="email" value={form.email} onChange={handleChange} required />
+                <input type="email" name="email" value={form.email} onChange={handleChange} placeholder="John.Doe@example.com"/>
             </div>
 
             <div className={styles.group}>
                 <label>Phone</label>
-                <input name="phone" value={form.phone} onChange={handleChange} />
+                <input name="phone" value={form.phone} onChange={handleChange} placeholder="ex: 70526703"/>
             </div>
 
             <div className={styles.row}>
@@ -232,7 +266,7 @@ function RegisterForm() {
 
             <div className={styles.group}>
                 <label>Verification Document</label>
-                <input type="file" onChange={(e) => setFile(e.target.files[0])} required />
+                <input type="file" onChange={(e) => setFile(e.target.files[0])} />
             </div>
 
             {message && <p className={styles.error}>{message}</p>}
