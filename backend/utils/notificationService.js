@@ -30,6 +30,11 @@ export const sendRequestStatusEmail = async ({
         text = `Your request (${requestNumber} - ${title}) has been approved.`;
     }
 
+    if (status === "in_progress") {
+        subject = "Request In Progress";
+        text = `Your request (${requestNumber} - ${title}) is now being processed by municipality staff.`;
+    }
+
     if (status === "rejected") {
         subject = "Request Rejected";
         text = `Your request (${requestNumber} - ${title}) was rejected.\n\nReason:\n${reason || "Not provided"}`;
