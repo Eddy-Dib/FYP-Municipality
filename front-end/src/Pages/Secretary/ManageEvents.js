@@ -14,20 +14,24 @@ function ManageEvents() {
     const [showModal, setShowModal] = useState(false);
     const [toast, setToast] = useState(false);
 
-    // edit mode
     const [editEvent, setEditEvent] = useState(null);
 
-    // delete modal
     const [deleteModal, setDeleteModal] = useState(false);
     const [selectedEventId, setSelectedEventId] = useState(null);
 
+    // FETCH EVENTS
     const fetchEvents = async () => {
         try {
             setLoading(true);
 
-            const res = await axios.get(`${API_URL}/api/secretary/events`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            const res = await axios.get(
+                `${API_URL}/api/secretary/events`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            );
 
             setEvents(res.data.data || []);
         } catch (err) {
@@ -41,11 +45,12 @@ function ManageEvents() {
         fetchEvents();
     }, []);
 
-    // 🗑 DELETE
-    const handleDelete = async () => {
+    // 🛑 CANCEL EVENT (SOFT DELETE)
+    const handleCancel = async () => {
         try {
-            await axios.delete(
-                `${API_URL}/api/secretary/events/${selectedEventId}`,
+            await axios.patch(
+                `${API_URL}/api/secretary/events/${selectedEventId}/cancel`,
+                {},
                 {
                     headers: {
                         Authorization: `Bearer ${token}`
@@ -55,21 +60,20 @@ function ManageEvents() {
 
             setDeleteModal(false);
             setSelectedEventId(null);
+
             fetchEvents();
             setToast(true);
 
         } catch (err) {
             console.error(err);
-            alert("Failed to delete event");
+            alert("Failed to cancel event");
         }
     };
 
-    // ✏ EDIT
     const handleEdit = (event) => {
         setEditEvent(event);
         setShowModal(true);
     };
-
     return (
         <div className={styles.page}>
 
@@ -125,7 +129,6 @@ function ManageEvents() {
                                         {ev.Name}
                                     </div>
 
-                                    {/* STATUS */}
                                     <div className={`${styles.badge} ${styles[status]}`}>
                                         {status}
                                     </div>
@@ -163,7 +166,7 @@ function ManageEvents() {
                                                 setDeleteModal(true);
                                             }}
                                         >
-                                            Delete
+                                            Cancel
                                         </button>
 
                                     </div>
@@ -177,7 +180,7 @@ function ManageEvents() {
 
             </div>
 
-            {/* EVENT FORM MODAL */}
+            {/* EVENT FORM */}
             {showModal && (
                 <EventForm
                     editData={editEvent}
@@ -189,20 +192,19 @@ function ManageEvents() {
                         setShowModal(false);
                         setEditEvent(null);
                         fetchEvents();
-                        setToast(true);
                     }}
                 />
             )}
 
-            {/* DELETE MODAL */}
+            {/* DELETE / CANCEL MODAL */}
             {deleteModal && (
                 <div className={styles.overlay}>
                     <div className={styles.modal}>
 
-                        <h2>Delete Event</h2>
+                        <h2>Cancel Event</h2>
 
                         <p style={{ marginTop: "10px", color: "#475569" }}>
-                            Are you sure you want to delete this event?
+                            Are you sure you want to cancel this event?
                         </p>
 
                         <div className={styles.actions}>
@@ -214,14 +216,14 @@ function ManageEvents() {
                                     setSelectedEventId(null);
                                 }}
                             >
-                                Cancel
+                                No
                             </button>
 
                             <button
                                 className={styles.deleteBtn}
-                                onClick={handleDelete}
+                                onClick={handleCancel}
                             >
-                                Yes, Delete
+                                Yes, Cancel
                             </button>
 
                         </div>

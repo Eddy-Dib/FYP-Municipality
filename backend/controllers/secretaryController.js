@@ -488,25 +488,26 @@ export const getEvents = async (req, res) => {
                 StartDate,
                 EndDate,
                 Details,
-                Entrance
+                Entrance,
+                Active_Flag
             FROM EVENT
+            WHERE Active_Flag = 1
             ORDER BY StartDate DESC
         `);
 
-        res.status(200).json({
+        return res.status(200).json({
             success: true,
             data: events
         });
 
     } catch (err) {
         console.error(err);
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
             message: "Failed to fetch events"
         });
     }
 };
-
 
 export const createEvent = async (req, res) => {
     try {
@@ -515,10 +516,10 @@ export const createEvent = async (req, res) => {
         const empId = 3;
 
         await db.promise().query(`
-            INSERT INTO EVENT
-            (Name, StartDate, EndDate, Details, Entrance, Emp_ID)
-            VALUES (?, ?, ?, ?, ?, ?)
-        `, [
+    INSERT INTO EVENT
+    (Name, StartDate, EndDate, Details, Entrance, Emp_ID, Active_Flag)
+    VALUES (?, ?, ?, ?, ?, ?, 1)
+`, [
             name,
             startDate,
             endDate,
@@ -540,24 +541,25 @@ export const createEvent = async (req, res) => {
         });
     }
 };
-export const deleteEvent = async (req, res) => {
+export const cancelEvent = async (req, res) => {
     try {
         const { id } = req.params;
 
-        const [result] = await db.promise().query(
-            `DELETE FROM EVENT WHERE Event_ID = ?`,
-            [id]
-        );
+        const [result] = await db.promise().query(`
+            UPDATE EVENT
+            SET Active_Flag = 0
+            WHERE Event_ID = ?
+        `, [id]);
 
         if (result.affectedRows === 0) {
             return sendError(res, 404, "Event not found", "EVENT_NOT_FOUND");
         }
 
-        return sendSuccess(res, "Event deleted successfully");
+        return sendSuccess(res, "Event cancelled successfully");
 
     } catch (err) {
         console.error(err);
-        return sendError(res, 500, "Failed to delete event", "DELETE_EVENT_ERROR");
+        return sendError(res, 500, "Failed to cancel event", "CANCEL_EVENT_ERROR");
     }
 };
 export const updateEvent = async (req, res) => {
@@ -565,19 +567,23 @@ export const updateEvent = async (req, res) => {
         const { id } = req.params;
         const { name, startDate, endDate, details, entrance } = req.body;
 
-        const [result] = await db.promise().query(
-            `
+        const [result] = await db.promise().query(`
             UPDATE EVENT
-            SET 
+            SET
                 Name = ?,
                 StartDate = ?,
                 EndDate = ?,
                 Details = ?,
                 Entrance = ?
             WHERE Event_ID = ?
-            `,
-            [name, startDate, endDate, details, entrance, id]
-        );
+        `, [
+            name,
+            startDate,
+            endDate,
+            details,
+            entrance,
+            id
+        ]);
 
         if (result.affectedRows === 0) {
             return sendError(res, 404, "Event not found", "EVENT_NOT_FOUND");
