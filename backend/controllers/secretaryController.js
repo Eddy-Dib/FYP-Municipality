@@ -491,7 +491,6 @@ export const getEvents = async (req, res) => {
                 Entrance,
                 Active_Flag
             FROM EVENT
-            WHERE Active_Flag = 1
             ORDER BY StartDate DESC
         `);
 
@@ -508,7 +507,6 @@ export const getEvents = async (req, res) => {
         });
     }
 };
-
 export const createEvent = async (req, res) => {
     try {
         const { name, startDate, endDate, details, entrance } = req.body;
@@ -567,7 +565,19 @@ export const updateEvent = async (req, res) => {
         const { id } = req.params;
         const { name, startDate, endDate, details, entrance } = req.body;
 
-        const [result] = await db.promise().query(`
+        console.log("UPDATE EVENT ID:", id);
+        console.log("UPDATE BODY:", req.body);
+
+        if (!id || isNaN(id)) {
+            return sendError(res, 400, "Invalid event ID", "BAD_EVENT_ID");
+        }
+
+        if (!name || !startDate || !endDate) {
+            return sendError(res, 400, "Missing required fields", "MISSING_FIELDS");
+        }
+
+        const [result] = await db.promise().query(
+            `
             UPDATE EVENT
             SET
                 Name = ?,
@@ -576,23 +586,168 @@ export const updateEvent = async (req, res) => {
                 Details = ?,
                 Entrance = ?
             WHERE Event_ID = ?
+            `,
+            [
+                name,
+                startDate,
+                endDate,
+                details || "",
+                Number(entrance) || 0,
+                id
+            ]
+        );
+
+        console.log("AFFECTED ROWS:", result.affectedRows);
+
+        if (result.affectedRows === 0) {
+            return sendError(res, 404, "Event not found or not updated", "EVENT_NOT_FOUND");
+        }
+
+        return sendSuccess(res, "Event updated successfully", {
+            affectedRows: result.affectedRows
+        });
+
+    } catch (err) {
+        console.error("UPDATE EVENT ERROR:", err);
+        return sendError(res, 500, "Failed to update event", "UPDATE_EVENT_ERROR");
+    }
+};
+
+/* GET ANNOUNCEMENTS */
+export const getAnnouncements = async (req, res) => {
+    try {
+        const [rows] = await db.promise().query(`
+    SELECT 
+        Anc_ID,
+        Name,
+        Details,
+        Emp_ID,
+        Active_Flag,
+        Created_Date
+    FROM ANNOUNCEMENT
+    ORDER BY Created_Date DESC
+`);
+
+        const formatted = rows.map(a => ({
+            ...a,
+            Active_Flag: a.Active_Flag ?? 1
+        }));
+
+        return res.status(200).json({
+            success: true,
+            data: formatted
+        });
+
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({
+            success: false,
+            message: "Failed to fetch announcements"
+        });
+    }
+};
+
+/* CREATE ANNOUNCEMENT */
+export const createAnnouncement = async (req, res) => {
+    try {
+        const { name, details, createdDate } = req.body;
+
+        const empId = req.user.empId || req.user.Emp_ID || 3;
+
+        const finalDate = createdDate
+            ? new Date(createdDate)
+            : new Date();
+
+        await db.promise().query(
+            `
+            INSERT INTO ANNOUNCEMENT
+            (Name, Details, Emp_ID, Active_Flag, Created_Date)
+            VALUES (?, ?, ?, 1, ?)
+            `,
+            [name, details, empId, finalDate]
+        );
+
+        return res.status(201).json({
+            success: true,
+            message: "Announcement created successfully"
+        });
+
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({
+            success: false,
+            message: "Failed to create announcement"
+        });
+    }
+};
+/* UPDATE ANNOUNCEMENT */
+export const updateAnnouncement = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { name, details, createdDate } = req.body;
+
+        const [result] = await db.promise().query(`
+            UPDATE ANNOUNCEMENT
+            SET 
+                Name = ?,
+                Details = ?,
+                Created_Date = ?
+            WHERE Anc_ID = ?
         `, [
             name,
-            startDate,
-            endDate,
-            details,
-            entrance,
+            details || "",
+            createdDate || new Date(),
             id
         ]);
 
         if (result.affectedRows === 0) {
-            return sendError(res, 404, "Event not found", "EVENT_NOT_FOUND");
+            return res.status(404).json({
+                success: false,
+                message: "Announcement not found"
+            });
         }
 
-        return sendSuccess(res, "Event updated successfully");
+        return res.status(200).json({
+            success: true,
+            message: "Announcement updated successfully"
+        });
 
     } catch (err) {
         console.error(err);
-        return sendError(res, 500, "Failed to update event", "UPDATE_EVENT_ERROR");
+        return res.status(500).json({
+            success: false,
+            message: "Failed to update announcement"
+        });
+    }
+};
+export const cancelAnnouncement = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const [result] = await db.promise().query(`
+            UPDATE ANNOUNCEMENT
+            SET Active_Flag = 0
+            WHERE Anc_ID = ?
+        `, [id]);
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({
+                success: false,
+                message: "Announcement not found"
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "Announcement cancelled successfully"
+        });
+
+    } catch (err) {
+        console.error("CANCEL ANNOUNCEMENT ERROR:", err);
+
+        return res.status(500).json({
+            success: false,
+            message: "Failed to cancel announcement"
+        });
     }
 };

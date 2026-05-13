@@ -18,7 +18,7 @@ function EventForm({ onClose, onSuccess, editData }) {
         entrance: 0
     });
 
-    // ✅ PREFILL FOR EDIT
+    // ✅ PREFILL
     useEffect(() => {
         if (editData) {
             const start = new Date(editData.StartDate);
@@ -31,7 +31,7 @@ function EventForm({ onClose, onSuccess, editData }) {
                 endDate: end.toISOString().split("T")[0],
                 endTime: end.toTimeString().slice(0, 5),
                 details: editData.Details || "",
-                entrance: editData.Entrance || 0
+                entrance: editData.Entrance ?? 0
             });
         }
     }, [editData]);
@@ -49,8 +49,9 @@ function EventForm({ onClose, onSuccess, editData }) {
             return;
         }
 
-        const startDateTime = `${form.startDate}T${form.startTime}`;
-        const endDateTime = `${form.endDate}T${form.endTime}`;
+        // ✅ FIXED DATE FORMAT (MySQL friendly)
+        const startDateTime = `${form.startDate} ${form.startTime}:00`;
+        const endDateTime = `${form.endDate} ${form.endTime}:00`;
 
         if (endDateTime < startDateTime) {
             alert("End date/time cannot be before start");
@@ -62,13 +63,15 @@ function EventForm({ onClose, onSuccess, editData }) {
             startDate: startDateTime,
             endDate: endDateTime,
             details: form.details,
-            entrance: form.entrance
+            entrance: Number(form.entrance) || 0   // ✅ FIX
         };
 
         try {
             setLoading(true);
 
             if (editData) {
+                console.log("UPDATING ID:", editData.Event_ID); // DEBUG
+
                 await axios.put(
                     `${API_URL}/api/secretary/events/${editData.Event_ID}`,
                     payload,
@@ -86,7 +89,7 @@ function EventForm({ onClose, onSuccess, editData }) {
             onClose?.();
 
         } catch (err) {
-            console.error(err);
+            console.error("EVENT SAVE ERROR:", err.response?.data || err.message);
             alert("Failed to save event");
         } finally {
             setLoading(false);
@@ -118,10 +121,14 @@ function EventForm({ onClose, onSuccess, editData }) {
                 <textarea name="details" value={form.details} onChange={handleChange} />
 
                 <label>Entrance Fee</label>
-                <input type="number" name="entrance" value={form.entrance} onChange={handleChange} />
+                <input
+                    type="number"
+                    name="entrance"
+                    value={form.entrance}
+                    onChange={handleChange}
+                />
 
                 <div className={styles.actions}>
-
                     <button className={styles.cancelBtn} onClick={onClose}>
                         Cancel
                     </button>
@@ -133,7 +140,6 @@ function EventForm({ onClose, onSuccess, editData }) {
                     >
                         {loading ? "Saving..." : editData ? "Update" : "Create"}
                     </button>
-
                 </div>
 
             </div>
