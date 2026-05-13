@@ -12,7 +12,7 @@ export const createComplaint = async (req, res) => {
 		const [citizens] = await db.promise().query(
 			`SELECT C_ID,
 			First_Name,
-			Last_Name,
+			Last_Name
       		FROM CITIZEN
       		WHERE U_ID = ?`,
 			[userId]
