@@ -6,7 +6,7 @@ export const getMyRequestsAndComplaints = async (req, res) => {
     try {
         const userId = req.user.id;
 
-        // get citizen id
+        // GET CITIZEN ID
         const [citizen] = await db.promise().query(
             `SELECT C_ID FROM CITIZEN WHERE U_ID = ?`,
             [userId]
@@ -18,14 +18,17 @@ export const getMyRequestsAndComplaints = async (req, res) => {
 
         const citizenId = citizen[0].C_ID;
 
+        // ======================
         // REQUESTS
+        // ======================
         const [requests] = await db.promise().query(
             `
             SELECT 
                 r.Req_ID,
                 r.DateMade,
+                r.DateCompleted,
                 r.Priority,
-                r.RType_ID,
+                r.Description,
                 rs.RStat_Name,
                 rt.RType_Name
             FROM REQUEST r
@@ -37,21 +40,55 @@ export const getMyRequestsAndComplaints = async (req, res) => {
             [citizenId]
         );
 
-        const formattedRequests = requests.map(r => ({
-            ...r,
-            Request_Number: formatRequestNumber({
-                date: r.DateMade,
-                requestTypeId: r.RType_ID,
-                requestId: r.Req_ID
-            })
-        }));
+        const formattedRequests = requests.map((r) => {
+            let desc = {};
 
-        // COMPLAINTS
+            // SAFE JSON PARSING (handles string / object / null)
+            try {
+                if (r.Description) {
+                    desc =
+                        typeof r.Description === "object"
+                            ? r.Description
+                            : JSON.parse(r.Description);
+                }
+            } catch (e) {
+                desc = {};
+            }
+
+            return {
+                Req_ID: r.Req_ID,
+                DateMade: r.DateMade,
+                DateCompleted: r.DateCompleted,
+                Priority: r.Priority,
+                RStat_Name: r.RStat_Name,
+                RType_Name: r.RType_Name,
+
+                // structured fields
+                Title: desc.title || "",
+                FullName: desc.fullName || "",
+                Email: desc.email || "",
+                Address: desc.address || "",
+                Details: desc.description || "",
+                Urgency: desc.urgency || "",
+                Phones: desc.phones || [],
+
+                Request_Number: formatRequestNumber({
+                    date: r.DateMade,
+                    requestTypeId: r.RType_ID,
+                    requestId: r.Req_ID
+                })
+            };
+        });
+
+        // ======================
+        // COMPLAINTS (FIXED CLEAN VERSION)
+        // ======================
         const [complaints] = await db.promise().query(
             `
             SELECT 
                 c.Cmpt_ID,
                 c.Subject,
+                c.Details,
                 c.DateMade,
                 c.DateResolved,
                 c.DateRejected,
@@ -64,9 +101,27 @@ export const getMyRequestsAndComplaints = async (req, res) => {
             [citizenId]
         );
 
+        const formattedComplaints = complaints.map((c) => {
+            return {
+                Cmpt_ID: c.Cmpt_ID,
+                Subject: c.Subject,
+                CType_Name: c.CType_Name,
+                DateMade: c.DateMade,
+                DateResolved: c.DateResolved,
+                DateRejected: c.DateRejected,
+
+                // CLEAN FIX:
+                // NEVER mix metadata (name/location) into details again
+                Details: c.Details || ""
+            };
+        });
+
+        // ======================
+        // RESPONSE
+        // ======================
         return sendSuccess(res, "My requests fetched successfully", {
             requests: formattedRequests,
-            complaints
+            complaints: formattedComplaints
         });
 
     } catch (err) {
