@@ -3,25 +3,12 @@
     width: 100%;
 }
 
-.title {
-    font-size: 28px;
-    margin-bottom: 5px;
-    font-weight: 700;
-    color: #1a1a1a;
-}
-
-.subtitle {
-    color: #666;
-    margin-bottom: 30px;
-    font-size: 16px;
-}
-
 .container {
     display: flex;
     flex-direction: column;
     align-items: center;
     min-height: 500px;
-    gap: 0; 
+    gap: 0;
 }
 
 .calendarBox {
@@ -32,18 +19,97 @@
     background: #fff;
     padding: 20px;
     border-radius: 20px;
-    box-shadow:var(--shadoww);
-    z-index: 5; 
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    z-index: 5;
 }
 
+/* ======================================================
+   REACT-CALENDAR OVERRIDES (Using :global for Modules)
+   ====================================================== */
+
+.calendarBox :global(.react-calendar) {
+    width: 100%;
+    border: none !important;
+    font-family: inherit;
+    background: #ffffff; /* Ensures background isn't transparent */
+}
+
+/* Fix for the Month/Navigation Label */
+.calendarBox :global(.react-calendar__navigation) {
+    display: flex;
+    height: 44px;
+    margin-bottom: 1em;
+}
+
+.calendarBox :global(.react-calendar__navigation button) {
+    min-width: 44px;
+    background: none;
+    font-size: 16px;
+    font-weight: 600;
+    color: #1a1a1a !important; /* Forces visibility */
+}
+
+.calendarBox :global(.react-calendar__navigation button:enabled:hover),
+.calendarBox :global(.react-calendar__navigation button:enabled:focus) {
+    background-color: #f0f7ff;
+    border-radius: 8px;
+}
+
+/* Fix for Weekdays (Mon, Tue, etc) */
+.calendarBox :global(.react-calendar__month-view__weekdays) {
+    text-align: center;
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: 0.85em;
+    color: #64748b !important;
+}
+
+.calendarBox :global(.react-calendar__month-view__weekdays__weekday) {
+    padding: 0.5em;
+}
+
+/* Fix for Individual Tiles (Dates) */
+.calendarBox :global(.react-calendar__tile) {
+    max-width: 100%;
+    padding: 12px 6.6667px;
+    background: none;
+    text-align: center;
+    line-height: 16px;
+    color: #1a1a1a !important; /* Forces dates to be visible */
+    position: relative;
+}
+
+.calendarBox :global(.react-calendar__tile:enabled:hover) {
+    background-color: #e6f0ff;
+    border-radius: 8px;
+}
+
+/* Current Day Highlight */
+.calendarBox :global(.react-calendar__tile--now) {
+    background: #fef3c7 !important;
+    border-radius: 8px;
+    color: #d97706 !important;
+}
+
+/* Selected Day Highlight */
+.calendarBox :global(.react-calendar__tile--active) {
+    background: #3b82f6 !important;
+    color: white !important;
+    border-radius: 8px;
+}
+
+/* =========================
+   EVENT DOT MARKER
+   ========================= */
+
 .eventDay {
-    position: relative; 
+    position: relative;
 }
 
 .eventDay::after {
     content: "";
     position: absolute;
-    bottom: 6px;     
+    bottom: 4px;
     left: 50%;
     transform: translateX(-50%);
     width: 6px;
@@ -52,58 +118,41 @@
     border-radius: 50%;
 }
 
+/* Blue dot should be white if the tile is currently selected */
+.calendarBox :global(.react-calendar__tile--active).eventDay::after {
+    background-color: white;
+}
+
+/* =========================
+   EVENT DETAILS BOX
+   ========================= */
+
 .eventBox {
     display: flex;
-    flex-direction: column; 
-    width: 90%; 
+    flex-direction: column;
+    width: 90%;
     max-width: 410px;
-    
-    background: linear-gradient(145deg, #0f2e5a 0%, #081d3a 100%); 
+    background: linear-gradient(145deg, #0f2e5a 0%, #081d3a 100%);
     color: white;
-    
     padding: 25px;
-    border-radius: 0 0 25px 25px; 
-    
-    margin-top: 5px; 
+    border-radius: 0 0 25px 25px;
+    margin-top: -10px; /* Slight overlap with calendar box */
     z-index: 1;
-    
     box-shadow: 0 15px 40px rgba(0, 31, 63, 0.3);
-    border-top: 4px solid #3b82f6; 
-    
+    border-top: 4px solid #3b82f6;
     animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
-    transition: all 0.3s ease;
-}
-
-.eventBox:hover {
-    transform: translateY(5px); 
-}
-
-.eventItem {
-    padding: 12px 0;
-}
-
-.eventItem:not(:last-child) {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .eventItem h3 {
     font-size: 1.2rem;
     margin: 0 0 8px 0;
-    font-weight: 600;
     color: #ffffff;
 }
 
-.eventItem p {
-    margin: 4px 0;
-    font-size: 0.9rem;
-    opacity: 0.9;
-}
-
 .eventItem p:first-of-type {
-    color: #93c5fd; 
+    color: #93c5fd;
     font-weight: 600;
 }
-
 
 @keyframes slideUp {
     from {
@@ -114,10 +163,4 @@
         opacity: 1;
         transform: translateY(0);
     }
-}
-
-.imageSection img {
-    width: 300px;
-    max-width: 100%;
-    margin-top: 40px;
 }

@@ -34,6 +34,8 @@ app.use("/api/mayor", mayorRoutes)
 app.use("/api", feesRoutes);
 app.use("/api/mayor", mayorRoutes);
 app.use("/api/documents", documentRoutes);
+app.use("/api/secretary", secretaryRoutes);
+app.use("/api/citizen", citizenRoutes);
 app.use("/api/my-requests", myRequestsRoutes);
 
 app.use("/issued-docs", express.static(path.join(process.env.DOC_ROOT, "municipality")));

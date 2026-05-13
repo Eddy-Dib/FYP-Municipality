@@ -25,6 +25,19 @@
     gap: 10px;
 }
 
+.toast button {
+    margin-top: 12px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    background: #2563eb;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
 .icon {
     color: #22c55e;
     font-size: 18px;
