@@ -1,3 +1,14 @@
+a:link,
+a:visited,
+a:active {
+    color: var(--primary-dark);
+    font-weight: 600;
+}
+
+a:hover{
+    color: var(--primary-light);
+}
+
 .page {
     padding: 30px;
     width: 100%;

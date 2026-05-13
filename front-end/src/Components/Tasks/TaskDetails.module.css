@@ -130,6 +130,13 @@
     color: var(--text-light);
 }
 
+.msg{
+    color: #ff00008b;
+    margin-top: 10px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
 /* @media (max-width: 768px) {
     .container {
         padding: 16px;

@@ -102,13 +102,13 @@ function MyRequests() {
                             <p><b>Type:</b> {r.RType_Name}</p>
                             <p><b>Status:</b> {r.RStat_Name}</p>
                             <p><b>Priority:</b> {formatPriority(r.Priority)}</p>
-                            <p><b>Date:</b> {new Date(r.DateMade).toLocaleDateString()}</p>
+                            <p><b>Date:</b> {new Date(r.DateMade).toISOString().split("T")[0]}</p>
 
                             <p><b>Full Name:</b> {r.FullName}</p>
                             <p><b>Email:</b> {r.Email}</p>
-                            <p><b>Phone:</b> {r.Phone1}{r.Phone2 ? `, ${r.Phone2}` : ""}</p>
+                            <p><b>Phone:</b> {r.Phones}</p>
                             <p><b>Address:</b> {r.Address}</p>
-                            <p><b>Description:</b> {r.Details}</p>
+                            {r.Details && r.Details.length > 0 && (<p><b>Description:</b> {r.Details}</p>)}
                             <p><b>Urgency:</b> {r.Urgency}</p>
 
                             {r.DateCompleted && (
@@ -173,20 +173,20 @@ function MyRequests() {
                             </p>
 
                             <p><b>Date:</b> {new Date(c.DateMade).toLocaleDateString()}</p>
+                            {c.Address && c.Address.length >0 && (<p><b>Address:</b> {c.Address}</p>)}
+                            <div>
+                                <b>Description:</b>
 
-                           <div>
-    <b>Description:</b>
-
-    <div className={styles.descriptionBox}>
-        {(c.Details || "No description provided")
-            .split("\n")
-            .map((line, index) => (
-                <p key={index} className={styles.descriptionLine}>
-                    {line}
-                </p>
-            ))}
-    </div>
-</div>
+                                <div className={styles.descriptionBox}>
+                                    {(c.Details || "No description provided")
+                                        .split("\n")
+                                        .map((line, index) => (
+                                            <p key={index} className={styles.descriptionLine}>
+                                                {line}
+                                            </p>
+                                        ))}
+                                </div>
+                            </div>
 
                             {c.DateResolved && (
                                 <p>

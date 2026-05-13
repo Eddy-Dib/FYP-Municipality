@@ -3,6 +3,7 @@ import { sendSuccess, sendError } from "../utils/responses.js";
 import { hashPassword } from "../utils/hash.js";
 import { saveNotification, sendCitizenStatusEmail } from "../utils/notificationService.js";
 import { generateUsername } from "../utils/generateUsername.js";
+import { toPublicPath } from "../utils/documentHandler.js";
 
 export const getCitizens = async (req, res) => {
     try {
@@ -13,11 +14,31 @@ export const getCitizens = async (req, res) => {
                 c.Last_Name,
                 c.Email,
                 c.Rejected,
+                c.CreatedAt,
                 u.U_ID,
                 u.Username,
-                u.Active_Flg
+                u.Active_Flg,
+
+                d.filepath,
+                d.DateUploaded
+
             FROM CITIZEN c
             LEFT JOIN USERS u ON c.U_ID = u.U_ID
+            LEFT JOIN DOCUMENT d
+                ON d.C_ID = c.C_ID 
+                AND d.Doc_Type = 1
+                AND d.IsReviewed = 1
+                AND d.IsValid = 1
+                AND d.DateUploaded = (
+                    SELECT MAX(d2.DateUploaded)
+                    FROM DOCUMENT d2
+                    WHERE
+                        d2.C_ID = c.C_ID
+                        AND d2.Doc_Type = 1
+                        AND d2.IsReviewed = 1
+                        AND d2.IsValid = 1
+                )
+            ORDER BY c.CreatedAt DESC
         `);
 
         const citizens = rows.map(c => {
@@ -34,6 +55,8 @@ export const getCitizens = async (req, res) => {
                 isRegistered,
                 isActive: c.Active_Flg === 1,
                 rejected: c.Rejected === 1,
+                identityDocument: toPublicPath(c.filepath),
+                identityUploadedAt: c.DateUploaded || null,
 
                 status: c.Rejected === 1
                     ? "Rejected"
@@ -386,3 +409,4 @@ export const createEmployee = async (req, res) => {
         return sendError(res, 500, "Server error");
     }
 };
+

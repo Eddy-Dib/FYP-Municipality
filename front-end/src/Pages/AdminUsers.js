@@ -177,6 +177,7 @@ function AdminUsers() {
                                 <th>Name</th>
                                 <th>Email</th>
                                 <th>Username</th>
+                                <th>ID Document</th>
                                 <th>Status</th>
                                 <th>Action</th>
                             </tr>
@@ -190,6 +191,20 @@ function AdminUsers() {
                                         <td>{c.name}</td>
                                         <td>{c.email}</td>
                                         <td>{c.username || "-"}</td>
+
+                                        <td>
+                                            {c.identityDocument ? (
+                                                <a
+                                                    href={`${API_URL}${c.identityDocument}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                >
+                                                    View Document
+                                                </a>
+                                            ) : (
+                                                "-"
+                                            )}
+                                        </td>
 
                                         <td>{c.status}</td>
 

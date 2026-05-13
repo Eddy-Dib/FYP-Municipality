@@ -1,12 +1,12 @@
 import db from "../config/db.js";
 import { sendSuccess, sendError } from "../utils/responses.js";
 import { formatRequestNumber } from "../utils/formats.js";
+import { getPriority } from "../utils/labels.js";
 
 export const getMyRequestsAndComplaints = async (req, res) => {
     try {
         const userId = req.user.id;
 
-        // GET CITIZEN ID
         const [citizen] = await db.promise().query(
             `SELECT C_ID FROM CITIZEN WHERE U_ID = ?`,
             [userId]
@@ -18,9 +18,6 @@ export const getMyRequestsAndComplaints = async (req, res) => {
 
         const citizenId = citizen[0].C_ID;
 
-        // ======================
-        // REQUESTS
-        // ======================
         const [requests] = await db.promise().query(
             `
             SELECT 
@@ -30,7 +27,8 @@ export const getMyRequestsAndComplaints = async (req, res) => {
                 r.Priority,
                 r.Description,
                 rs.RStat_Name,
-                rt.RType_Name
+                rt.RType_Name,
+                rt.RType_ID
             FROM REQUEST r
             JOIN REQ_STATUSES rs ON r.RStat_Code = rs.RStat_Code
             JOIN REQUEST_TYPES rt ON r.RType_ID = rt.RType_ID
@@ -43,7 +41,6 @@ export const getMyRequestsAndComplaints = async (req, res) => {
         const formattedRequests = requests.map((r) => {
             let desc = {};
 
-            // SAFE JSON PARSING (handles string / object / null)
             try {
                 if (r.Description) {
                     desc =
@@ -63,14 +60,18 @@ export const getMyRequestsAndComplaints = async (req, res) => {
                 RStat_Name: r.RStat_Name,
                 RType_Name: r.RType_Name,
 
-                // structured fields
                 Title: desc.title || "",
                 FullName: desc.fullName || "",
                 Email: desc.email || "",
                 Address: desc.address || "",
                 Details: desc.description || "",
-                Urgency: desc.urgency || "",
-                Phones: desc.phones || [],
+                Urgency: getPriority(desc.Priority),
+                Phones: Array.isArray(desc.phones)
+                    ? desc.phones
+                        .map((p) => p.trim())
+                        .filter(Boolean)
+                        .join(" | ")
+                    : "",    
 
                 Request_Number: formatRequestNumber({
                     date: r.DateMade,
@@ -80,9 +81,6 @@ export const getMyRequestsAndComplaints = async (req, res) => {
             };
         });
 
-        // ======================
-        // COMPLAINTS (FIXED CLEAN VERSION)
-        // ======================
         const [complaints] = await db.promise().query(
             `
             SELECT 
@@ -102,6 +100,19 @@ export const getMyRequestsAndComplaints = async (req, res) => {
         );
 
         const formattedComplaints = complaints.map((c) => {
+            let parsedDetails = (c.Details || "").trim();
+            let address = "";
+
+            const descriptionMatch = parsedDetails.match(/Description:\s*([\s\S]*)/i);
+            const locationMatch = parsedDetails.match(/Location:\s*(.*)/i);
+
+            if (descriptionMatch) {
+                parsedDetails = descriptionMatch[1].trim();
+            }
+            if (locationMatch) {
+                address = locationMatch[1].trim();
+            }
+
             return {
                 Cmpt_ID: c.Cmpt_ID,
                 Subject: c.Subject,
@@ -109,16 +120,11 @@ export const getMyRequestsAndComplaints = async (req, res) => {
                 DateMade: c.DateMade,
                 DateResolved: c.DateResolved,
                 DateRejected: c.DateRejected,
-
-                // CLEAN FIX:
-                // NEVER mix metadata (name/location) into details again
-                Details: c.Details || ""
+                Address: address,
+                Details: parsedDetails || ""
             };
         });
 
-        // ======================
-        // RESPONSE
-        // ======================
         return sendSuccess(res, "My requests fetched successfully", {
             requests: formattedRequests,
             complaints: formattedComplaints

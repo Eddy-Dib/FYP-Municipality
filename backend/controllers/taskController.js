@@ -1,7 +1,7 @@
 import db from "../config/db.js";
 import { sendSuccess, sendError } from "../utils/responses.js";
 import { formatDate, formatRequestNumber } from "../utils/formats.js";
-
+import {sendRequestStatusEmail} from "../utils/notificationService.js";
 // returns task details
 export const getTaskDetails = async (req, res) => {
     const empId = req.user?.empId;
@@ -215,7 +215,14 @@ export const updateTaskStatus = async (req, res) => {
 
         // makes sure the employee is assigned to the task first
         const [taskRows] = await db.promise().query(
-            `SELECT Task_ID FROM TASK WHERE Task_ID = ? AND Emp_ID = ?`,
+            `SELECT t.Task_ID, t.Req_ID,
+                r.DateMade, r.RType_ID, rt.RType_Name,
+                c.Email
+            FROM TASK t
+            JOIN REQUEST r ON t.Req_ID = r.Req_ID
+            JOIN REQUEST_TYPES rt ON r.RType_ID = rt.RType_ID
+            JOIN CITIZEN c ON r.C_ID = c.C_ID
+            WHERE Task_ID = ? AND Emp_ID = ?`,
             [taskId, empId]
         );
 
@@ -238,6 +245,33 @@ export const updateTaskStatus = async (req, res) => {
                 `UPDATE TASK SET DateCompleted = NULL WHERE Task_ID = ?`,
                 [taskId]
             );
+        }
+
+        if (status === "In Progress") {
+            await db.promise().query(
+                `UPDATE REQUEST SET RStat_Code = 7 WHERE Req_ID = ?`,
+                [taskRows[0].Req_ID]
+            );
+
+            const task = taskRows[0];
+
+            const requestNumber = formatRequestNumber({
+                date: task.DateMade,
+                requestTypeId: task.RType_ID,
+                requestId: task.Req_ID
+            });
+
+            try {
+                await sendRequestStatusEmail({
+                    email: task.Email,
+                    status: "in_progress",
+                    requestNumber,
+                    reqId: task.Req_ID,
+                    title: task.RType_Name
+                });
+            } catch (emailErr) {
+                console.error("EMAIL ERROR:", emailErr);
+            }
         }
 
         return sendSuccess(res, "Task status updated", {

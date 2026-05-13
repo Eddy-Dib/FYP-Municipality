@@ -59,13 +59,33 @@ function TaskDetails() {
 
             setData(prev => {
                 if (!prev) return prev;
+
                 const isCompleted = newStatus === "Completed";
+
+                let requestStatus = prev.request?.status;
+
+                if (newStatus === "In Progress") {
+                    requestStatus = "In Progress";
+                }
+
+                if (newStatus === "Rejected" || newStatus === "Cancelled") {
+                    requestStatus = "Rejected";
+                }
+
                 return {
                     ...prev,
+
                     task: {
                         ...prev.task,
                         status: newStatus,
-                        completedDate: isCompleted ? new Date().toISOString().split("T")[0] : null
+                        completedDate: isCompleted
+                            ? new Date().toISOString()
+                            : null
+                    },
+
+                    request: {
+                        ...prev.request,
+                        status: requestStatus
                     }
                 };
             });
@@ -167,6 +187,9 @@ function TaskDetails() {
 
                 {renderActions()}
             </div>
+            {data?.task?.status === "In Progress" && (
+                <p className={styles.msg}>You must submit a report befor completing this task.</p>
+            )}
 
         </div>
     );
