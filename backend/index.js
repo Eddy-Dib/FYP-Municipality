@@ -12,6 +12,7 @@ import adminRoutes from "./routes/adminRoutes.js";
 import mayorRoutes from "./routes/mayorRoutes.js"
 import locationRoutes from "./routes/locationRoutes.js"
 import feesRoutes from "./routes/feesRoutes.js";
+import myRequestsRoutes from "./routes/myrequestsRoutes.js";
 import documentRoutes from "./routes/documentRoutes.js"
 
 const app = express();
@@ -35,6 +36,7 @@ app.use("/api/mayor", mayorRoutes);
 app.use("/api/documents", documentRoutes);
 app.use("/api/secretary", secretaryRoutes);
 app.use("/api/citizen", citizenRoutes);
+app.use("/api/my-requests", myRequestsRoutes);
 
 app.use("/issued-docs", express.static(path.join(process.env.DOC_ROOT, "municipality")));
 

@@ -5,12 +5,14 @@
 }
 
 .hero {
-    background: linear-gradient(135deg, #10376a 0%, #1e4a7a 100%);
-    padding: 120px 20px 60px;
-    text-align: center;
+    background: linear-gradient(135deg, #16365f 0%, #2d62a6 100%);
+    padding: 45px 0 90px 0;
+    color: white;
+    display: flex;
+    justify-content: center;
+    width: 100%;
     position: relative;
     overflow: hidden;
-    color: white;
 }
 
 .hero::before {
@@ -20,8 +22,18 @@
     left: -50%;
     width: 200%;
     height: 200%;
-    background: radial-gradient(circle, rgba(255,255,255,0.1), transparent);
-    animation: rotate 20s linear infinite;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.12) 0%, transparent 70%);
+    animation: rotateGlow 20s linear infinite;
+}
+
+@keyframes rotateGlow {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 .hero h1,
@@ -31,41 +43,98 @@
     z-index: 1;
 }
 
+.hero {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
 .icon {
-    font-size: 40px;
-    background: white;
-    color: #10376a;
-    width: 80px;
-    height: 80px;
+    font-size: 38px;
+    background: rgba(255, 255, 255, 0.12);
+    color: white;
+    width: 85px;
+    height: 85px;
     border-radius: 50%;
-    margin: auto;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 10px;
+
+    /* makes icon half in blue half outside */
+    margin-bottom: -10px;
+    margin-top: 60px;
+
+    border: 4px solid rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(5px);
+}
+
+.hero h1 {
+    font-size: 2.4rem;
+    margin-top: 20px;
+    margin-bottom: 8px;
+    font-weight: 750;
+    line-height: 1.1;
+}
+
+.hero p {
+    font-size: 1.1rem;
+    opacity: 0.92;
+    margin: 0;
 }
 
 .container {
-    max-width: 600px;
-    margin: 40px auto 40px;
+    max-width: 700px;
+    margin: 30px auto 40px;
     padding: 0 20px;
+    position: relative;
+    z-index: 2;
 }
 
 .card {
     background: white;
-    padding: 25px;
-    border-radius: 20px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    padding: 28px;
+    border-radius: 16px;
+
+    border-left: 5px solid #16365f;
+
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
     margin-bottom: 20px;
+
+    transition: 0.25s;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+}
+
+.info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    color: black;
 }
 
 .info p {
-    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 12px 0;
+    margin: 0;
+
+    border-bottom: 1px solid #eef2f7;
+
+    font-size: 15px;
+    color: #374151;
+}
+
+.info p:last-child {
+    border-bottom: none;
 }
 
 .info span {
-    font-weight: bold;
-    color: #334155;
+    font-weight: 600;
+    color: #16365f;
 }
 
 .form {
@@ -90,7 +159,7 @@
     margin-top: 10px;
     padding: 12px;
     border: none;
-    background: #2563eb;
+    background: #18377a;
     color: white;
     border-radius: 10px;
     cursor: pointer;
@@ -133,9 +202,15 @@
 
 /* ANIMATION */
 @keyframes rotate {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
 }
+
 .profileSection {
     display: flex;
     flex-direction: column;

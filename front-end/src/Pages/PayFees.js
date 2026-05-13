@@ -160,7 +160,14 @@ function PayFees() {
 
                                 <div className={styles.feeRow}>
                                     <span>Status</span>
-                                    <span>
+
+                                    <span
+                                        className={
+                                            fee.IsPaid
+                                                ? styles.paid
+                                                : styles.unpaid
+                                        }
+                                    >
                                         {fee.IsPaid ? "PAID" : "UNPAID"}
                                     </span>
                                 </div>
@@ -171,7 +178,7 @@ function PayFees() {
 
                     {/* TOTAL */}
                     <div className={styles.totalBox}>
-                        Total Due: ${getTotal()}
+                        Total: ${getTotal()}
                     </div>
 
                 </div>

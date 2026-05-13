@@ -17,20 +17,26 @@
     align-items: center;
 }
 
-/* Priority styles */
-.high {
-    color: #c62828;
-    background: #fde2e2;
+.low {
+    color: #5f6368;
+    background: #f1f3f4;
 }
 
 .medium {
-    color: #ef6c00;
-    background: #fff1dc;
+    color: #b26a00;
+    background: #fff4df;
 }
 
-.low {
-    color: #424242;
-    background: #eeeeee;
+.high {
+    color: #c62828;
+    background: #fde7e7;
+}
+
+.urgent {
+    color: #ffffff;
+    background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%);
+
+    box-shadow: 0 2px 8px rgba(183, 28, 28, 0.25);
 }
 
 /* Status styles */

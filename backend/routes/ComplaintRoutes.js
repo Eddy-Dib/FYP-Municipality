@@ -4,7 +4,7 @@ import { authMiddleware } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-router.post("/message", sendMessage);
+router.post("/message", authMiddleware, sendMessage);
 
 // Create complaint (logged in citizen only)
 router.post("/createcomplaint", authMiddleware, createComplaint);

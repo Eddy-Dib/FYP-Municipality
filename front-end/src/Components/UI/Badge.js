@@ -3,13 +3,20 @@ import { FaExclamationTriangle, FaClock, FaSpinner, FaCheckCircle } from "react-
 
 export function PriorityBadge({ value }) {
     const normalizedValue =
-        value === 2 || value === "2" || value === "High"
-            ? "High"
-            : value === 1 || value === "1" || value === "Medium"
-                ? "Medium"
-                : "Low";
+        value === 4 || value === "4" || value === "Urgent"
+            ? "Urgent"
+            : value === 3 || value === "3" || value === "High"
+                ? "High"
+                : value === 2 || value === "2" || value === "Medium"
+                    ? "Medium"
+                    : "Low";
 
     const priorityConfig = {
+        Urgent: {
+            label: "Urgent",
+            className: "urgent",
+            icon: <FaExclamationTriangle />
+        },
         High: {
             label: "High",
             className: "high",
@@ -31,7 +38,11 @@ export function PriorityBadge({ value }) {
 
     return (
         <span className={`${styles.badge} ${styles[config.className]}`}>
-            {config.icon && <span className={styles.icon}>{config.icon}</span>}
+            {config.icon && (
+                <span className={styles.icon}>
+                    {config.icon}
+                </span>
+            )}
             {config.label}
         </span>
     );
