@@ -7,8 +7,6 @@ export const getMyProfile = (req, res) => {
     try {
         const userId = req.user?.id;
 
-        console.log(req.user);
-
         if (!userId) {
             return sendError(res, 401, "Unauthorized", "NO_USER");
         }

@@ -13,11 +13,13 @@ export const getCitizens = async (req, res) => {
                 c.Last_Name,
                 c.Email,
                 c.Rejected,
+                c.CreatedAt,
                 u.U_ID,
                 u.Username,
                 u.Active_Flg
             FROM CITIZEN c
             LEFT JOIN USERS u ON c.U_ID = u.U_ID
+            ORDER BY c.CreatedAt DESC
         `);
 
         const citizens = rows.map(c => {
