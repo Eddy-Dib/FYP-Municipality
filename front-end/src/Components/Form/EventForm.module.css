@@ -1,0 +1,79 @@
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal {
+    background: white;
+    width: 450px;
+    /* 🔥 slightly bigger than 380px */
+    padding: 18px;
+    border-radius: 16px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.modal h2 {
+    margin: 0 0 10px 0;
+    font-size: 20px;
+    color: #0f172a;
+}
+
+.modal label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #334155;
+    margin-top: 3px;
+    /* smaller spacing */
+}
+
+.modal input,
+.modal textarea {
+    padding: 9px;
+    /* smaller padding */
+    border-radius: 8px;
+    border: 1px solid #cbd5e1;
+    font-size: 13px;
+    outline: none;
+}
+
+.modal textarea {
+    height: 60px;
+    /* was 90px */
+    resize: none;
+}
+
+.actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 6px;
+}
+
+.cancelBtn {
+    background: #e2e8f0;
+    border: none;
+    padding: 9px 14px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.createBtn {
+    background: #2563eb;
+    color: white;
+    border: none;
+    padding: 9px 14px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+}

@@ -1,99 +1,42 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
+import axios from "axios";
 import styles from "./EventCalendar.module.css";
 
 function EventCalendar() {
-
     const [date, setDate] = useState(new Date());
+    const [events, setEvents] = useState([]);
 
-    const events = [
+    const API_URL = process.env.REACT_APP_API_URL;
 
-        {
-            date: "2026-04-20",
-            title: "Trash Collection",
-            time: "08:00 AM",
-            type: "waste",
-            details: "Full municipal waste and recycling pickup."
-        },
-        {
-            date: "2026-04-23",
-            title: "Trash Collection",
-            time: "08:00 AM",
-            type: "waste",
-            details: "Standard waste collection for all sectors."
-        },
-        {
-            date: "2026-04-27",
-            title: "Trash Collection",
-            time: "08:00 AM",
-            type: "waste",
-            details: "Standard waste collection for all sectors."
-        },
-        {
-            date: "2026-04-30",
-            title: "Trash Collection",
-            time: "08:00 AM",
-            type: "waste",
-            details: "Standard waste collection for all sectors."
-        },
+    useEffect(() => {
+        const fetchEvents = async () => {
+            try {
+                const res = await axios.get(`${API_URL}/api/citizen/events`);
+                setEvents(res.data.data || []);
+            } catch (err) {
+                console.error("Failed to load events", err);
+            }
+        };
 
-        {
-            date: "2026-04-20",
-            title: "Road Maintenance Briefing",
-            time: "09:00 AM",
-            type: "meeting",
-            details: "Public session regarding infrastructure upgrades on Main St."
-        },
-        {
-            date: "2026-05-05",
-            title: "Urban Planning Committee",
-            time: "10:00 AM",
-            type: "meeting",
-            details: "Review of new construction permits and zoning laws."
-        },
+        fetchEvents();
+    }, []);
 
-        {
-            date: "2026-05-12",
-            title: "Scheduled Water Maintenance",
-            time: "08:00 AM",
-            type: "utility",
-            details: "Network maintenance. Possible low pressure in Northern Districts."
-        },
-        {
-            date: "2026-05-20",
-            title: "Grid Optimization Work",
-            time: "09:00 AM",
-            type: "utility",
-            details: "Electrical grid upgrades to improve local power stability."
-        },
-
-        {
-            date: "2026-06-15",
-            title: "Annual Summer Festival",
-            time: "06:00 PM",
-            type: "festival",
-            details: "Live music, local vendors, and family activities in City Square."
-        },
-        {
-            date: "2026-07-10",
-            title: "Heritage & Cultural Night",
-            time: "07:30 PM",
-            type: "festival",
-            details: "Celebrating local history through art and performance."
-        },
-        {
-            date: "2026-08-05",
-            title: "Regional Gastronomy Fair",
-            time: "05:00 PM",
-            type: "festival",
-            details: "Showcasing traditional cuisine and artisanal food products."
-        }
-    ];
+    const formatDate = (d) => {
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, "0");
+        const day = String(d.getDate()).padStart(2, "0");
+        return `${year}-${month}-${day}`;
+    };
 
     const getEvents = (dateObj) => {
-        const d = dateObj.toISOString().split("T")[0];
-        return events.filter(e => e.date === d);
+        const selected = formatDate(dateObj);
+
+        return events.filter(e => {
+            const eventDate = formatDate(new Date(e.StartDate));
+            return eventDate === selected;
+        });
     };
 
     const selectedEvents = getEvents(date);
@@ -114,11 +57,16 @@ function EventCalendar() {
 
                 {selectedEvents.length > 0 && (
                     <div className={styles.eventBox}>
-                        {selectedEvents.map((ev, i) => (
-                            <div key={i} className={styles.eventItem}>
-                                <h3>{ev.title}</h3>
-                                <p>🕒 {ev.time}</p>
-                                <p>{ev.details}</p>
+                        {selectedEvents.map((ev) => (
+                            <div key={ev.Event_ID} className={styles.eventItem}>
+                                <h3>{ev.Name}</h3>
+                                <p>
+                                    🕒 {new Date(ev.StartDate).toLocaleTimeString([], {
+                                        hour: "2-digit",
+                                        minute: "2-digit"
+                                    })}
+                                </p>
+                                <p>{ev.Details}</p>
                             </div>
                         ))}
                     </div>

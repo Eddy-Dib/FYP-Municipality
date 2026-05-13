@@ -40,9 +40,9 @@ import SystemLogs from "./Pages/SystemLogs";
 import ManageRequests from "./Pages/Secretary/ManageRequests";
 import RequestDetailsPage from "./Pages/Secretary/RequestDetailsPage";
 import VerifyDocuments from "./Pages/Secretary/VerifyDocuments";
-
 // Print
 import ReportPrint from "./Pages/ReportPrint";
+import ManageEvents from "./Pages/Secretary/ManageEvents";
 
 function App() {
   return (
@@ -86,6 +86,7 @@ function App() {
           <Route path="secretary/managereq" element={<ProtectedRoute allowedRoles={["Secretary"]}><ManageRequests /></ProtectedRoute>}/>
           <Route path="secretary/managereq/:id" element={<ProtectedRoute allowedRoles={["Secretary"]}><RequestDetailsPage /></ProtectedRoute>} />
           <Route path="secretary/verifydoc" element={<ProtectedRoute allowedRoles={["Secretary"]}><VerifyDocuments /></ProtectedRoute>} />
+          <Route path="secretary/events" element={<ProtectedRoute allowedRoles={["Secretary"]}><ManageEvents/></ProtectedRoute>} />
 
         </Route>
 
