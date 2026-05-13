@@ -19,7 +19,7 @@ function ManageEvents() {
     const [deleteModal, setDeleteModal] = useState(false);
     const [selectedEventId, setSelectedEventId] = useState(null);
 
-    // FETCH EVENTS
+    // FETCH
     const fetchEvents = async () => {
         try {
             setLoading(true);
@@ -27,9 +27,7 @@ function ManageEvents() {
             const res = await axios.get(
                 `${API_URL}/api/secretary/events`,
                 {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
+                    headers: { Authorization: `Bearer ${token}` }
                 }
             );
 
@@ -45,23 +43,19 @@ function ManageEvents() {
         fetchEvents();
     }, []);
 
-    // 🛑 CANCEL EVENT (SOFT DELETE)
+    // CANCEL
     const handleCancel = async () => {
         try {
             await axios.patch(
                 `${API_URL}/api/secretary/events/${selectedEventId}/cancel`,
                 {},
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
-                }
+                { headers: { Authorization: `Bearer ${token}` } }
             );
 
             setDeleteModal(false);
             setSelectedEventId(null);
 
-            fetchEvents();
+            await fetchEvents();
             setToast(true);
 
         } catch (err) {
@@ -74,13 +68,114 @@ function ManageEvents() {
         setEditEvent(event);
         setShowModal(true);
     };
+
+    // SPLIT
+    const activeEvents = events.filter(e => Number(e.Active_Flag) === 1);
+    const cancelledEvents = events.filter(e => Number(e.Active_Flag) === 0);
+
+    // STATUS ENGINE (FIXED)
+    const getStatusInfo = (ev) => {
+        const now = new Date();
+        const start = new Date(ev.StartDate);
+        const end = new Date(ev.EndDate);
+
+        let primary = "";
+
+        if (Number(ev.Active_Flag) === 0) {
+            primary = "cancelled";
+        } else if (now < start) {
+            primary = "upcoming";
+        } else if (now > end) {
+            primary = "past";
+        } else {
+            primary = "ongoing";
+        }
+
+        const tags = [];
+
+        // FIX IMPORTANT: accept string OR number OR boolean
+        if (Number(ev.Updated_Flag) === 1 || ev.Updated_Flag === true) {
+            tags.push("updated");
+        }
+
+        return { primary, tags };
+    };
+
+    // CARD
+    const renderCard = (ev) => {
+        const { primary, tags } = getStatusInfo(ev);
+
+        return (
+            <div key={ev.Event_ID} className={styles.card}>
+
+                {/* HEADER */}
+                <div className={styles.cardHeader}>
+                    <div className={styles.cardTitle}>{ev.Name}</div>
+
+                    <div className={styles.badgeGroup}>
+
+                        <div className={`${styles.badge} ${styles[primary]}`}>
+                            {primary}
+                        </div>
+
+                        {/* FORCE UPDATED VISIBILITY */}
+                        {Number(ev.Updated_Flag) === 1 && (
+                            <div className={`${styles.badge} ${styles.updated}`}>
+                                updated
+                            </div>
+                        )}
+
+                    </div>
+                </div>
+
+                {/* INFO */}
+                <div className={styles.cardSub}>
+                    Start: {new Date(ev.StartDate).toLocaleString()}
+                </div>
+
+                <div className={styles.cardSub}>
+                    End: {new Date(ev.EndDate).toLocaleString()}
+                </div>
+
+                <div className={styles.cardSub}>
+                    {ev.Details}
+                </div>
+
+                <div className={styles.cardValue}>
+                    {ev.Entrance === 0 ? "Free" : `$${ev.Entrance}`}
+                </div>
+
+                {/* ACTIONS */}
+                {Number(ev.Active_Flag) === 1 && (
+                    <div className={styles.actions}>
+                        <button
+                            className={styles.editBtn}
+                            onClick={() => handleEdit(ev)}
+                        >
+                            Edit
+                        </button>
+
+                        <button
+                            className={styles.deleteBtn}
+                            onClick={() => {
+                                setSelectedEventId(ev.Event_ID);
+                                setDeleteModal(true);
+                            }}
+                        >
+                            Cancel
+                        </button>
+                    </div>
+                )}
+
+            </div>
+        );
+    };
+
     return (
         <div className={styles.page}>
 
-            {/* HEADER */}
             <div className={styles.header}>
                 <div className={styles.headerTop}>
-
                     <h1>Manage Events</h1>
 
                     <button
@@ -92,95 +187,32 @@ function ManageEvents() {
                     >
                         + Add Event
                     </button>
-
                 </div>
             </div>
 
-            {/* SECTION */}
             <div className={styles.section}>
 
                 {loading ? (
                     <p>Loading...</p>
-
                 ) : events.length === 0 ? (
-                    <p style={{ textAlign: "center", color: "#64748b" }}>
-                        No events found
-                    </p>
-
+                    <p className={styles.emptyState}>No events found</p>
                 ) : (
-                    <div className={styles.cards}>
+                    <>
+                        <h2>Active Events</h2>
+                        <div className={styles.cards}>
+                            {activeEvents.map(renderCard)}
+                        </div>
 
-                        {events.map(ev => {
-
-                            const status = (() => {
-                                const now = new Date();
-                                const start = new Date(ev.StartDate);
-                                const end = new Date(ev.EndDate);
-
-                                if (now < start) return "upcoming";
-                                if (now > end) return "past";
-                                return "ongoing";
-                            })();
-
-                            return (
-                                <div key={ev.Event_ID} className={styles.card}>
-
-                                    <div className={styles.cardTitle}>
-                                        {ev.Name}
-                                    </div>
-
-                                    <div className={`${styles.badge} ${styles[status]}`}>
-                                        {status}
-                                    </div>
-
-                                    <div className={styles.cardSub}>
-                                        Start: {new Date(ev.StartDate).toLocaleString()}
-                                    </div>
-
-                                    <div className={styles.cardSub}>
-                                        End: {new Date(ev.EndDate).toLocaleString()}
-                                    </div>
-
-                                    <div className={styles.cardSub}>
-                                        {ev.Details}
-                                    </div>
-
-                                    <div className={styles.cardValue}>
-                                        {ev.Entrance === 0 ? "Free" : `$${ev.Entrance}`}
-                                    </div>
-
-                                    {/* ACTIONS */}
-                                    <div className={styles.actions}>
-
-                                        <button
-                                            className={styles.editBtn}
-                                            onClick={() => handleEdit(ev)}
-                                        >
-                                            Edit
-                                        </button>
-
-                                        <button
-                                            className={styles.deleteBtn}
-                                            onClick={() => {
-                                                setSelectedEventId(ev.Event_ID);
-                                                setDeleteModal(true);
-                                            }}
-                                        >
-                                            Cancel
-                                        </button>
-
-                                    </div>
-
-                                </div>
-                            );
-                        })}
-
-                    </div>
+                        <h2 style={{ marginTop: "30px" }}>Cancelled Events</h2>
+                        <div className={styles.cards}>
+                            {cancelledEvents.map(renderCard)}
+                        </div>
+                    </>
                 )}
 
             </div>
 
-            {/* EVENT FORM */}
+            {/* MODAL */}
             {showModal && (
                 <EventForm
                     editData={editEvent}
@@ -196,10 +228,10 @@ function ManageEvents() {
                 />
             )}
 
-            {/* DELETE / CANCEL MODAL */}
+            {/* DELETE MODAL */}
             {deleteModal && (
-                <div className={styles.overlay}>
-                    <div className={styles.modal}>
+                <div className={styles.modalOverlay}>
+                    <div className={styles.modalBox}>
 
                         <h2>Cancel Event</h2>
 
@@ -207,10 +239,8 @@ function ManageEvents() {
                             Are you sure you want to cancel this event?
                         </p>
 
-                        <div className={styles.actions}>
-
+                        <div className={styles.modalActions}>
                             <button
-                                className={styles.cancelBtn}
                                 onClick={() => {
                                     setDeleteModal(false);
                                     setSelectedEventId(null);
@@ -219,23 +249,18 @@ function ManageEvents() {
                                 No
                             </button>
 
-                            <button
-                                className={styles.deleteBtn}
-                                onClick={handleCancel}
-                            >
+                            <button onClick={handleCancel}>
                                 Yes, Cancel
                             </button>
-
                         </div>
 
                     </div>
                 </div>
             )}
 
-            {/* TOAST */}
             {toast && (
                 <SuccessToast
-                    message="Operation successful!"
+                    message="Event updated successfully!"
                     onClose={() => setToast(false)}
                 />
             )}

@@ -5,206 +5,206 @@
     background: #f4f7fb;
 }
 
-.header {
-    margin-bottom: 25px;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-}
+/* HEADER TOP ADJUSTMENTS */
 .headerTop {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
-    width: 100%;
+    align-items: center;
+    margin-bottom: 30px; /* Space before the white card */
 }
-.header h1 {
+
+.headerTop h1 {
+    font-size: 32px; /* Bigger and more impactful */
+    font-weight: 800; /* Extra bold to match the screenshot */
+    color: #1a1a1a;
     margin: 0;
-    font-size: 22px;
-    color: #1e293b;
 }
 
-.header p {
-    color: #64748b;
-    margin-top: 6px;
-}
-
-/* SAME SYSTEM BUTTON STYLE */
+/* THE ADD EVENT BUTTON - ENLARGED */
 .blueBtn {
-    border: none;
-    background: #2563eb;
+    background: #3b82f6; /* Modern Blue */
     color: white;
-    padding: 10px 16px;
-    border-radius: 10px;
-    cursor: pointer;
+    border: none;
+    padding: 10px 24px; /* Increased padding for a bigger look */
+    border-radius: 8px; /* Clean rounded edges */
+    font-size: 15px; /* Slightly larger text */
     font-weight: 600;
-
-    margin-top: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 10px rgba(59, 130, 246, 0.2);
 }
-/* CARDS (same system style as Admin/AssignRoles feel) */
+
+.blueBtn:hover {
+    background: #2563eb;
+    transform: translateY(-1px);
+}
+
+/* SECTION CARD */
+.section {
+    background: white;
+    border-radius: 18px;
+    padding: 30px; /* More internal breathing room */
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
+}
+
+.section h2 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #111;
+    margin-bottom: 20px;
+}
+
 .cards {
     display: flex;
     flex-direction: column;
     gap: 16px;
 }
+
 .card {
     background: white;
     border-radius: 12px;
-    padding: 16px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+    border: 1px solid #f0f2f5;
+}
+
+/* HEADER INSIDE CARD */
+.cardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
 }
 
 .cardTitle {
-    font-size: 18px;
-    font-weight: 600;
-    margin-bottom: 8px;
+    font-size: 20px; /* Bigger titles within the cards */
+    font-weight: 700;
 }
 
+/* BADGES */
+.badgeGroup {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+/* STATUS COLORS */
+.upcoming { background: #dbeafe; color: #1d4ed8; }
+.ongoing { background: #dcfce7; color: #16a34a; }
+.past { background: #e2e8f0; color: #475569; }
+.cancelled { background: #fee2e2; color: #b91c1c; }
+.updated { background: #fef9c3; color: #854d0e; border: 1px solid #facc15; }
+
+/* TEXT CONTENT */
 .cardSub {
     font-size: 14px;
     color: #64748b;
-    margin-bottom: 4px;
+    margin-bottom: 6px;
 }
 
 .cardValue {
-    margin-top: 10px;
-    font-weight: 600;
+    margin-top: 12px;
+    font-size: 18px;
+    font-weight: 700;
     color: #1d4ed8;
 }
 
-/* SECTION */
-.section {
-    background: white;
-    border-radius: 18px;
-    padding: 24px;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+/* ACTIONS (Edit/Cancel) */
+.actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 15px;
 }
-/* MODAL (NOW MATCHES YOUR SYSTEM STYLE) */
+
+.editBtn {
+    background: #3b82f6;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 600;
+}
+
+.deleteBtn {
+    background: #ef4444;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 600;
+}
 .modalOverlay {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.5);
+    background: rgba(0,0,0,0.55);
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 9999;
 }
 
-.modal {
-    background: white;
-    padding: 25px;
-    border-radius: 18px;
+/* THE CENTER BOX */
+.modalBox {
     width: 420px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+    background: white;
+    border-radius: 14px;
+    padding: 22px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    animation: pop 0.2s ease-in-out;
 }
 
-.modal input,
-.modal textarea {
-    padding: 12px;
-    border-radius: 10px;
-    border: 1px solid #cbd5e1;
-}
-
-.modal textarea {
-    height: 90px;
-    resize: none;
+@keyframes pop {
+    from {
+        transform: scale(0.9);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
 }
 
 .modalActions {
     display: flex;
     justify-content: flex-end;
     gap: 10px;
+    margin-top: 20px;
 }
 
 .modalActions button {
-    padding: 8px 12px;
+    padding: 8px 14px;
     border-radius: 8px;
     border: none;
     cursor: pointer;
+    font-weight: 600;
 }
 
+/*.modalActions button:first-child {
+    background: #e2e8f0;
+}*/
 .modalActions button:first-child {
     background: #e2e8f0;
+    color: #1e293b;
+}
+
+.modalActions button:first-child:hover {
+    background: #3b82f6;
+    color: white;
 }
 
 .modalActions button:last-child {
-    background: #2563eb;
-    color: white;
-}
-.headerTop {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-.emptyState {
-    text-align: center;
-    padding: 40px;
-    color: #64748b;
-    font-size: 14px;
-}
-.badge {
-    display: inline-block;
-    padding: 4px 10px;
-    border-radius: 999px;
-    font-size: 12px;
-    font-weight: 600;
-    margin-bottom: 10px;
-    text-transform: capitalize;
-}
-.upcoming {
-    background: #dbeafe;
-    color: #1d4ed8;
-}
-.ongoing {
-    background: #dcfce7;
-    color: #16a34a;
-}
-.past {
-    background: #e2e8f0;
-    color: #475569;
-}
-.actions {
-    display: flex;
-    gap: 10px;
-    margin-top: 12px;
-}
-.editBtn {
-    background: #2563eb;
-    color: white;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 8px;
-    cursor: pointer;
-}
-
-.editBtn:hover {
-    background: #1d4ed8;
-}
-.deleteBtn {
     background: #ef4444;
     color: white;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 8px;
-    cursor: pointer;
-}
-
-.deleteBtn:hover {
-    background: #dc2626;
-}
-.overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
-.modal {
-    background: white;
-    width: 400px;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
 }

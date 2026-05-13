@@ -489,9 +489,9 @@ export const getEvents = async (req, res) => {
                 EndDate,
                 Details,
                 Entrance,
-                Active_Flag
+                Active_Flag,
+                Updated_Flag
             FROM EVENT
-            WHERE Active_Flag = 1
             ORDER BY StartDate DESC
         `);
 
@@ -508,7 +508,6 @@ export const getEvents = async (req, res) => {
         });
     }
 };
-
 export const createEvent = async (req, res) => {
     try {
         const { name, startDate, endDate, details, entrance } = req.body;
@@ -567,7 +566,21 @@ export const updateEvent = async (req, res) => {
         const { id } = req.params;
         const { name, startDate, endDate, details, entrance } = req.body;
 
-        const [result] = await db.promise().query(`
+        console.log("UPDATE EVENT ID:", id);
+        console.log("UPDATE BODY:", req.body);
+
+        console.log(events)
+
+        if (!id || isNaN(id)) {
+            return sendError(res, 400, "Invalid event ID", "BAD_EVENT_ID");
+        }
+
+        if (!name || !startDate || !endDate) {
+            return sendError(res, 400, "Missing required fields", "MISSING_FIELDS");
+        }
+
+        const [result] = await db.promise().query(
+            `
             UPDATE EVENT
             SET
                 Name = ?,
@@ -576,23 +589,29 @@ export const updateEvent = async (req, res) => {
                 Details = ?,
                 Entrance = ?
             WHERE Event_ID = ?
-        `, [
-            name,
-            startDate,
-            endDate,
-            details,
-            entrance,
-            id
-        ]);
+            `,
+            [
+                name,
+                startDate,
+                endDate,
+                details || "",
+                Number(entrance) || 0,
+                id
+            ]
+        );
+
+        console.log("AFFECTED ROWS:", result.affectedRows);
 
         if (result.affectedRows === 0) {
-            return sendError(res, 404, "Event not found", "EVENT_NOT_FOUND");
+            return sendError(res, 404, "Event not found or not updated", "EVENT_NOT_FOUND");
         }
 
-        return sendSuccess(res, "Event updated successfully");
+        return sendSuccess(res, "Event updated successfully", {
+            affectedRows: result.affectedRows
+        });
 
     } catch (err) {
-        console.error(err);
+        console.error("UPDATE EVENT ERROR:", err);
         return sendError(res, 500, "Failed to update event", "UPDATE_EVENT_ERROR");
     }
 };
