@@ -370,7 +370,7 @@ function Complain() {
                     <textarea name="description" placeholder="Describe the issue..." onChange={handleChange} value={data.description} />
                 </div>
 
-                <div className={styles.formGroup}>
+                {/* <div className={styles.formGroup}>
                     <label>Priority</label>
 
                     <div className={styles.priorityGroup}>
@@ -387,7 +387,7 @@ function Complain() {
                             </label>
                         ))}
                     </div>
-                </div>
+                </div> */}
 
                 <div className={styles.formGroup}>
                     <label>Upload Photos </label>

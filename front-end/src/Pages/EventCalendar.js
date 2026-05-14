@@ -168,7 +168,7 @@ function EventCalendar() {
                     <div className={styles.announcementBox}>
                         {selectedAnnouncements.map(a => {
                             const isCancelled = Number(a.Active_Flag) === 0;
-
+                            if(!isCancelled)
                             return (
                                 <div key={a.Anc_ID} className={styles.announcementItem}>
 
@@ -195,9 +195,10 @@ function EventCalendar() {
                                 </div>
                             );
                         })}
+                        <p>No Announcements</p>
                     </div>
                 )}
-
+                    
             </div>
         </div>
     );
