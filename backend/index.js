@@ -2,6 +2,9 @@ import express, { json } from "express";
 import cors from "cors";
 import path from "path";
 
+import cron from "node-cron";
+import { generateFees } from "./utils/feeGenerator.js";
+
 import authRoutes from "./routes/authRoutes.js";
 import requestRoutes from "./routes/requestRoutes.js";
 import complaintRoutes from "./routes/complaintRoutes.js";
@@ -9,11 +12,13 @@ import employeeRoutes from "./routes/employeeRoutes.js";
 import citizenRoutes from "./routes/citizenRoutes.js";
 import secretaryRoutes from "./routes/secretaryRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
-import mayorRoutes from "./routes/mayorRoutes.js"
-import locationRoutes from "./routes/locationRoutes.js"
+import mayorRoutes from "./routes/mayorRoutes.js";
+import locationRoutes from "./routes/locationRoutes.js";
 import feesRoutes from "./routes/feesRoutes.js";
 import myRequestsRoutes from "./routes/myrequestsRoutes.js";
-import documentRoutes from "./routes/documentRoutes.js"
+import documentRoutes from "./routes/documentRoutes.js";
+import financeRoutes from "./routes/financeRoutes.js";
+
 
 const app = express();
 
@@ -37,11 +42,22 @@ app.use("/api/documents", documentRoutes);
 app.use("/api/secretary", secretaryRoutes);
 app.use("/api/citizen", citizenRoutes);
 app.use("/api/my-requests", myRequestsRoutes);
+app.use("/api/finance", financeRoutes)
 
 app.use("/issued-docs", express.static(path.join(process.env.DOC_ROOT, "municipality")));
 
 app.get("/test", (req, res) => {
     res.send("API WORKS");
+});
+
+cron.schedule("0 0 * * *", async () => {
+    console.log("Checking fee generation cycle...");
+
+    try {
+        await generateFees(new Date(), false);
+    } catch (err) {
+        console.error("Fee generation failed:", err);
+    }
 });
 
 // Start server (ONLY ONCE)

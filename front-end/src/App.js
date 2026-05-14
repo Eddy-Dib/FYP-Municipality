@@ -45,6 +45,8 @@ import VerifyDocuments from "./Pages/Secretary/VerifyDocuments";
 import ReportPrint from "./Pages/ReportPrint";
 import ManageEvents from "./Pages/Secretary/ManageEvents";
 import ManageAnnouncements from "./Pages/Secretary/ManageAnnouncements";
+// Finance
+import FeeSettings from "./Pages/Finance/FeeSettings";
 
 function App() {
   return (
@@ -90,6 +92,9 @@ function App() {
           <Route path="secretary/verifydoc" element={<ProtectedRoute allowedRoles={["Secretary"]}><VerifyDocuments /></ProtectedRoute>} />
           <Route path="secretary/events" element={<ProtectedRoute allowedRoles={["Secretary"]}><ManageEvents/></ProtectedRoute>} />
           <Route path="secretary/announcements" element={<ProtectedRoute allowedRoles={["Secretary"]}><ManageAnnouncements/></ProtectedRoute>} />
+
+          {/* FINANCE ROUTES */}
+          <Route path="finance/fees" element={<ProtectedRoute allowedRoles={["Financial Staff"]}><FeeSettings /></ProtectedRoute>} />
 
         </Route>
 

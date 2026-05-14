@@ -63,7 +63,7 @@ function EmployeeSideBar() {
 
         case "Financial Staff":
             roleItems = [
-                // { label: "Set Fees", path: "/employee/finance/fees" },
+                { label: "Set Fees", path: "/employee/finance/fees" },
                 // { label: "Unpaid Fees", path: "/employee/finance/unpaid" },
                 // { label: "Review Payments", path: "/employee/finance/payments"}
             ];
