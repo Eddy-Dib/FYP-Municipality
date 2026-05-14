@@ -77,7 +77,9 @@
    DOTS & DAY HIGHLIGHTS
 ========================= */
 
-:global(.eventDay) {
+:global(.eventDay),
+:global(.announcementDay),
+:global(.cancelledDay) {
     position: relative;
 }
 
@@ -85,16 +87,22 @@
     content: "";
     position: absolute;
     bottom: 4px;
-    left: 50%;
-    transform: translateX(-50%);
+    left: calc(50% - 5px);
     width: 6px;
     height: 6px;
-    background: #3b82f6;
+    background: #4043ec;
     border-radius: 50%;
 }
 
-:global(.cancelledDay) {
-    position: relative;
+:global(.announcementDay)::before {
+    content: "";
+    position: absolute;
+    bottom: 4px;
+    left: calc(50% + 5px);
+    width: 6px;
+    height: 6px;
+    background: #26de32;
+    border-radius: 50%;
 }
 
 :global(.cancelledDay)::after {
@@ -108,7 +116,6 @@
     background: #ef4444;
     border-radius: 50%;
 }
-
 /* =========================
    EVENT BOX (Original Blue)
 ========================= */

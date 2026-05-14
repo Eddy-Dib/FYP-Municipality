@@ -80,7 +80,7 @@ function Documents() {
             file: selectedFile,
             docType: form.docType,
             docTypeName: selectedType?.Doc_Type_Name || "Unknown",
-            validFor: selectedType?.Valid_For || 0,
+            validFor: selectedType?.Valid_for || 0,
             description: form.description,
             preview: URL.createObjectURL(selectedFile),
             type: selectedFile.type,

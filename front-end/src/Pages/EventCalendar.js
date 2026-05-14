@@ -64,7 +64,7 @@ function EventCalendar() {
 
     // ANNOUNCEMENTS FOR SELECTED DAY
     const selectedAnnouncements = announcements.filter(a =>
-        formatDateOnly(a.Created_Date) === selectedDate
+        formatDateOnly(a.Created_Date) === selectedDate && Number(a.Active_Flag) !== 0
     );
 
     return (
@@ -93,26 +93,28 @@ function EventCalendar() {
                             const hasAnn = dayAnnouncements.length > 0;
 
                             const hasCancelledEvent = dayEvents.some(e => e.Active_Flag === 0);
-                            const hasCancelledAnn = dayAnnouncements.some(a => Number(a.Active_Flag) === 0);
 
                             const hasActiveEvent = dayEvents.some(e => e.Active_Flag === 1);
                             const hasActiveAnn = dayAnnouncements.some(a => Number(a.Active_Flag) === 1);
 
-                            // 🚨 PRIORITY RULES
+                            const classes = [];
 
-                            if (hasAnn && !hasEvent) {
-                                return "announcementDay"; // ONLY announcements → yellow background
+                            if (hasActiveEvent) {
+                                classes.push("eventDay");
                             }
 
-                            if ((hasCancelledEvent || hasCancelledAnn) && !(hasActiveEvent || hasActiveAnn)) {
-                                return "cancelledDay";
+                            if (hasActiveAnn) {
+                                classes.push("announcementDay");
                             }
 
-                            if (hasEvent || hasAnn) {
-                                return "eventDay";
+                            if (
+                                (hasCancelledEvent) &&
+                                !(hasActiveEvent || hasActiveAnn)
+                            ) {
+                                classes.push("cancelledDay");
                             }
 
-                            return "";
+                            return classes.join(" ");
                         }}
                     />
                 </div>
@@ -164,20 +166,14 @@ function EventCalendar() {
                 )}
 
                 {/* ANNOUNCEMENTS */}
+                
                 {selectedAnnouncements.length > 0 && (
                     <div className={styles.announcementBox}>
                         {selectedAnnouncements.map(a => {
-                            const isCancelled = Number(a.Active_Flag) === 0;
-                            if(!isCancelled)
                             return (
                                 <div key={a.Anc_ID} className={styles.announcementItem}>
 
-                                    <h3 className={styles.announcementTitle}>
-                                        {a.Name}
-                                        {isCancelled && (
-                                            <span className={styles.cancelLabel}>Cancelled</span>
-                                        )}
-                                    </h3>
+                                    <h3 className={styles.announcementTitle}>{a.Name}</h3>
 
                                     <p className={styles.announcementDate}>
                                          {new Date(a.Created_Date).toLocaleString()}
@@ -186,16 +182,9 @@ function EventCalendar() {
                                     <p className={styles.announcementDetails}>
                                         {a.Details}
                                     </p>
-
-                                    {isCancelled && (
-                                        <p className={styles.cancelText}>
-                                            This announcement was cancelled
-                                        </p>
-                                    )}
                                 </div>
                             );
                         })}
-                        <p>No Announcements</p>
                     </div>
                 )}
                     
