@@ -10,6 +10,14 @@ function AnnouncementForm({ editData, onClose, onSuccess }) {
     const [details, setDetails] = useState("");
     const [createdDate, setCreatedDate] = useState("");
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
+
+    const validate = () => {
+        if(!name) return "Name is required"
+        if(!details) return "Details are required"
+        if(!createdDate) return "Date is required"
+        return ""
+    }
 
     // fill form when editing
     useEffect(() => {
@@ -42,6 +50,13 @@ function AnnouncementForm({ editData, onClose, onSuccess }) {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        const validationError = validate();
+
+        if (validationError) {
+            setError(validationError);
+            return;
+        }
+        
         try {
             setLoading(true);
 
@@ -71,11 +86,12 @@ function AnnouncementForm({ editData, onClose, onSuccess }) {
                 );
             }
 
+            setError("");
             onSuccess();
 
         } catch (err) {
             console.error(err);
-            alert("Failed to save announcement");
+            setError("Failed to save announcement");
         } finally {
             setLoading(false);
         }
@@ -98,7 +114,6 @@ function AnnouncementForm({ editData, onClose, onSuccess }) {
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         placeholder="Enter announcement title"
-                        required
                     />
 
                     {/* DETAILS */}
@@ -107,7 +122,6 @@ function AnnouncementForm({ editData, onClose, onSuccess }) {
                         value={details}
                         onChange={(e) => setDetails(e.target.value)}
                         placeholder="Write announcement details..."
-                        required
                     />
 
                     {/* DATE */}
@@ -116,8 +130,9 @@ function AnnouncementForm({ editData, onClose, onSuccess }) {
                         type="datetime-local"
                         value={createdDate}
                         onChange={(e) => setCreatedDate(e.target.value)}
-                        required
                     />
+
+                    <p className={styles.errorMsg}>{error}</p>
 
                     {/* BUTTONS */}
                     <div className={styles.actions}>

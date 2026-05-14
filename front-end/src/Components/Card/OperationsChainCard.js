@@ -13,6 +13,7 @@ function OperationsChainCard({ data, onSelect }) {
         requestNumber,
         requestTitle,
         type,
+        status,
         citizen,
         date,
         task,
@@ -63,10 +64,10 @@ function OperationsChainCard({ data, onSelect }) {
                     </p>
                 )}
 
-                {task?.status && (
+                {status && (
                     <p>
                         <strong>Status:</strong>{" "}
-                        <StatusBadge value={task.status} />
+                        <StatusBadge value={status} />
                     </p>
                 )}
 

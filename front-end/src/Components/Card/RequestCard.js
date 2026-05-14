@@ -31,7 +31,7 @@ function RequestCard({ request, onSelect }) {
             onClick={() => onSelect(request)}
         >
             <div className={styles.middle}>
-                <h3 className={styles.title}>{request.type}</h3>
+                <h3 className={styles.title}>{request.type}{": "}{request.description.title}</h3>
 
                 <p>
                     <strong>Request #:</strong> {request.requestNumber}

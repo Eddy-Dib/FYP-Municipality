@@ -3,6 +3,7 @@ import { FaPhone, FaEnvelope, FaMapMarkerAlt, FaLandmark } from "react-icons/fa"
 import logo from "../Assets/Logo.jpg";
 import axios from "axios";
 import { useState } from "react";
+import SuccessToast from "../Components/UI/SuccessToast";
 
 function Footer() {
     const token = localStorage.getItem("token");
@@ -10,6 +11,8 @@ function Footer() {
     const user = JSON.parse(localStorage.getItem("user"));
 
     const [message, setMessage] = useState("");
+    const [successMsg, setSuccessMsg] = useState("");
+    const [error, setError] = useState("");
 
     const sendMessage = async () => {
         try {
@@ -20,14 +23,15 @@ function Footer() {
                     }});
 
             if (res.data.success) {
-                alert("Message sent successfully");
+                setSuccessMsg("Message sent successfully");
                 setMessage("");
+                setError("");
             } else {
-                alert(res.data.message);
+                setError(res.data.message);
             }
         } catch (err) {
             console.log(err);
-            alert("Server error");
+            setError("Server error");
         }
     };
 
@@ -51,7 +55,8 @@ function Footer() {
                         value={message}
                         onChange={(e) => setMessage(e.target.value)}
                     ></textarea>
-
+                    {error && (<p className={styles.error}>{error}</p>)}
+                    {successMsg && <SuccessToast message={successMsg} onClose={() => setSuccessMsg("")}/>}
                     <button onClick={sendMessage}>Send</button>
                 </div>
 

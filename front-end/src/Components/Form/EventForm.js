@@ -7,6 +7,7 @@ function EventForm({ onClose, onSuccess, editData }) {
     const token = localStorage.getItem("token");
 
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
 
     const [form, setForm] = useState({
         name: "",
@@ -18,7 +19,6 @@ function EventForm({ onClose, onSuccess, editData }) {
         entrance: 0
     });
 
-    // ✅ PREFILL
     useEffect(() => {
         if (editData) {
             const start = new Date(editData.StartDate);
@@ -45,16 +45,15 @@ function EventForm({ onClose, onSuccess, editData }) {
 
     const handleSubmit = async () => {
         if (!form.name || !form.startDate || !form.startTime || !form.endDate || !form.endTime) {
-            alert("Please fill all required fields");
+            setError("Please fill all required fields");
             return;
         }
 
-        // ✅ FIXED DATE FORMAT (MySQL friendly)
         const startDateTime = `${form.startDate} ${form.startTime}:00`;
         const endDateTime = `${form.endDate} ${form.endTime}:00`;
 
         if (endDateTime < startDateTime) {
-            alert("End date/time cannot be before start");
+            setError("End date/time cannot be before start");
             return;
         }
 
@@ -90,7 +89,7 @@ function EventForm({ onClose, onSuccess, editData }) {
 
         } catch (err) {
             console.error("EVENT SAVE ERROR:", err.response?.data || err.message);
-            alert("Failed to save event");
+            setError("Failed to save event");
         } finally {
             setLoading(false);
         }
@@ -127,6 +126,8 @@ function EventForm({ onClose, onSuccess, editData }) {
                     value={form.entrance}
                     onChange={handleChange}
                 />
+                
+                <p className={styles.error}>{error}</p>
 
                 <div className={styles.actions}>
                     <button className={styles.cancelBtn} onClick={onClose}>

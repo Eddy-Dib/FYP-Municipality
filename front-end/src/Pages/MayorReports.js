@@ -123,6 +123,7 @@ export default function MayorReports() {
                                 requestNumber: op.requestNumber,
                                 requestTitle: op.requestTitle,
                                 type: op.type,
+                                status: op.status,
 
                                 citizen:
                                     typeof op.citizen === "string"

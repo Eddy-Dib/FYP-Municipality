@@ -395,6 +395,7 @@ export const getOperationsOverview = async (req, res) => {
                 r.RStat_Code,
                 r.RType_ID,
                 rt.RType_Name,
+                rs.RStat_Name,
 
                 c.First_Name,
                 c.Last_Name,
@@ -439,6 +440,9 @@ export const getOperationsOverview = async (req, res) => {
 
             LEFT JOIN ISSUED_DOCUMENT idoc
                 ON idoc.Req_ID = r.Req_ID
+            
+            JOIN REQ_STATUSES rs 
+                ON r.RStat_Code = rs.RStat_Code
 
             WHERE r.FlagRejected = 0
 
@@ -465,6 +469,7 @@ export const getOperationsOverview = async (req, res) => {
                 map.set(r.Req_ID, {
                     requestId: r.Req_ID,
                     type: r.RType_Name,
+                    status: r.RStat_Name,
                     citizen: `${r.First_Name} ${r.Last_Name}`,
                     date: r.DateMade,
                     requestTitle: description?.title

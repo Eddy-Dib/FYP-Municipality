@@ -271,7 +271,7 @@ function Complain() {
 
         } catch (err) {
             console.log(err);
-            alert(err.response?.data?.error || "Error sending complaint");
+            setError(err.response?.data?.error || "Error sending complaint");
 
         } finally {
             setLoading(false);

@@ -61,7 +61,6 @@ textarea {
     cursor: pointer;
 }
 
-/* CANCEL BUTTON */
 .actions button:first-child {
     background: #e2e8f0;
     color: #1e293b;
@@ -72,7 +71,6 @@ textarea {
     color: white;
 }
 
-/* SUBMIT BUTTON */
 .actions button:last-child {
     background: #3b82f6;
     color: white;
@@ -80,4 +78,8 @@ textarea {
 
 .actions button:last-child:hover {
     background: #2563eb;
+}
+
+.errorMsg{
+    color: red;
 }

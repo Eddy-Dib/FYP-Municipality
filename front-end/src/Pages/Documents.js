@@ -8,6 +8,7 @@ import {
     FiImage,
     FiX
 } from "react-icons/fi";
+import SuccessToast from "../Components/UI/SuccessToast";
 
 function Documents() {
 
@@ -17,6 +18,8 @@ function Documents() {
     const [selectedFile, setSelectedFile] = useState(null);
     const [types, setTypes] = useState([]);
     const [previewModal, setPreviewModal] = useState(null);
+    const [error, setError] = useState("");
+    const [successMsg, setSuccessMsg] = useState("");
 
     const [form, setForm] = useState({
         docType: "",
@@ -54,7 +57,7 @@ function Documents() {
         if (!file) return;
 
         if (documents.length >= 5) {
-            alert("Maximum 5 documents allowed");
+            setError("Maximum 5 documents allowed");
             return;
         }
 
@@ -65,7 +68,7 @@ function Documents() {
         if (!selectedFile) return;
 
         if (!form.docType) {
-            alert("Please select document type");
+            setError("Please select document type");
             return;
         }
 
@@ -98,9 +101,10 @@ function Documents() {
 
     const handleSubmit = async () => {
         try {
+            setSuccessMsg("");
 
             if (documents.length === 0) {
-                alert("No documents to upload");
+                setError("No documents to upload");
                 return;
             }
 
@@ -128,14 +132,15 @@ function Documents() {
             );
 
             if (res.data.success) {
-                alert("Documents uploaded successfully");
+                setSuccessMsg("Documents uploaded successfully");
                 setDocuments([]);
+                setError("");
             }
 
         } catch (err) {
             console.log(err);
 
-            alert(
+            setError(
                 err.response?.data?.message ||
                 err.response?.data?.error ||
                 "Upload failed"
@@ -271,6 +276,8 @@ function Documents() {
                     </div>
                 </div>
 
+                <p className={styles.error}>{error}</p>
+
                 {/* SUBMIT */}
                 <button
                     className={styles.submitBtn}
@@ -314,6 +321,8 @@ function Documents() {
                     </div>
                 </div>
             )}
+
+            {successMsg && (<SuccessToast message={successMsg} onClose={() => setSuccessMsg("")}/>)}
 
         </div>
     );
