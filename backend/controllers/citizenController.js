@@ -165,7 +165,7 @@ export const registerCitizen = async (req, res) => {
             firstName,
             lastName,
             citizenId,
-            docType: 1
+            docType: "Identity Document"
         });
 
         await db.promise().query(
